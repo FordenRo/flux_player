@@ -13,16 +13,26 @@ enum LoopMode { playlist, single, none }
 class AudioPlayer {
   final _player = media_kit.Player();
 
-  AudioPlayer._internal();
+  AudioPlayer._internal() {
+    _player.stream.completed.listen((completed) async {
+      if (completed) {
+        return _onEnd();
+      }
+    });
+  }
 
   static final instance = AudioPlayer._internal();
 
   List<AudioTrack> _queue = [];
+  List<int>? _shuffledQueue;
+  int? _currentIndex;
+  var _shuffled = false;
+  var _looped = false;
 
   bool get isPlaying => _player.state.playing;
   bool get isEmpty => _queue.isEmpty;
   bool get isNotEmpty => _queue.isNotEmpty;
-  int? get currentIndex => isNotEmpty ? _player.state.playlist.index : null;
+  int? get currentIndex => _currentIndex;
   AudioTrack? get currentTrack => isNotEmpty ? queue[currentIndex!] : null;
   List<AudioTrack> get queue => _queue;
   LoopMode get loopMode => switch (_player.state.playlistMode) {
@@ -33,82 +43,98 @@ class AudioPlayer {
   double get volume => _player.state.volume / 100;
   Duration get duration => _player.state.duration;
   Duration get position => _player.state.position;
-  bool get shuffled => _player.state.shuffle;
+  bool get shuffled => _shuffled;
+  bool get looped => _looped;
 
   final StreamController<List<AudioTrack>> _queueController = .broadcast();
+  final StreamController<int?> _currentIndexController = .broadcast();
+  final StreamController<bool> _shuffledController = .broadcast();
+  final StreamController<bool> _loopedController = .broadcast();
 
   late final stream = AudioPlayerStream(
     _player.stream.volume.map((e) => e / 100),
-    _player.stream.playlist.map((e) => e.index),
+    _currentIndexController.stream.distinct(),
     _queueController.stream.distinct(),
     _player.stream.position,
     _player.stream.duration,
     _player.stream.playing,
-    _player.stream.shuffle,
-    _player.stream.playlist.map((e) => queue[e.index]),
-    _player.stream.playlistMode.map(
-      (e) => switch (e) {
-        .loop => .playlist,
-        .single => .single,
-        .none => .none,
-      },
+    _shuffledController.stream.distinct(),
+    _currentIndexController.stream.distinct().map(
+      (e) => e != null ? queue[e] : null,
     ),
+    _loopedController.stream.distinct(),
   );
 
   Future<void> setVolume(double volume) async =>
       await _player.setVolume(max(min(volume, 1), 0) * 100);
 
-  Future<void> setShuffled(bool shuffled) async =>
-      await _player.setShuffle(shuffled);
-
-  Future<void> setQueue(List<AudioTrack> tracks) async {
-    _queue = List.of(tracks);
-    _queueController.add(tracks);
-    await _player.open(
-      media_kit.Playlist(tracks.map((e) => media_kit.Media(e.path)).toList()),
-      play: false,
-    );
+  void setShuffled(bool shuffled) {
+    _shuffled = shuffled;
+    _shuffledController.add(shuffled);
+    if (shuffled) {
+      _shuffledQueue = List.generate(_queue.length, (e) => e)..shuffle();
+    } else {
+      _shuffledQueue = null;
+    }
   }
 
-  Future<void> setLoopMode(LoopMode mode) async =>
-      await _player.setPlaylistMode(switch (mode) {
-        .playlist => .loop,
-        .single => .single,
-        .none => .single,
-      });
+  void setLooped(bool looped) {
+    _looped = looped;
+    _loopedController.add(looped);
+  }
+
+  Future<void> setQueue(List<AudioTrack> tracks) {
+    _queue = List.of(tracks);
+    _queueController.add(tracks);
+    return jump(0);
+  }
 
   void addToQueue(AudioTrack track) {
     _queue.add(track);
     _queueController.add(queue);
-    _player.add(.new(track.path));
   }
 
-  void playNext(AudioTrack track) {
-    _queue.insert(currentIndex!, track);
+  void addNext(AudioTrack track) {
+    _queue.insert(currentIndex! + 1, track);
     _queueController.add(queue);
-    _player
-        .add(.new(track.path))
-        .then((_) => _player.move(_queue.length, currentIndex!));
   }
 
   Future<void> play() => _player.play();
 
   Future<void> pause() => _player.pause();
 
-  Future<void> stop() async {
+  Future<void> stop() {
     _queue = [];
-    await _player.stop();
+    return _player.stop();
   }
 
   Future<void> seek(Duration position) => _player.seek(position);
 
-  Future<void> jump(int index) => _player.jump(index);
+  Future<void> jump(int index) async {
+    if (index < 0 || index >= queue.length) {
+      index = 0;
+    }
+    _currentIndex = index;
+    _currentIndexController.add(index);
+    await _player.open(media_kit.Media(queue[index].path));
+  }
 
-  Future<void> next() => _player.next();
+  Future<void> _onEnd() => looped ? play() : next();
 
-  Future<void> previous() => _player.previous();
+  Future<void> next() => jump(
+    shuffled
+        ? _shuffledQueue![_shuffledQueue!.indexOf(currentIndex!) + 1]
+        : currentIndex! + 1,
+  );
+
+  Future<void> previous() => jump(
+    shuffled
+        ? _shuffledQueue![_shuffledQueue!.indexOf(currentIndex!) - 1]
+        : currentIndex! - 1,
+  );
 
   Future<void> dispose() async {
+    _shuffledQueue = null;
     await _player.dispose();
     await _queueController.close();
   }
@@ -116,14 +142,14 @@ class AudioPlayer {
 
 class AudioPlayerStream {
   final Stream<double> volume;
-  final Stream<int> currentIndex;
+  final Stream<int?> currentIndex;
   final Stream<List<AudioTrack>> queue;
   final Stream<Duration> position;
   final Stream<Duration> duration;
   final Stream<bool> isPlaying;
   final Stream<bool> shuffled;
-  final Stream<AudioTrack> currentTrack;
-  final Stream<LoopMode> loopMode;
+  final Stream<AudioTrack?> currentTrack;
+  final Stream<bool> looped;
 
   AudioPlayerStream(
     this.volume,
@@ -134,7 +160,7 @@ class AudioPlayerStream {
     this.isPlaying,
     this.shuffled,
     this.currentTrack,
-    this.loopMode,
+    this.looped,
   );
 }
 
