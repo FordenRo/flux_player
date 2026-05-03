@@ -1,0 +1,30 @@
+name: flux_player
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  audioplayers: ^6.6.0
+  media_kit: ^1.2.6
+  media_kit_libs_audio: ^1.0.7
+  metadata_audio: ^0.7.2
+  window_manager: ^0.5.1
+  file_picker: ^11.0.2
+  vector_math: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/

@@ -1,0 +1,20 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - omit_local_variable_types
+    - omit_obvious_local_variable_types
+    - omit_obvious_property_types
+    - use_named_constants
+    - use_to_and_as_if_applicable
+    - prefer_relative_imports
+    - use_truncating_division
+    - simplify_variable_pattern
+    - avoid_types_on_closure_parameters
+    - prefer_expression_function_bodies
+    - unnecessary_lambdas
+    - unnecessary_parenthesis
+    - unnecessary_statements
+    - use_setters_to_change_properties
+
