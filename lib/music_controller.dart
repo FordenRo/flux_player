@@ -3,12 +3,14 @@ import 'dart:math';
 
 import 'package:metadata_audio/metadata_audio.dart' as audio_metadata;
 import 'package:media_kit/media_kit.dart' as media_kit;
-import 'package:metadata_audio/metadata_audio.dart' show AudioMetadata;
 
 final audioPlayer = AudioPlayer._internal();
 List<AudioTrack> importedTracks = [];
 
 enum LoopMode { playlist, single, none }
+
+typedef AudioDevice = media_kit.AudioDevice;
+typedef AudioMetadata = audio_metadata.AudioMetadata;
 
 class AudioPlayer {
   final _player = media_kit.Player();
@@ -33,6 +35,8 @@ class AudioPlayer {
   bool get isEmpty => _queue.isEmpty;
   bool get isNotEmpty => _queue.isNotEmpty;
   int? get currentIndex => _currentIndex;
+  List<AudioDevice> get audioDevices => _player.state.audioDevices;
+  AudioDevice get audioDevice => _player.state.audioDevice;
   AudioTrack? get currentTrack => isNotEmpty ? queue[currentIndex!] : null;
   List<AudioTrack> get queue => _queue;
   LoopMode get loopMode => switch (_player.state.playlistMode) {
@@ -98,6 +102,9 @@ class AudioPlayer {
     _queue.insert(currentIndex! + 1, track);
     _queueController.add(queue);
   }
+
+  Future<void> setAudioDevice(AudioDevice device) =>
+      _player.setAudioDevice(device);
 
   Future<void> play() => _player.play();
 

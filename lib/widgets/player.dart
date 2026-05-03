@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_show_menu/flutter_show_menu.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 import '../music_controller.dart';
@@ -81,13 +82,7 @@ class _PlayerState extends State<Player> {
                     Expanded(
                       child: Row(
                         mainAxisAlignment: .end,
-                        children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.input_rounded),
-                          ),
-                          volumeButton(),
-                        ],
+                        children: [inputDeviceButton(), volumeButton()],
                       ),
                     ),
                   ],
@@ -98,6 +93,34 @@ class _PlayerState extends State<Player> {
           ),
         )
       : SizedBox();
+
+  Builder inputDeviceButton() => Builder(
+    builder: (context) => IconButton(
+      onPressed: () async {
+        var device = await showOverlayMenu(
+          context: context,
+          initialValue: audioPlayer.audioDevice,
+          style: .new(padding: .zero, itemStyle: .new(height: 30)),
+          items: audioPlayer.audioDevices
+              .map(
+                (e) => OverlayMenuItem(
+                  child: Padding(
+                    padding: const .symmetric(horizontal: 8),
+                    child: Text(e.description, style: .new(fontSize: 12)),
+                  ),
+                  value: e,
+                  enabled: e != audioPlayer.audioDevice,
+                ),
+              )
+              .toList(),
+        );
+        if (device != null) {
+          audioPlayer.setAudioDevice(device);
+        }
+      },
+      icon: const Icon(Icons.input_rounded),
+    ),
+  );
 
   Listener volumeButton() => Listener(
     onPointerSignal: (e) {
