@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../music_controller.dart';
@@ -12,6 +14,17 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   var query = '';
+  late final ScrollController controller = .new(
+    onAttach: (position) => position.addListener(
+      () => floatingUpdater.add(
+        (controller.offset > 1000) ^
+            (currentTrackPos != null &&
+                (currentTrackPos! - controller.offset).abs() > 500),
+      ),
+    ),
+  );
+  final StreamController<bool?> floatingUpdater = .broadcast();
+  late final floatingStream = floatingUpdater.stream.distinct();
 
   Iterable<AudioTrack> get tracks => importedTracks.where(
     (e) =>
@@ -19,22 +32,119 @@ class _SearchPageState extends State<SearchPage> {
         e.title.toLowerCase().contains(query) ||
         e.author.toLowerCase().contains(query),
   );
+  int? get currentTrackPos => audioPlayer.currentTrack != null
+      ? (tracks.toList().indexOf(audioPlayer.currentTrack!) - 1) * 50
+      : null;
 
   @override
-  Widget build(BuildContext context) => Column(
-    mainAxisSize: .max,
-    children: [
-      SearchField(
-        hint: 'Поиск музыки',
-        onChanged: (v) => setState(() => query = v.toLowerCase()),
+  Widget build(BuildContext context) => Scaffold(
+    floatingActionButton: FutureBuilder(
+      future: Future.doWhile(
+        () => Future.delayed(Durations.short1, () => !controller.hasClients),
       ),
-      Expanded(
-        child: ListView.builder(
-          itemCount: tracks.length,
-          itemBuilder: (context, idx) => TrackLabel(tracks.toList(), idx),
+      builder: (context, asyncSnapshot) =>
+          asyncSnapshot.connectionState == .done
+          ? StreamBuilder(
+              stream: floatingStream,
+              builder: (context, snapshot) => Column(
+                spacing: 4,
+                mainAxisSize: .min,
+                children: [
+                  AnimatedSlide(
+                    offset: Offset(
+                      0,
+                      (currentTrackPos! - controller.offset).abs() > 500
+                          ? 0
+                          : 1.4,
+                    ),
+                    duration: Durations.medium1,
+                    curve: Curves.easeInOut,
+                    child: AnimatedOpacity(
+                      opacity: controller.offset > 1000 ? 1 : 0,
+                      duration: Durations.medium1,
+                      child: IconButton.filled(
+                        onPressed: () => controller.animateTo(
+                          0,
+                          duration: Durations.extralong1,
+                          curve: Curves.easeOutQuart,
+                        ),
+                        iconSize: 20,
+                        padding: .zero,
+                        splashRadius: 10,
+                        visualDensity: .compact,
+                        style: .new(
+                          backgroundColor: .all(
+                            Color.alphaBlend(
+                              Theme.of(
+                                context,
+                              ).colorScheme.secondary.withAlpha(100),
+                              Theme.of(context).colorScheme.surface,
+                            ),
+                          ),
+                        ),
+                        color: Theme.of(context).colorScheme.onSurface,
+                        icon: const Icon(Icons.arrow_upward_rounded),
+                      ),
+                    ),
+                  ),
+                  AnimatedOpacity(
+                    opacity: (currentTrackPos! - controller.offset).abs() > 500
+                        ? 1
+                        : 0,
+                    duration: Durations.medium1,
+                    child: IconButton.filled(
+                      onPressed: () =>
+                          (currentTrackPos! - controller.offset).abs() > 500
+                          ? controller.animateTo(
+                              currentTrackPos!.toDouble(),
+                              duration: Durations.long2,
+                              curve: Curves.easeOutQuart,
+                            )
+                          : controller.animateTo(
+                              0,
+                              duration: Durations.extralong1,
+                              curve: Curves.easeOutQuart,
+                            ),
+                      iconSize: 22,
+                      padding: .zero,
+                      splashRadius: 10,
+                      visualDensity: .comfortable,
+                      style: .new(
+                        backgroundColor: .all(
+                          Color.alphaBlend(
+                            Theme.of(
+                              context,
+                            ).colorScheme.primary.withAlpha(120),
+                            Theme.of(context).colorScheme.surface,
+                          ),
+                        ),
+                      ),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      icon: const Icon(Icons.music_note_rounded),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : SizedBox(),
+    ),
+    body: Column(
+      mainAxisSize: .max,
+      children: [
+        SearchField(
+          hint: 'Поиск музыки',
+          onChanged: (v) => setState(() => query = v.toLowerCase()),
         ),
-      ),
-    ],
+        Expanded(
+          child: ListView.builder(
+            itemExtent: 50,
+            controller: controller,
+            itemCount: tracks.length,
+            itemBuilder: (context, idx) => TrackLabel(tracks.toList(), idx),
+          ),
+        ),
+      ],
+    ),
   );
 }
 
