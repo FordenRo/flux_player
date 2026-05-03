@@ -8,7 +8,7 @@ import 'music_controller.dart';
 
 Future<void> loadConfiguration() async {
   var dir = await getApplicationDocumentsDirectory();
-  var file = File('${dir.path}/config.json');
+  var file = File('${dir.path}/Flux Player/config.json');
   if (!await file.exists()) {
     return;
   }
@@ -30,7 +30,7 @@ Future<void> loadConfiguration() async {
 
 Future<void> saveConfiguration() async {
   var dir = await getApplicationDocumentsDirectory();
-  var file = File('${dir.path}/config.json');
+  var file = File('${dir.path}/Flux Player/config.json');
   await file.create(recursive: true);
   await file.writeAsString(
     jsonEncode({
