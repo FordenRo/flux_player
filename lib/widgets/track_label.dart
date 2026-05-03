@@ -53,41 +53,19 @@ class _TrackLabelState extends State<TrackLabel> {
   }
 
   @override
-  Widget build(BuildContext context) => Card(
-    clipBehavior: .hardEdge,
-    shape: RoundedRectangleBorder(
-      borderRadius: .circular(12),
-      side: isSelected
-          ? BorderSide(color: Theme.of(context).colorScheme.primary)
-          : .none,
-    ),
-    child: GestureDetector(
-      behavior: .opaque,
-      onSecondaryTapDown: (e) async {
-        await showOverlayMenu(
-          context: context,
-          style: .new(itemStyle: .new(height: 30), padding: .zero),
-          offset: e.localPosition.translate(0, -context.size!.height),
-          items: [
-            OverlayMenuItem(
-              child: Padding(
-                padding: const .symmetric(horizontal: 10),
-                child: Text('Играть следующим'),
-              ),
-              onTap: () => audioPlayer.playNext(track),
-            ),
-            OverlayMenuItem(
-              child: Padding(
-                padding: const .symmetric(horizontal: 10),
-                child: Text('Убрать из списка'),
-              ),
-              onTap: () => playlist.remove(track),
-            ),
-          ],
-        );
-      },
+  Widget build(BuildContext context) => GestureDetector(
+    behavior: .opaque,
+    onSecondaryTapDown: (e) => showMenu(context, e),
+    child: Card(
+      clipBehavior: .hardEdge,
+      shape: RoundedRectangleBorder(
+        borderRadius: .circular(12),
+        side: isSelected
+            ? BorderSide(color: Theme.of(context).colorScheme.primary)
+            : .none,
+      ),
       child: Padding(
-        padding: const .all(8),
+        padding: const .symmetric(horizontal: 8),
         child: Row(
           spacing: 8,
           children: [
@@ -140,4 +118,34 @@ class _TrackLabelState extends State<TrackLabel> {
       ),
     ),
   );
+
+  Future<void> showMenu(BuildContext context, TapDownDetails e) =>
+      showOverlayMenu(
+        context: context,
+        style: .new(itemStyle: .new(height: 30), padding: .zero),
+        offset: e.localPosition.translate(0, -context.size!.height),
+        items: [
+          OverlayMenuItem(
+            child: Padding(
+              padding: const .symmetric(horizontal: 10),
+              child: Text('Добавить в очередь'),
+            ),
+            onTap: () => audioPlayer.addToQueue(track),
+          ),
+          OverlayMenuItem(
+            child: Padding(
+              padding: const .symmetric(horizontal: 10),
+              child: Text('Играть следующим'),
+            ),
+            onTap: () => audioPlayer.addNext(track),
+          ),
+          OverlayMenuItem(
+            child: Padding(
+              padding: const .symmetric(horizontal: 10),
+              child: Text('Убрать из списка'),
+            ),
+            onTap: () => playlist.remove(track),
+          ),
+        ],
+      );
 }
