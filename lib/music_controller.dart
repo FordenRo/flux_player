@@ -7,10 +7,9 @@ import 'package:media_kit/media_kit.dart' as media_kit;
 final audioPlayer = AudioPlayer._internal();
 List<AudioTrack> importedTracks = [];
 
-enum LoopMode { playlist, single, none }
-
 typedef AudioDevice = media_kit.AudioDevice;
 typedef AudioMetadata = audio_metadata.AudioMetadata;
+typedef Picture = audio_metadata.Picture;
 
 class AudioPlayer {
   final _player = media_kit.Player();
@@ -37,11 +36,6 @@ class AudioPlayer {
   AudioDevice get audioDevice => _player.state.audioDevice;
   AudioTrack? get currentTrack => isNotEmpty ? queue[currentIndex!] : null;
   List<AudioTrack> get queue => _queue;
-  LoopMode get loopMode => switch (_player.state.playlistMode) {
-    .loop => .playlist,
-    .single => .single,
-    .none => .none,
-  };
   double get volume => _player.state.volume / 100;
   Duration get duration => _player.state.duration;
   Duration get position => _player.state.position;
@@ -65,7 +59,6 @@ class AudioPlayer {
       (e) => e != null ? queue[e] : null,
     ),
     _loopedController.stream.distinct(),
-    _player.stream.audioDevices,
   );
 
   Future<void> setVolume(double volume) async =>
@@ -156,7 +149,6 @@ class AudioPlayerStream {
   final Stream<bool> shuffled;
   final Stream<AudioTrack?> currentTrack;
   final Stream<bool> looped;
-  final Stream<List<AudioDevice>> audioDevices;
 
   AudioPlayerStream(
     this.volume,
@@ -168,7 +160,6 @@ class AudioPlayerStream {
     this.shuffled,
     this.currentTrack,
     this.looped,
-    this.audioDevices,
   );
 }
 
@@ -180,8 +171,7 @@ class AudioTrack {
   String get author => metadata.common.artist ?? 'No artist';
   Duration get duration =>
       Duration(milliseconds: (metadata.format.duration ?? 0 * 1000).toInt());
-  audio_metadata.Picture? get picture =>
-      metadata.common.picture?.nonNulls.first;
+  Picture? get picture => metadata.common.picture?.nonNulls.first;
 
   AudioTrack({required this.path, required this.metadata});
 
