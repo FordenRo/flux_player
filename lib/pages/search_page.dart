@@ -35,6 +35,9 @@ class _SearchPageState extends State<SearchPage> {
   int? get currentTrackPos => audioPlayer.currentTrack != null
       ? (tracks.toList().indexOf(audioPlayer.currentTrack!) - 1) * 50
       : null;
+  bool get showTop =>
+      currentTrackPos != null &&
+      (currentTrackPos! - controller.offset).abs() > 500;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -51,12 +54,7 @@ class _SearchPageState extends State<SearchPage> {
                 mainAxisSize: .min,
                 children: [
                   AnimatedSlide(
-                    offset: Offset(
-                      0,
-                      (currentTrackPos! - controller.offset).abs() > 500
-                          ? 0
-                          : 1.4,
-                    ),
+                    offset: Offset(0, showTop ? 0 : 1.4),
                     duration: Durations.medium1,
                     curve: Curves.easeInOut,
                     child: AnimatedOpacity(
@@ -88,13 +86,10 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   AnimatedOpacity(
-                    opacity: (currentTrackPos! - controller.offset).abs() > 500
-                        ? 1
-                        : 0,
+                    opacity: showTop ? 1 : 0,
                     duration: Durations.medium1,
                     child: IconButton.filled(
-                      onPressed: () =>
-                          (currentTrackPos! - controller.offset).abs() > 500
+                      onPressed: () => showTop
                           ? controller.animateTo(
                               currentTrackPos!.toDouble(),
                               duration: Durations.long2,

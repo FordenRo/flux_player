@@ -23,8 +23,6 @@ class AudioPlayer {
     });
   }
 
-  static final instance = AudioPlayer._internal();
-
   List<AudioTrack> _queue = [];
   List<int>? _shuffledQueue;
   int? _currentIndex;
@@ -67,6 +65,7 @@ class AudioPlayer {
       (e) => e != null ? queue[e] : null,
     ),
     _loopedController.stream.distinct(),
+    _player.stream.audioDevices,
   );
 
   Future<void> setVolume(double volume) async =>
@@ -157,6 +156,7 @@ class AudioPlayerStream {
   final Stream<bool> shuffled;
   final Stream<AudioTrack?> currentTrack;
   final Stream<bool> looped;
+  final Stream<List<AudioDevice>> audioDevices;
 
   AudioPlayerStream(
     this.volume,
@@ -168,6 +168,7 @@ class AudioPlayerStream {
     this.shuffled,
     this.currentTrack,
     this.looped,
+    this.audioDevices,
   );
 }
 
