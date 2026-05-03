@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
 import 'pages/main_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   await windowManager.ensureInitialized();
 
   final windowOptions = WindowOptions(

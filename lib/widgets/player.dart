@@ -220,7 +220,7 @@ class _TrackPositionState extends State<TrackPosition>
           overlayShape: RoundSliderOverlayShape(overlayRadius: 12),
         ),
         child: Slider(
-          value: duration > 0 ? min(position / duration, 1) : 0,
+          value: duration > 0 ? max(min(position / duration, 1), 0) : 0,
           onChangeStart: (_) => setState(() => sliding = true),
           onChangeEnd: (_) => setState(() => sliding = false),
           onChanged: (e) => audioPlayer.seek(

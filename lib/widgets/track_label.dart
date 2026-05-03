@@ -65,8 +65,15 @@ class _TrackLabelState extends State<TrackLabel> {
         children: [
           IconButton(
             onPressed: () async {
-              await audioPlayer.jump(widget.index);
-              await audioPlayer.play();
+              if (isSelected) {
+                if (isPlaying) {
+                  await audioPlayer.pause();
+                } else {
+                  await audioPlayer.play();
+                }
+              } else {
+                await audioPlayer.jump(widget.index);
+              }
             },
             icon: Icon(
               isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,

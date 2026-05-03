@@ -1,82 +1,62 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart' as audioplayers;
 import 'package:metadata_audio/metadata_audio.dart' as audio_metadata;
+import 'package:media_kit/media_kit.dart' as media_kit;
+import 'package:metadata_audio/metadata_audio.dart' show AudioMetadata;
 
 final audioPlayer = AudioPlayer._internal();
 
 class AudioPlayer {
-  final _player = audioplayers.AudioPlayer();
+  // final _player = audioplayers.AudioPlayer();
+  final _player = media_kit.Player();
 
-  AudioPlayer._internal() {
-    _player.onDurationChanged.listen((duration) => _duration = duration);
-    _player.onPositionChanged.listen((position) => _position = position);
-    _player.onPlayerStateChanged.listen((state) {
-      _isPlaying = state == .playing;
-      _isPlayingController.add(_isPlaying);
-      if (state == .completed) {
-        next();
-      }
-    });
-  }
+  AudioPlayer._internal();
 
   static final instance = AudioPlayer._internal();
 
   List<AudioTrack> _audioTracks = [];
-  List<int>? _shuffledIndeces;
-  int? _currentIndex;
-  Duration _duration = .zero;
-  Duration _position = .zero;
-  var _isPlaying = false;
-  var _shuffled = false;
 
-  bool get isPlaying => _isPlaying;
-  int? get currentIndex => _currentIndex;
-  AudioTrack? get currentTrack => audioTracks[currentIndex!];
+  bool get isPlaying => _player.state.playing;
+  bool get isEmpty => _audioTracks.isEmpty;
+  bool get isNotEmpty => _audioTracks.isNotEmpty;
+  int? get currentIndex => isNotEmpty ? _player.state.playlist.index : null;
+  AudioTrack? get currentTrack =>
+      isNotEmpty ? audioTracks[currentIndex!] : null;
   List<AudioTrack> get audioTracks => _audioTracks;
-  double get volume => _player.volume;
-  Duration get duration => _duration;
-  Duration get position => _position;
-  bool get shuffled => _shuffled;
+  double get volume => _player.state.volume / 100;
+  Duration get duration => _player.state.duration;
+  Duration get position => _player.state.position;
+  bool get shuffled => _player.state.shuffle;
 
   final StreamController<int> _currentIndexController = .broadcast();
-  final StreamController<double> _volumeController = .broadcast();
-  final StreamController<bool> _isPlayingController = .broadcast();
   final StreamController<List<AudioTrack>> _audioTracksController =
       .broadcast();
-  final StreamController<bool> _shuffledController = .broadcast();
 
   late final stream = AudioPlayerStream(
-    _volumeController.stream.distinct(),
-    _currentIndexController.stream.distinct(),
+    _player.stream.volume.map((e) => e / 100),
+    _player.stream.playlist.map((e) => e.index),
     _audioTracksController.stream.distinct(),
-    _player.onPositionChanged.distinct(),
-    _player.onDurationChanged.distinct(),
-    _isPlayingController.stream.distinct(),
-    _shuffledController.stream.distinct(),
+    _player.stream.position,
+    _player.stream.duration,
+    _player.stream.playing,
+    _player.stream.shuffle,
     _currentIndexController.stream.distinct().map((e) => audioTracks[e]),
   );
 
-  Future<void> setVolume(double volume) async {
-    await _player.setVolume(volume);
-    _volumeController.add(volume);
-  }
+  Future<void> setVolume(double volume) async =>
+      await _player.setVolume(volume * 100);
 
-  void setShuffled(bool shuffled) {
-    if (shuffled) {
-      _shuffledIndeces = List.generate(audioTracks.length, (e) => e)..shuffle();
-    } else {
-      _shuffledIndeces = null;
-    }
-    _shuffled = shuffled;
-    _shuffledController.add(shuffled);
-  }
+  Future<void> setShuffled(bool shuffled) async =>
+      await _player.setShuffle(shuffled);
 
   void setAudioTrack(AudioTrack track) => setAudioTracks([track]);
 
   void setAudioTracks(List<AudioTrack> tracks) {
     _audioTracks = tracks;
     _audioTracksController.add(tracks);
+    _player.open(
+      media_kit.Playlist(tracks.map((e) => media_kit.Media(e.path)).toList()),
+    );
     jump(0);
   }
 
@@ -85,47 +65,22 @@ class AudioPlayer {
     _audioTracksController.add(audioTracks);
   }
 
-  Future<void> play() async => await _player.resume();
+  Future<void> play() async => await _player.play();
 
   Future<void> pause() async => await _player.pause();
 
   Future<void> stop() async {
-    _currentIndex = null;
     _audioTracks = [];
     await _player.stop();
   }
 
-  Future<void> seek(Duration position) async {
-    await _player.seek(position);
-  }
+  Future<void> seek(Duration position) async => await _player.seek(position);
 
-  Future<void> jump(int index) async {
-    _currentIndex = index;
-    await _player.setSourceDeviceFile(audioTracks[index].path);
-    _currentIndexController.add(index);
-  }
+  Future<void> jump(int index) async => await _player.jump(index);
 
-  Future<void> next() async {
-    await jump(
-      !shuffled
-          ? currentIndex! + 1
-          : _shuffledIndeces![_shuffledIndeces!.indexOf(currentIndex!) + 1],
-    );
-    if (isPlaying) {
-      await _player.resume();
-    }
-  }
+  Future<void> next() async => await _player.next();
 
-  Future<void> previous() async {
-    await jump(
-      !shuffled
-          ? currentIndex! + 1
-          : _shuffledIndeces![_shuffledIndeces!.indexOf(currentIndex!) - 1],
-    );
-    if (isPlaying) {
-      await _player.resume();
-    }
-  }
+  Future<void> previous() async => await _player.previous();
 }
 
 class AudioPlayerStream {
@@ -152,7 +107,7 @@ class AudioPlayerStream {
 
 class AudioTrack {
   final String path;
-  final audio_metadata.AudioMetadata metadata;
+  final AudioMetadata metadata;
 
   String get title => metadata.common.title ?? 'Unnamed';
   String get author => metadata.common.artist ?? 'No artist';
@@ -166,10 +121,4 @@ class AudioTrack {
     final metadata = await audio_metadata.parseFile(path);
     return AudioTrack(path: path, metadata: metadata);
   }
-}
-
-class Playlist {
-  final List<AudioTrack> tracks;
-
-  Playlist({required this.tracks});
 }
