@@ -47,10 +47,7 @@ class _PlayerState extends State<Player> {
   void createVolumeOverlay() {
     removeVolumeOverlay();
 
-    volumeOverlay = OverlayEntry(
-      builder: (context) => VolumeControl(onExit: removeVolumeOverlay),
-    );
-    Overlay.of(context).insert(volumeOverlay!);
+    VolumeControl.createOverlay(context, onExit: removeVolumeOverlay);
   }
 
   void removeVolumeOverlay() {

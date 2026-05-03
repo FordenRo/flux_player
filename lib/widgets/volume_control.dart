@@ -10,6 +10,17 @@ class VolumeControl extends StatefulWidget {
 
   const VolumeControl({super.key, required this.onExit});
 
+  static OverlayEntry createOverlay(
+    BuildContext context, {
+    required void Function() onExit,
+  }) {
+    var entry = OverlayEntry(
+      builder: (context) => VolumeControl(onExit: onExit),
+    );
+    Overlay.of(context).insert(entry);
+    return entry;
+  }
+
   @override
   State<VolumeControl> createState() => _VolumeControlState();
 }
