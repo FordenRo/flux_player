@@ -13,13 +13,12 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   var query = '';
 
-  Iterable<MapEntry<int, AudioTrack>> get tracks =>
-      audioPlayer.audioTracks.asMap().entries.where(
-        (e) =>
-            query.isEmpty ||
-            e.value.title.toLowerCase().contains(query) ||
-            e.value.author.toLowerCase().contains(query),
-      );
+  Iterable<AudioTrack> get tracks => importedTracks.where(
+    (e) =>
+        query.isEmpty ||
+        e.title.toLowerCase().contains(query) ||
+        e.author.toLowerCase().contains(query),
+  );
 
   @override
   Widget build(BuildContext context) => Column(
@@ -32,7 +31,7 @@ class _SearchPageState extends State<SearchPage> {
       Expanded(
         child: ListView.builder(
           itemCount: tracks.length,
-          itemBuilder: (context, idx) => TrackLabel(tracks.elementAt(idx).key),
+          itemBuilder: (context, idx) => TrackLabel(tracks.toList(), idx),
         ),
       ),
     ],

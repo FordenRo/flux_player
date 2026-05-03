@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart';
+import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 import '../music_controller.dart';
 import 'volume_control.dart';
@@ -18,21 +19,29 @@ class Player extends StatefulWidget {
 class _PlayerState extends State<Player> {
   OverlayEntry? volumeOverlay;
   Timer? volumeHoverTimer;
+  late final List<StreamSubscription> subscriptions;
   var hovered = false;
 
   @override
   void initState() {
     super.initState();
 
-    audioPlayer.stream
-      ..isPlaying.listen((_) => setState(() {}))
-      ..currentIndex.listen((_) => setState(() {}));
+    subscriptions = [
+      audioPlayer.stream.isPlaying.listen((_) => setState(() {})),
+      audioPlayer.stream.currentIndex.listen((_) => setState(() {})),
+      audioPlayer.stream.loopMode.listen((_) => setState(() {})),
+    ];
+    audioPlayer.setLoopMode(.playlist);
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
     removeVolumeOverlay();
     super.dispose();
+    await Future.wait([
+      audioPlayer.dispose(),
+      ...subscriptions.map((e) => e.cancel()),
+    ]);
   }
 
   void createVolumeOverlay() {
@@ -58,6 +67,14 @@ class _PlayerState extends State<Player> {
           onExit: (_) => setState(() => hovered = false),
           child: Card(
             clipBehavior: .hardEdge,
+            shape: RoundedRectangleBorder(
+              borderRadius: .circular(12),
+              side: BorderSide(
+                color: audioPlayer.isPlaying
+                    ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                    : Theme.of(context).colorScheme.secondary.withAlpha(100),
+              ),
+            ),
             elevation: 2,
             child: Column(
               children: [
@@ -66,27 +83,12 @@ class _PlayerState extends State<Player> {
                   child: Row(
                     mainAxisAlignment: .center,
                     children: [
-                      Expanded(child: buildInfo(context)),
-                      buildControls(),
+                      Expanded(child: trackInfo(context)),
+                      controlButtons(),
                       Expanded(
                         child: Row(
                           mainAxisAlignment: .end,
-                          children: [
-                            IconButton(
-                              onHover: (hovered) {
-                                if (hovered) {
-                                  volumeHoverTimer = Timer(
-                                    Duration(milliseconds: 300),
-                                    createVolumeOverlay,
-                                  );
-                                } else {
-                                  volumeHoverTimer?.cancel();
-                                }
-                              },
-                              onPressed: createVolumeOverlay,
-                              icon: const Icon(Icons.volume_up_rounded),
-                            ),
-                          ],
+                          children: [volumeButton()],
                         ),
                       ),
                     ],
@@ -99,7 +101,30 @@ class _PlayerState extends State<Player> {
         )
       : SizedBox();
 
-  Row buildInfo(BuildContext context) => Row(
+  Listener volumeButton() => Listener(
+    onPointerSignal: (e) {
+      if (e is PointerScrollEvent) {
+        audioPlayer.setVolume(audioPlayer.volume - e.scrollDelta.dy / 5000);
+      }
+    },
+    child: IconButton(
+      onHover: (hovered) {
+        if (hovered) {
+          volumeHoverTimer = Timer(
+            Duration(milliseconds: 300),
+            createVolumeOverlay,
+          );
+        } else {
+          volumeHoverTimer?.cancel();
+        }
+      },
+      onPressed: createVolumeOverlay,
+      icon: const Icon(Icons.volume_up_rounded),
+    ),
+  );
+
+  Row trackInfo(BuildContext context) => Row(
+    mainAxisSize: .min,
     children: [
       audioPlayer.currentTrack!.picture != null
           ? Image.memory(
@@ -111,9 +136,10 @@ class _PlayerState extends State<Player> {
         mainAxisSize: .min,
         crossAxisAlignment: .start,
         children: [
-          Text(audioPlayer.currentTrack!.title),
+          Text(audioPlayer.currentTrack!.title, overflow: .fade),
           Text(
             audioPlayer.currentTrack!.author,
+            softWrap: true,
             style: TextStyle(
               fontSize: 12,
               color: Theme.of(
@@ -126,15 +152,17 @@ class _PlayerState extends State<Player> {
     ],
   );
 
-  Row buildControls() => Row(
+  Row controlButtons() => Row(
     mainAxisAlignment: .center,
     children: [
       IconButton(
+        color: audioPlayer.shuffled
+            ? Theme.of(context).colorScheme.primary
+            : null,
         onPressed: () => audioPlayer.setShuffled(!audioPlayer.shuffled),
         icon: const Icon(Icons.shuffle_rounded),
       ),
       IconButton(
-        // onPressed: audioPlayer.seekToPrevious,
         onPressed: audioPlayer.previous,
         icon: const Icon(Icons.skip_previous_rounded),
       ),
@@ -142,18 +170,26 @@ class _PlayerState extends State<Player> {
         onPressed: () =>
             audioPlayer.isPlaying ? audioPlayer.pause() : audioPlayer.play(),
         icon: Icon(
-          // audioPlayer.playing
           audioPlayer.isPlaying
               ? Icons.pause_circle_outline_rounded
               : Icons.play_circle_fill_rounded,
         ),
       ),
       IconButton(
-        // onPressed: audioPlayer.seekToNext,
         onPressed: audioPlayer.next,
         icon: const Icon(Icons.skip_next_rounded),
       ),
-      IconButton(onPressed: () {}, icon: const Icon(Icons.loop_rounded)),
+      IconButton(
+        color: audioPlayer.loopMode == .single
+            ? Theme.of(context).colorScheme.primary
+            : null,
+        onPressed: () => audioPlayer.setLoopMode(switch (audioPlayer.loopMode) {
+          .single => .playlist,
+          .playlist => .single,
+          .none => .single,
+        }),
+        icon: const Icon(Icons.loop_rounded),
+      ),
     ],
   );
 }
@@ -177,6 +213,7 @@ class _TrackPositionState extends State<TrackPosition>
     begin: 1,
     end: 2,
   ).animate(animationController);
+  late final List<StreamSubscription> subscriptions;
   var position = 0.0;
   var duration = 0.0;
   var hovered = false;
@@ -188,13 +225,20 @@ class _TrackPositionState extends State<TrackPosition>
   void initState() {
     super.initState();
 
-    audioPlayer
-      ..stream.position.listen(
+    subscriptions = [
+      audioPlayer.stream.position.listen(
         (e) => setState(() => position = e.inMilliseconds / 1000),
-      )
-      ..stream.duration.listen(
+      ),
+      audioPlayer.stream.duration.listen(
         (e) => setState(() => duration = e.inMilliseconds / 1000),
-      );
+      ),
+    ];
+  }
+
+  @override
+  Future<void> dispose() async {
+    super.dispose();
+    await Future.wait(subscriptions.map((e) => e.cancel()));
   }
 
   @override

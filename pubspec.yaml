@@ -16,6 +16,7 @@ dependencies:
   window_manager: ^0.5.1
   file_picker: ^11.0.2
   vector_math: ^2.2.0
+  flutter_show_menu: ^0.6.1
 
 dev_dependencies:
   flutter_test:

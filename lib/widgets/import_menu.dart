@@ -7,18 +7,17 @@ import '../music_controller.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
-Future<void> _onFilesSelected(List<String> paths) async {
-  audioPlayer.setAudioTracks(
-    await Stream.fromIterable(paths).asyncMap(AudioTrack.fromPath).toList(),
-  );
-}
+Future<void> _onFilesSelected(List<String> paths) async =>
+    importedTracks.addAll(
+      await Stream.fromIterable(paths).asyncMap(AudioTrack.fromPath).toList(),
+    );
 
 Future<void> _onFolderSelected(String path) async {
   final folder = Directory(path);
   if (!await folder.exists()) {
     return;
   }
-  audioPlayer.setAudioTracks(
+  importedTracks.addAll(
     await folder
         .list()
         .where((e) => audioExtensions.contains(e.path.split('.').last))

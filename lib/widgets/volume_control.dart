@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../music_controller.dart';
@@ -44,12 +45,11 @@ class _VolumeControlState extends State<VolumeControl>
   }
 
   @override
-  void dispose() {
-    timer?.cancel();
+  Future<void> dispose() async {
     animationController.dispose();
-    subscription.cancel();
-
+    timer?.cancel();
     super.dispose();
+    await subscription.cancel();
   }
 
   void close() async {
@@ -62,18 +62,24 @@ class _VolumeControlState extends State<VolumeControl>
   }
 
   @override
-  Widget build(BuildContext context) => SafeArea(
-    child: Align(
-      alignment: .bottomRight,
-      child: Transform.translate(
-        offset: Offset(15, -50),
-        child: SizedBox(
-          width: 250,
-          height: 100,
+  Widget build(BuildContext context) => Align(
+    alignment: .bottomRight,
+    child: Transform.translate(
+      offset: Offset(15, -55),
+      child: SizedBox(
+        width: 250,
+        height: 100,
+        child: Listener(
+          onPointerSignal: (e) async {
+            if (e is PointerScrollEvent) {
+              await audioPlayer.setVolume(
+                audioPlayer.volume - e.scrollDelta.dy / 5000,
+              );
+            }
+          },
           child: MouseRegion(
             // onEnter: (event) => canExit = true,
             onExit: (event) => close(),
-            opaque: false,
             child: Center(
               child: SizedBox(
                 width: 200,
@@ -82,7 +88,11 @@ class _VolumeControlState extends State<VolumeControl>
                   opacity: fadeAnimation,
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.white12),
+                      side: BorderSide(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.secondary.withAlpha(100),
+                      ),
                       borderRadius: .circular(16),
                     ),
                     elevation: 8,
