@@ -20,7 +20,6 @@ class _PlayerState extends State<Player> {
   OverlayEntry? volumeOverlay;
   Timer? volumeHoverTimer;
   late final List<StreamSubscription> subscriptions;
-  var hovered = false;
 
   @override
   void initState() {
@@ -29,9 +28,9 @@ class _PlayerState extends State<Player> {
     subscriptions = [
       audioPlayer.stream.isPlaying.listen((_) => setState(() {})),
       audioPlayer.stream.currentIndex.listen((_) => setState(() {})),
-      audioPlayer.stream.loopMode.listen((_) => setState(() {})),
+      audioPlayer.stream.looped.listen((_) => setState(() {})),
+      audioPlayer.stream.shuffled.listen((_) => setState(() {})),
     ];
-    audioPlayer.setLoopMode(.playlist);
   }
 
   @override
@@ -59,41 +58,43 @@ class _PlayerState extends State<Player> {
 
   @override
   Widget build(BuildContext context) => audioPlayer.currentIndex != null
-      ? MouseRegion(
-          onEnter: (_) => setState(() => hovered = true),
-          onExit: (_) => setState(() => hovered = false),
-          child: Card(
-            clipBehavior: .hardEdge,
-            shape: RoundedRectangleBorder(
-              borderRadius: .circular(12),
-              side: BorderSide(
-                color: audioPlayer.isPlaying
-                    ? Theme.of(context).colorScheme.primary.withAlpha(200)
-                    : Theme.of(context).colorScheme.secondary.withAlpha(100),
-              ),
+      ? Card(
+          clipBehavior: .hardEdge,
+          shape: RoundedRectangleBorder(
+            borderRadius: .circular(12),
+            side: BorderSide(
+              color: audioPlayer.isPlaying
+                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                  : Theme.of(context).colorScheme.secondary.withAlpha(100),
             ),
-            elevation: 2,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const .all(8),
-                  child: Row(
-                    mainAxisAlignment: .center,
-                    children: [
-                      Expanded(child: trackInfo(context)),
-                      controlButtons(),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: .end,
-                          children: [volumeButton()],
-                        ),
+          ),
+          elevation: 2,
+          child: Column(
+            children: [
+              Padding(
+                padding: const .all(8),
+                child: Row(
+                  mainAxisAlignment: .center,
+                  children: [
+                    Expanded(child: trackInfo(context)),
+                    controlButtons(),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: .end,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.input_rounded),
+                          ),
+                          volumeButton(),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                TrackPosition(expanded: hovered),
-              ],
-            ),
+              ),
+              TrackPosition(),
+            ],
           ),
         )
       : SizedBox();
@@ -177,14 +178,10 @@ class _PlayerState extends State<Player> {
         icon: const Icon(Icons.skip_next_rounded),
       ),
       IconButton(
-        color: audioPlayer.loopMode == .single
+        color: audioPlayer.looped
             ? Theme.of(context).colorScheme.primary
             : null,
-        onPressed: () => audioPlayer.setLoopMode(switch (audioPlayer.loopMode) {
-          .single => .playlist,
-          .playlist => .single,
-          .none => .single,
-        }),
+        onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
         icon: const Icon(Icons.loop_rounded),
       ),
     ],
@@ -192,9 +189,7 @@ class _PlayerState extends State<Player> {
 }
 
 class TrackPosition extends StatefulWidget {
-  final bool expanded;
-
-  const TrackPosition({super.key, required this.expanded});
+  const TrackPosition({super.key});
 
   @override
   State<TrackPosition> createState() => _TrackPositionState();
