@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
+import 'config.dart';
 import 'pages/main_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await windowManager.ensureInitialized();
@@ -17,6 +19,11 @@ void main() async {
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
+  });
+
+  await FlutterWindowClose.setWindowShouldCloseHandler(() async {
+    await saveConfiguration();
+    return true;
   });
 
   runApp(const MainApp());

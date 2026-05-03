@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../config.dart';
 import '../widgets/import_menu.dart';
 import '../widgets/player.dart';
 import 'loading_page.dart';
@@ -77,7 +78,7 @@ class _MainPageState extends State<MainPage>
             ),
           )
         : LoadingPage(
-            future: Future.delayed(const Duration(seconds: 1), () {}),
+            future: loadConfiguration(),
             onLoad: () => setState(() {
               isLoaded = true;
               animationController.forward();
