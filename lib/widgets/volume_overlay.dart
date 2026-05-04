@@ -48,14 +48,10 @@ class VolumeOverlayEntry {
 
 class _VolumeOverlayState extends State<VolumeOverlay>
     with SingleTickerProviderStateMixin {
-  late final animationController = AnimationController(
+  late final fadeAnimation = AnimationController(
     duration: const Duration(milliseconds: 300),
     vsync: this,
   );
-  late final Animation<double> fadeAnimation = Tween(begin: 0.0, end: 1.0)
-      .animate(
-        CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
-      );
   var hovered = false;
   var sliding = false;
   late Timer timer;
@@ -72,14 +68,14 @@ class _VolumeOverlayState extends State<VolumeOverlay>
 
   @override
   Future<void> dispose() async {
-    animationController.dispose();
+    fadeAnimation.dispose();
     timer.cancel();
     super.dispose();
     await subscription.cancel();
   }
 
   Future<void> show() async {
-    await animationController.forward();
+    await fadeAnimation.animateTo(1, curve: Curves.easeInOut);
   }
 
   Future<void> hide() async {
@@ -87,7 +83,7 @@ class _VolumeOverlayState extends State<VolumeOverlay>
       return;
     }
 
-    await animationController.animateBack(0);
+    await fadeAnimation.animateTo(0, curve: Curves.easeInOut);
     widget.onHide();
   }
 

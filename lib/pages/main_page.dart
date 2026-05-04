@@ -17,21 +17,23 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
-  late final animationController = AnimationController(
+  late final animation = AnimationController(
     duration: const Duration(seconds: 1),
     vsync: this,
-  );
-  late final fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-    CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
   );
   var pageIndex = 1;
   var isLoaded = false;
 
   @override
   void dispose() {
-    animationController.dispose();
+    animation.dispose();
     super.dispose();
   }
+
+  void onLoad() => setState(() {
+    animation.animateTo(1.0, curve: Curves.easeInOut);
+    isLoaded = true;
+  });
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -43,7 +45,7 @@ class _MainPageState extends State<MainPage>
     home: isLoaded
         ? Scaffold(
             body: FadeTransition(
-              opacity: fadeAnimation,
+              opacity: animation,
               child: Row(
                 mainAxisSize: .max,
                 children: [
@@ -77,13 +79,7 @@ class _MainPageState extends State<MainPage>
               ),
             ),
           )
-        : LoadingPage(
-            future: loadConfiguration(),
-            onLoad: () => setState(() {
-              isLoaded = true;
-              animationController.forward();
-            }),
-          ),
+        : LoadingPage(future: loadConfiguration(), onLoad: onLoad),
   );
 
   Widget buildCaption(String title) => SizedBox(
