@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'audio_player.dart';
 
@@ -13,6 +15,11 @@ Future<void> loadConfiguration() async {
     return;
   }
   var json = jsonDecode(await file.readAsString());
+
+  List<double>? wPos = json['wPos'];
+  if (wPos != null) {
+    await windowManager.setPosition(Offset(wPos[0], wPos[1]));
+  }
 
   importedTracks = await Future.wait(
     (json['imported'] as List?)?.cast<String>().map(AudioTrack.fromPath) ?? [],
@@ -55,6 +62,7 @@ Future<void> loadConfiguration() async {
 Future<void> saveConfiguration() async {
   var dir = await getApplicationDocumentsDirectory();
   var file = File('${dir.path}/Flux Player/config.json');
+  var wPos = await windowManager.getPosition();
   await file.create(recursive: true);
   await file.writeAsString(
     jsonEncode({
@@ -64,6 +72,7 @@ Future<void> saveConfiguration() async {
       'queue': audioPlayer.queue.map((e) => e.path).toList(),
       'index': audioPlayer.currentIndex,
       'pos': audioPlayer.position.inMilliseconds,
+      'wPos': [wPos.dx, wPos.dy],
       'lp': audioPlayer.looped,
       'sh': audioPlayer.shuffled,
     }),
