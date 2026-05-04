@@ -13,19 +13,19 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  var query = '';
   late final ScrollController controller = .new(
-    onAttach: (position) => position.addListener(
-      () => floatingUpdater.add(
-        (controller.offset > 1000) ^
-            (currentTrackPos != null &&
-                (currentTrackPos! - controller.offset).abs() > 500),
-      ),
-    ),
+    onAttach: (position) => position.addListener(() {
+      floatingUpdater.add((controller.offset > 1000) ^ showWatchTrack);
+      if (watchCurrentTrack && position.userScrollDirection != .idle) {
+        watchCurrentTrack = false;
+      }
+    }),
   );
   final StreamController<bool?> floatingUpdater = .broadcast();
   late final floatingStream = floatingUpdater.stream.distinct();
   late final StreamSubscription indexSubscription;
+  var watchCurrentTrack = false;
+  var query = '';
 
   List<AudioTrack> get filteredTracks => importedTracks
       .where(
@@ -39,18 +39,35 @@ class _SearchPageState extends State<SearchPage> {
   int? get currentTrackPos => audioPlayer.currentTrack != null
       ? (filteredTracks.indexOf(audioPlayer.currentTrack!) - 1) * 50
       : null;
-  bool get showTop =>
+  bool get showWatchTrack =>
       currentTrackPos != null &&
-      (currentTrackPos! - controller.offset).abs() > 500;
+      !watchCurrentTrack &&
+      (currentTrackPos! - controller.offset).abs() > 80;
 
   @override
   void initState() {
     super.initState();
 
-    indexSubscription = audioPlayer.stream.currentIndex.listen(
-      (_) => floatingUpdater.add(null),
-    );
+    indexSubscription = audioPlayer.stream.currentIndex.listen((_) {
+      if (watchCurrentTrack) {
+        animateToTrack();
+      } else {
+        floatingUpdater.add(null);
+      }
+    });
   }
+
+  Future<void> animateToTrack() => controller.animateTo(
+    currentTrackPos!.toDouble(),
+    duration: Durations.long2,
+    curve: Curves.easeOutQuart,
+  );
+
+  Future<void> animateToTop() => controller.animateTo(
+    0,
+    duration: Durations.extralong1,
+    curve: Curves.easeOutQuart,
+  );
 
   @override
   Future<void> dispose() async {
@@ -75,18 +92,14 @@ class _SearchPageState extends State<SearchPage> {
                 mainAxisSize: .min,
                 children: [
                   AnimatedSlide(
-                    offset: Offset(0, showTop ? 0 : 1.4),
+                    offset: Offset(0, showWatchTrack ? 0 : 1.4),
                     duration: Durations.medium1,
                     curve: Curves.easeInOut,
                     child: AnimatedOpacity(
                       opacity: controller.offset > 1000 ? 1 : 0,
                       duration: Durations.medium1,
                       child: IconButton.filled(
-                        onPressed: () => controller.animateTo(
-                          0,
-                          duration: Durations.extralong1,
-                          curve: Curves.easeOutQuart,
-                        ),
+                        onPressed: animateToTop,
                         iconSize: 20,
                         padding: .zero,
                         splashRadius: 10,
@@ -107,20 +120,13 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   AnimatedOpacity(
-                    opacity: showTop ? 1 : 0,
+                    opacity: showWatchTrack ? 1 : 0,
                     duration: Durations.medium1,
                     child: IconButton.filled(
-                      onPressed: () => showTop
-                          ? controller.animateTo(
-                              currentTrackPos!.toDouble(),
-                              duration: Durations.long2,
-                              curve: Curves.easeOutQuart,
-                            )
-                          : controller.animateTo(
-                              0,
-                              duration: Durations.extralong1,
-                              curve: Curves.easeOutQuart,
-                            ),
+                      onPressed: () {
+                        showWatchTrack ? animateToTrack() : animateToTop();
+                        watchCurrentTrack = showWatchTrack;
+                      },
                       iconSize: 22,
                       padding: .zero,
                       splashRadius: 10,
