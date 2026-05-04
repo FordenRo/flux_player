@@ -16,7 +16,7 @@ Future<void> loadConfiguration() async {
   }
   var json = jsonDecode(await file.readAsString());
 
-  List<double>? wPos = json['wPos'];
+  var wPos = (json['wPos'] as List?)?.cast<double>();
   if (wPos != null) {
     await windowManager.setPosition(Offset(wPos[0], wPos[1]));
   }
