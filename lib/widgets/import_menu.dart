@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -7,12 +8,12 @@ import '../audio_player.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
-Future<void> _onFilesSelected(List<String> paths) async =>
-    importedTracks.addAll(
-      await Stream.fromIterable(paths).asyncMap(AudioTrack.fromPath).toList(),
-    );
+Future<void> _onFilesSelected(List<String> paths) => Isolate.run(
+  () async =>
+      importedTracks.addAll(await Future.wait(paths.map(AudioTrack.fromPath))),
+);
 
-Future<void> _onFolderSelected(String path) async {
+Future<void> _onFolderSelected(String path) => Isolate.run(() async {
   final folder = Directory(path);
   if (!await folder.exists()) {
     return;
@@ -24,58 +25,73 @@ Future<void> _onFolderSelected(String path) async {
         .asyncMap((e) => AudioTrack.fromPath(e.path))
         .toList(),
   );
+});
+
+class ImportMenu extends StatefulWidget {
+  const ImportMenu({super.key});
+
+  @override
+  State<ImportMenu> createState() => _ImportMenuState();
 }
 
-class ImportMenu extends StatelessWidget {
-  const ImportMenu({super.key});
+class _ImportMenuState extends State<ImportMenu> {
+  var selected = false;
 
   @override
   Widget build(BuildContext context) => Center(
     child: Card(
-      child: Padding(
-        padding: const .all(40),
-        child: Row(
-          mainAxisSize: .min,
-          spacing: 20,
-          children: [
-            buildButton(
-              context,
-              icon: Icons.file_copy_rounded,
-              text: 'Add files',
-              onTap: () async {
-                var result = await FilePicker.pickFiles(
-                  type: .custom,
-                  dialogTitle: 'Flux Import Files',
-                  allowedExtensions: audioExtensions,
-                  allowMultiple: true,
-                );
-                if (result != null) {
-                  await _onFilesSelected(
-                    result.files.map((e) => e.path).nonNulls.toList(),
-                  );
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                }
-              },
-            ),
-            buildButton(
-              context,
-              icon: Icons.folder_copy_rounded,
-              text: 'Add folder',
-              onTap: () async {
-                var result = await FilePicker.getDirectoryPath(
-                  dialogTitle: 'Flux Import Folder',
-                );
-                if (result != null) {
-                  await _onFolderSelected(result);
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                }
-              },
-            ),
-          ],
+      child: AnimatedSize(
+        duration: Durations.medium1,
+        curve: Curves.easeInOut,
+        child: Padding(
+          padding: const .all(40),
+          child: !selected
+              ? Row(
+                  mainAxisSize: .min,
+                  spacing: 20,
+                  children: [
+                    buildButton(
+                      context,
+                      icon: Icons.file_copy_rounded,
+                      text: 'Add files',
+                      onTap: () async {
+                        var result = await FilePicker.pickFiles(
+                          type: .custom,
+                          dialogTitle: 'Flux Import Files',
+                          allowedExtensions: audioExtensions,
+                          allowMultiple: true,
+                        );
+                        if (result != null) {
+                          setState(() => selected = true);
+                          await _onFilesSelected(
+                            result.files.map((e) => e.path).nonNulls.toList(),
+                          );
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
+                    ),
+                    buildButton(
+                      context,
+                      icon: Icons.folder_copy_rounded,
+                      text: 'Add folder',
+                      onTap: () async {
+                        var result = await FilePicker.getDirectoryPath(
+                          dialogTitle: 'Flux Import Folder',
+                        );
+                        if (result != null) {
+                          setState(() => selected = true);
+                          await _onFolderSelected(result);
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
+                    ),
+                  ],
+                )
+              : CircularProgressIndicator(),
         ),
       ),
     ),
