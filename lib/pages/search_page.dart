@@ -43,6 +43,13 @@ class _SearchPageState extends State<SearchPage> {
       (currentTrackPos! - controller.offset).abs() > 500;
 
   @override
+  Future<void> dispose() async {
+    controller.dispose();
+    super.dispose();
+    await floatingUpdater.close();
+  }
+
+  @override
   Widget build(BuildContext context) => Scaffold(
     floatingActionButton: FutureBuilder(
       future: Future.doWhile(
