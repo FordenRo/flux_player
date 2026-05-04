@@ -26,14 +26,17 @@ class _SearchPageState extends State<SearchPage> {
   final StreamController<bool?> floatingUpdater = .broadcast();
   late final floatingStream = floatingUpdater.stream.distinct();
 
-  Iterable<AudioTrack> get tracks => importedTracks.where(
-    (e) =>
-        query.isEmpty ||
-        e.title.toLowerCase().contains(query) ||
-        e.author.toLowerCase().contains(query),
-  );
+  List<AudioTrack> get filteredTracks => importedTracks
+      .where(
+        (e) =>
+            query.isEmpty ||
+            e.title.toLowerCase().contains(query) ||
+            e.author.toLowerCase().contains(query),
+      )
+      .toList();
+
   int? get currentTrackPos => audioPlayer.currentTrack != null
-      ? (tracks.toList().indexOf(audioPlayer.currentTrack!) - 1) * 50
+      ? (filteredTracks.indexOf(audioPlayer.currentTrack!) - 1) * 50
       : null;
   bool get showTop =>
       currentTrackPos != null &&
@@ -131,11 +134,17 @@ class _SearchPageState extends State<SearchPage> {
           onChanged: (v) => setState(() => query = v.toLowerCase()),
         ),
         Expanded(
-          child: ListView.builder(
-            itemExtent: 50,
-            controller: controller,
-            itemCount: tracks.length,
-            itemBuilder: (context, idx) => TrackLabel(tracks.toList(), idx),
+          child: StreamBuilder(
+            stream: Stream.periodic(
+              const Duration(seconds: 1),
+              (_) => importedTracks.length,
+            ).distinct(),
+            builder: (context, asyncSnapshot) => ListView.builder(
+              itemExtent: 50,
+              controller: controller,
+              itemCount: filteredTracks.length,
+              itemBuilder: (context, idx) => TrackLabel(filteredTracks, idx),
+            ),
           ),
         ),
       ],
