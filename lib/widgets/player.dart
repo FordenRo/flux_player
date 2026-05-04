@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-import '../music_controller.dart';
+import '../audio_player.dart';
 import 'volume_overlay.dart';
 
 class Player extends StatefulWidget {

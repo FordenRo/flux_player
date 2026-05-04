@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../music_controller.dart';
+import '../audio_player.dart';
 
 class VolumeOverlay extends StatefulWidget {
   const VolumeOverlay({super.key, required this.onHide});

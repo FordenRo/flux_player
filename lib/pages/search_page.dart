@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../music_controller.dart';
+import '../audio_player.dart';
 import '../widgets/track_label.dart';
 
 class SearchPage extends StatefulWidget {

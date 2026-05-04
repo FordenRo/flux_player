@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-import 'music_controller.dart';
+import 'audio_player.dart';
 
 Future<void> loadConfiguration() async {
   var dir = await getApplicationDocumentsDirectory();

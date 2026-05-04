@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
-import '../music_controller.dart';
+import '../audio_player.dart';
 
 class TrackLabel extends StatefulWidget {
   const TrackLabel(this.playlist, this.index, {super.key});
