@@ -6,9 +6,10 @@ import 'package:flutter_show_menu/flutter_show_menu.dart';
 import '../audio_player.dart';
 
 class TrackLabel extends StatefulWidget {
-  const TrackLabel(this.playlist, this.index, {super.key});
+  const TrackLabel(this.playlist, this.index, {super.key, this.removeFrom});
 
   final List<AudioTrack> playlist;
+  final void Function(AudioTrack track)? removeFrom;
   final int index;
 
   @override
@@ -144,13 +145,14 @@ class _TrackLabelState extends State<TrackLabel> {
             ),
             onTap: () => audioPlayer.addNext(track),
           ),
-          OverlayMenuItem(
-            child: Padding(
-              padding: const .symmetric(horizontal: 10),
-              child: Text('Убрать из списка'),
+          if (widget.removeFrom != null)
+            OverlayMenuItem(
+              child: Padding(
+                padding: const .symmetric(horizontal: 10),
+                child: Text('Убрать из списка'),
+              ),
+              onTap: () => widget.removeFrom!(track),
             ),
-            onTap: () => playlist.remove(track),
-          ),
         ],
       );
 }

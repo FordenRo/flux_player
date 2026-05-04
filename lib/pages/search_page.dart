@@ -143,7 +143,11 @@ class _SearchPageState extends State<SearchPage> {
               itemExtent: 50,
               controller: controller,
               itemCount: filteredTracks.length,
-              itemBuilder: (context, idx) => TrackLabel(filteredTracks, idx),
+              itemBuilder: (context, idx) => TrackLabel(
+                filteredTracks,
+                idx,
+                removeFrom: (track) => importedTracks.remove(track),
+              ),
             ),
           ),
         ),
