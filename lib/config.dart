@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:path_provider/path_provider.dart';
@@ -10,31 +11,42 @@ import 'audio_player.dart';
 
 Future<void> loadConfiguration() async {
   var dir = await getApplicationDocumentsDirectory();
-  var file = File('${dir.path}/Flux Player/config.json');
-  if (!await file.exists()) {
+
+  var json = await Isolate.run(() async {
+    var file = File('${dir.path}/Flux Player/config.json');
+    if (await file.exists()) {
+      return jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    }
+  });
+  if (json == null) {
     return;
   }
-  var json = jsonDecode(await file.readAsString());
 
   var wPos = (json['wPos'] as List?)?.cast<double>();
   if (wPos != null) {
     await windowManager.setPosition(Offset(wPos[0], wPos[1]));
   }
 
-  importedTracks = await Future.wait(
-    (json['imported'] as List?)?.cast<String>().map(AudioTrack.fromPath) ?? [],
+  importedTracks = await Isolate.run(
+    () => Future.wait(
+      (json['imported'] as List?)?.cast<String>().map(AudioTrack.fromPath) ??
+          [],
+    ),
   );
 
-  var queue =
-      (json['queue'] as List?)
-          ?.cast<String>()
-          .map(
-            (path) =>
-                importedTracks.where((track) => track.path == path).firstOrNull,
-          )
-          .nonNulls
-          .toList() ??
-      [];
+  var queue = await Isolate.run(
+    () =>
+        (json['queue'] as List?)
+            ?.cast<String>()
+            .map(
+              (path) => importedTracks
+                  .where((track) => track.path == path)
+                  .firstOrNull,
+            )
+            .nonNulls
+            .toList() ??
+        <AudioTrack>[],
+  );
   if (queue.isNotEmpty) {
     await audioPlayer.setQueue(queue, index: json['index'] as int? ?? 0);
   }
