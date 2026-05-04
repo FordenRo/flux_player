@@ -127,7 +127,12 @@ class _PlayerState extends State<Player> {
         }
       },
       onPressed: volumeOverlay.show,
-      icon: const Icon(Icons.volume_up_rounded),
+      icon: Icon(switch (audioPlayer.volume) {
+        > .7 => Icons.volume_up_rounded,
+        > .3 => Icons.volume_down_rounded,
+        > 0 => Icons.volume_mute_rounded,
+        _ => Icons.volume_off_rounded,
+      }),
     ),
   );
 
