@@ -79,9 +79,14 @@ class _TrackLabelState extends State<TrackLabel> {
                   }
                 } else {
                   if (audioPlayer.queue != playlist) {
-                    await audioPlayer.setQueue(playlist);
+                    await audioPlayer.setQueue(
+                      playlist,
+                      index: index,
+                      play: true,
+                    );
+                  } else {
+                    await audioPlayer.jump(index);
                   }
-                  await audioPlayer.jump(index);
                 }
               },
               icon: Icon(

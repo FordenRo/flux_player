@@ -216,8 +216,8 @@ class _TrackPositionState extends State<TrackPosition>
     end: 2,
   ).animate(animationController);
   late final List<StreamSubscription> subscriptions;
-  var position = 0.0;
-  var duration = 0.0;
+  double position = audioPlayer.position.inMilliseconds / 1000;
+  double duration = audioPlayer.duration.inMilliseconds / 1000;
   var hovered = false;
   var sliding = false;
 

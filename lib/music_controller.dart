@@ -34,7 +34,8 @@ class AudioPlayer {
   int? get currentIndex => _currentIndex;
   List<AudioDevice> get audioDevices => _player.state.audioDevices;
   AudioDevice get audioDevice => _player.state.audioDevice;
-  AudioTrack? get currentTrack => isNotEmpty ? queue[currentIndex!] : null;
+  AudioTrack? get currentTrack =>
+      currentIndex != null ? queue[currentIndex!] : null;
   List<AudioTrack> get queue => _queue;
   double get volume => _player.state.volume / 100;
   Duration get duration => _player.state.duration;
@@ -79,10 +80,19 @@ class AudioPlayer {
     _loopedController.add(looped);
   }
 
-  Future<void> setQueue(List<AudioTrack> tracks) {
+  Future<void> setQueue(
+    List<AudioTrack> tracks, {
+    int? index,
+    bool play = false,
+  }) async {
     _queue = List.of(tracks);
     _queueController.add(tracks);
-    return jump(0);
+    if (index != null) {
+      await jump(index, play: play);
+    } else {
+      _currentIndex = null;
+      _currentIndexController.add(null);
+    }
   }
 
   void addToQueue(AudioTrack track) {
@@ -104,18 +114,21 @@ class AudioPlayer {
 
   Future<void> stop() {
     _queue = [];
+    _queueController.add([]);
+    _currentIndex = null;
+    _currentIndexController.add(null);
     return _player.stop();
   }
 
   Future<void> seek(Duration position) => _player.seek(position);
 
-  Future<void> jump(int index) async {
+  Future<void> jump(int index, {bool play = true}) async {
     if (index < 0 || index >= queue.length) {
       index = 0;
     }
     _currentIndex = index;
     _currentIndexController.add(index);
-    await _player.open(media_kit.Media(queue[index].path));
+    await _player.open(media_kit.Media(queue[index].path), play: play);
   }
 
   Future<void> _onEnd() => looped ? play() : next();
@@ -173,11 +186,11 @@ class AudioTrack {
       Duration(milliseconds: (metadata.format.duration ?? 0 * 1000).toInt());
   Picture? get picture => metadata.common.picture?.nonNulls.first;
 
-  AudioTrack({required this.path, required this.metadata});
+  AudioTrack._internal({required this.path, required this.metadata});
 
   static Future<AudioTrack> fromPath(String path) async {
     final metadata = await audio_metadata.parseFile(path);
 
-    return AudioTrack(path: path, metadata: metadata);
+    return AudioTrack._internal(path: path, metadata: metadata);
   }
 }
