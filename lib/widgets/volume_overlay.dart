@@ -5,27 +5,48 @@ import 'package:flutter/material.dart';
 
 import '../music_controller.dart';
 
-class VolumeControl extends StatefulWidget {
-  final void Function() onExit;
+class VolumeOverlay extends StatefulWidget {
+  const VolumeOverlay({super.key, required this.onHide});
 
-  const VolumeControl({super.key, required this.onExit});
+  final void Function() onHide;
 
-  static OverlayEntry createOverlay(
-    BuildContext context, {
-    required void Function() onExit,
-  }) {
-    var entry = OverlayEntry(
-      builder: (context) => VolumeControl(onExit: onExit),
+  static VolumeOverlayEntry createOverlay(BuildContext context) {
+    var entry = VolumeOverlayEntry._internal(context);
+    entry.entry = .new(
+      builder: (context) => VolumeOverlay(onHide: entry.remove),
     );
-    Overlay.of(context).insert(entry);
     return entry;
   }
 
   @override
-  State<VolumeControl> createState() => _VolumeControlState();
+  State<VolumeOverlay> createState() => _VolumeOverlayState();
 }
 
-class _VolumeControlState extends State<VolumeControl>
+class VolumeOverlayEntry {
+  late final OverlayEntry entry;
+  final BuildContext context;
+
+  VolumeOverlayEntry._internal(this.context);
+
+  void show() {
+    if (!entry.mounted) {
+      Overlay.of(context).insert(entry);
+    }
+  }
+
+  void remove() {
+    if (entry.mounted) {
+      entry.remove();
+    }
+  }
+
+  void dispose() {
+    remove();
+    entry.dispose();
+  }
+}
+
+class _VolumeOverlayState extends State<VolumeOverlay>
     with SingleTickerProviderStateMixin {
   late final animationController = AnimationController(
     duration: const Duration(milliseconds: 300),
@@ -35,41 +56,39 @@ class _VolumeControlState extends State<VolumeControl>
       .animate(
         CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
       );
-  var _canExit = false;
-  Timer? timer;
+  var hovered = false;
+  var sliding = false;
+  late Timer timer;
   late final StreamSubscription subscription;
-
-  bool get canExit => _canExit;
-
-  set canExit(bool v) {
-    _canExit = v;
-    v ? timer = Timer(const Duration(seconds: 5), close) : timer?.cancel();
-  }
 
   @override
   void initState() {
     super.initState();
 
-    animationController.forward();
-    canExit = true;
+    timer = Timer(const Duration(seconds: 5), hide);
     subscription = audioPlayer.stream.volume.listen((_) => setState(() {}));
+    show();
   }
 
   @override
   Future<void> dispose() async {
     animationController.dispose();
-    timer?.cancel();
+    timer.cancel();
     super.dispose();
     await subscription.cancel();
   }
 
-  void close() async {
-    if (!canExit) {
+  Future<void> show() async {
+    await animationController.forward();
+  }
+
+  Future<void> hide() async {
+    if (sliding) {
       return;
     }
 
     await animationController.animateBack(0);
-    widget.onExit();
+    widget.onHide();
   }
 
   @override
@@ -89,8 +108,14 @@ class _VolumeControlState extends State<VolumeControl>
             }
           },
           child: MouseRegion(
-            // onEnter: (event) => canExit = true,
-            onExit: (event) => close(),
+            onEnter: (event) {
+              hovered = true;
+              timer.cancel();
+            },
+            onExit: (event) {
+              hovered = false;
+              hide();
+            },
             child: Center(
               child: SizedBox(
                 width: 200,
@@ -121,8 +146,13 @@ class _VolumeControlState extends State<VolumeControl>
                       ),
                       child: Slider(
                         value: audioPlayer.volume,
-                        onChangeStart: (_) => canExit = false,
-                        onChangeEnd: (_) => canExit = true,
+                        onChangeStart: (_) => sliding = true,
+                        onChangeEnd: (_) {
+                          sliding = false;
+                          if (!hovered) {
+                            hide();
+                          }
+                        },
                         onChanged: audioPlayer.setVolume,
                       ),
                     ),

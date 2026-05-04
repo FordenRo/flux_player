@@ -8,7 +8,7 @@ import 'package:flutter_show_menu/flutter_show_menu.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 import '../music_controller.dart';
-import 'volume_control.dart';
+import 'volume_overlay.dart';
 
 class Player extends StatefulWidget {
   const Player({super.key});
@@ -18,7 +18,7 @@ class Player extends StatefulWidget {
 }
 
 class _PlayerState extends State<Player> {
-  OverlayEntry? volumeOverlay;
+  late final volumeOverlay = VolumeOverlay.createOverlay(context);
   Timer? volumeHoverTimer;
   late final List<StreamSubscription> subscriptions;
 
@@ -36,25 +36,12 @@ class _PlayerState extends State<Player> {
 
   @override
   Future<void> dispose() async {
-    removeVolumeOverlay();
     super.dispose();
+    volumeOverlay.dispose();
     await Future.wait([
       audioPlayer.dispose(),
       ...subscriptions.map((e) => e.cancel()),
     ]);
-  }
-
-  void createVolumeOverlay() {
-    removeVolumeOverlay();
-
-    VolumeControl.createOverlay(context, onExit: removeVolumeOverlay);
-  }
-
-  void removeVolumeOverlay() {
-    volumeHoverTimer?.cancel();
-    volumeOverlay?.remove();
-    volumeOverlay?.dispose();
-    volumeOverlay = null;
   }
 
   @override
@@ -133,13 +120,13 @@ class _PlayerState extends State<Player> {
         if (hovered) {
           volumeHoverTimer = Timer(
             Duration(milliseconds: 300),
-            createVolumeOverlay,
+            volumeOverlay.show,
           );
         } else {
           volumeHoverTimer?.cancel();
         }
       },
-      onPressed: createVolumeOverlay,
+      onPressed: volumeOverlay.show,
       icon: const Icon(Icons.volume_up_rounded),
     ),
   );
