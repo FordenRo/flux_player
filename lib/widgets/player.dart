@@ -18,8 +18,6 @@ class Player extends StatefulWidget {
 }
 
 class _PlayerState extends State<Player> {
-  late final volumeOverlay = VolumeOverlay.createOverlay(context);
-  Timer? volumeHoverTimer;
   late final List<StreamSubscription> subscriptions;
 
   @override
@@ -37,7 +35,6 @@ class _PlayerState extends State<Player> {
   @override
   Future<void> dispose() async {
     super.dispose();
-    volumeOverlay.dispose();
     await Future.wait([
       audioPlayer.dispose(),
       ...subscriptions.map((e) => e.cancel()),
@@ -69,7 +66,7 @@ class _PlayerState extends State<Player> {
                     Expanded(
                       child: Row(
                         mainAxisAlignment: .end,
-                        children: [inputDeviceButton(), volumeButton()],
+                        children: [inputDeviceButton(), VolumeButton()],
                       ),
                     ),
                   ],
@@ -106,33 +103,6 @@ class _PlayerState extends State<Player> {
         }
       },
       icon: const Icon(Icons.input_rounded),
-    ),
-  );
-
-  Listener volumeButton() => Listener(
-    onPointerSignal: (e) {
-      if (e is PointerScrollEvent) {
-        audioPlayer.setVolume(audioPlayer.volume - e.scrollDelta.dy / 5000);
-      }
-    },
-    child: IconButton(
-      onHover: (hovered) {
-        if (hovered) {
-          volumeHoverTimer = Timer(
-            Duration(milliseconds: 300),
-            volumeOverlay.show,
-          );
-        } else {
-          volumeHoverTimer?.cancel();
-        }
-      },
-      onPressed: volumeOverlay.show,
-      icon: Icon(switch (audioPlayer.volume) {
-        > .7 => Icons.volume_up_rounded,
-        > .3 => Icons.volume_down_rounded,
-        > 0 => Icons.volume_mute_rounded,
-        _ => Icons.volume_off_rounded,
-      }),
     ),
   );
 
@@ -278,6 +248,61 @@ class _TrackPositionState extends State<TrackPosition>
             Duration(milliseconds: (e * duration * 1000).toInt()),
           ),
         ),
+      ),
+    ),
+  );
+}
+
+class VolumeButton extends StatefulWidget {
+  const VolumeButton({super.key});
+
+  @override
+  State<VolumeButton> createState() => _VolumeButtonState();
+}
+
+class _VolumeButtonState extends State<VolumeButton> {
+  Timer? hoverTimer;
+  late final volumeOverlay = VolumeOverlay.createOverlay(context);
+  late final StreamSubscription subscription;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    volumeOverlay.dispose();
+    hoverTimer?.cancel();
+    super.dispose();
+  }
+
+  IconData getIconDataFromVolume(double volume) => switch (volume) {
+    > .7 => Icons.volume_up_rounded,
+    > .3 => Icons.volume_down_rounded,
+    > 0 => Icons.volume_mute_rounded,
+    _ => Icons.volume_off_rounded,
+  };
+
+  @override
+  Widget build(BuildContext context) => Listener(
+    onPointerSignal: (e) {
+      if (e is PointerScrollEvent) {
+        audioPlayer.setVolume(audioPlayer.volume - e.scrollDelta.dy / 5000);
+      }
+    },
+    child: StreamBuilder(
+      stream: audioPlayer.stream.volume.map(getIconDataFromVolume).distinct(),
+      builder: (context, snapshot) => IconButton(
+        onHover: (hovered) {
+          if (hovered) {
+            hoverTimer = Timer(Duration(milliseconds: 300), volumeOverlay.show);
+          } else {
+            hoverTimer?.cancel();
+          }
+        },
+        onPressed: volumeOverlay.show,
+        icon: Icon(snapshot.data ?? getIconDataFromVolume(audioPlayer.volume)),
       ),
     ),
   );
