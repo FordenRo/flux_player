@@ -25,6 +25,7 @@ class _SearchPageState extends State<SearchPage> {
   );
   final StreamController<bool?> floatingUpdater = .broadcast();
   late final floatingStream = floatingUpdater.stream.distinct();
+  late final StreamSubscription indexSubscription;
 
   List<AudioTrack> get filteredTracks => importedTracks
       .where(
@@ -43,10 +44,20 @@ class _SearchPageState extends State<SearchPage> {
       (currentTrackPos! - controller.offset).abs() > 500;
 
   @override
+  void initState() {
+    super.initState();
+
+    indexSubscription = audioPlayer.stream.currentIndex.listen(
+      (_) => floatingUpdater.add(null),
+    );
+  }
+
+  @override
   Future<void> dispose() async {
     controller.dispose();
     super.dispose();
     await floatingUpdater.close();
+    await indexSubscription.cancel();
   }
 
   @override
