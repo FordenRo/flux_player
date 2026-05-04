@@ -18,27 +18,19 @@ class Player extends StatefulWidget {
 }
 
 class _PlayerState extends State<Player> {
-  late final List<StreamSubscription> subscriptions;
+  late final StreamSubscription subscription;
 
   @override
   void initState() {
     super.initState();
-
-    subscriptions = [
-      audioPlayer.stream.isPlaying.listen((_) => setState(() {})),
-      audioPlayer.stream.currentIndex.listen((_) => setState(() {})),
-      audioPlayer.stream.looped.listen((_) => setState(() {})),
-      audioPlayer.stream.shuffled.listen((_) => setState(() {})),
-    ];
+    subscription = audioPlayer.stream.isPlaying.listen((_) => setState(() {}));
   }
 
   @override
   Future<void> dispose() async {
     super.dispose();
-    await Future.wait([
-      audioPlayer.dispose(),
-      ...subscriptions.map((e) => e.cancel()),
-    ]);
+    await audioPlayer.dispose();
+    await subscription.cancel();
   }
 
   @override
@@ -106,49 +98,60 @@ class _PlayerState extends State<Player> {
     ),
   );
 
-  Row trackInfo(BuildContext context) => Row(
-    mainAxisSize: .min,
-    children: [
-      audioPlayer.currentTrack!.picture != null
-          ? Image.memory(
-              Uint8List.fromList(audioPlayer.currentTrack!.picture!.data),
-              width: 64,
-            )
-          : SizedBox(),
-      Column(
-        mainAxisSize: .min,
-        crossAxisAlignment: .start,
-        children: [
-          Text(audioPlayer.currentTrack!.title, overflow: .fade),
-          Text(
-            audioPlayer.currentTrack!.author,
-            softWrap: true,
-            style: TextStyle(
-              fontSize: 12,
-              color: Theme.of(
-                context,
-              ).colorScheme.inverseSurface.withAlpha(170),
+  Widget trackInfo(BuildContext context) => StreamBuilder(
+    stream: audioPlayer.stream.currentTrack,
+    builder: (context, asyncSnapshot) => Row(
+      mainAxisSize: .min,
+      children: [
+        audioPlayer.currentTrack!.picture != null
+            ? Image.memory(
+                Uint8List.fromList(audioPlayer.currentTrack!.picture!.data),
+                width: 64,
+              )
+            : SizedBox(width: 2),
+        Column(
+          mainAxisSize: .min,
+          crossAxisAlignment: .start,
+          children: [
+            Text(audioPlayer.currentTrack!.title, overflow: .fade),
+            Text(
+              audioPlayer.currentTrack!.author,
+              softWrap: true,
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(
+                  context,
+                ).colorScheme.inverseSurface.withAlpha(170),
+              ),
             ),
-          ),
-        ],
-      ),
-    ],
+          ],
+        ),
+      ],
+    ),
   );
 
-  Row controlButtons() => Row(
+  Widget controlButtons() => Row(
     mainAxisAlignment: .center,
     children: [
-      IconButton(
-        color: audioPlayer.shuffled
-            ? Theme.of(context).colorScheme.primary
-            : null,
-        onPressed: () => audioPlayer.setShuffled(!audioPlayer.shuffled),
-        icon: const Icon(Icons.shuffle_rounded),
+      /// Shuffle
+      StreamBuilder(
+        stream: audioPlayer.stream.shuffled,
+        builder: (context, asyncSnapshot) => IconButton(
+          color: audioPlayer.shuffled
+              ? Theme.of(context).colorScheme.primary
+              : null,
+          onPressed: () => audioPlayer.setShuffled(!audioPlayer.shuffled),
+          icon: const Icon(Icons.shuffle_rounded),
+        ),
       ),
+
+      /// Previous
       IconButton(
         onPressed: audioPlayer.previous,
         icon: const Icon(Icons.skip_previous_rounded),
       ),
+
+      /// Play/Pause
       IconButton(
         onPressed: () =>
             audioPlayer.isPlaying ? audioPlayer.pause() : audioPlayer.play(),
@@ -158,16 +161,23 @@ class _PlayerState extends State<Player> {
               : Icons.play_circle_fill_rounded,
         ),
       ),
+
+      /// Next
       IconButton(
         onPressed: audioPlayer.next,
         icon: const Icon(Icons.skip_next_rounded),
       ),
-      IconButton(
-        color: audioPlayer.looped
-            ? Theme.of(context).colorScheme.primary
-            : null,
-        onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
-        icon: const Icon(Icons.loop_rounded),
+
+      /// Loop
+      StreamBuilder(
+        stream: audioPlayer.stream.looped,
+        builder: (context, asyncSnapshot) => IconButton(
+          color: audioPlayer.looped
+              ? Theme.of(context).colorScheme.primary
+              : null,
+          onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
+          icon: const Icon(Icons.loop_rounded),
+        ),
       ),
     ],
   );
@@ -261,9 +271,10 @@ class VolumeButton extends StatefulWidget {
 }
 
 class _VolumeButtonState extends State<VolumeButton> {
-  Timer? hoverTimer;
   late final volumeOverlay = VolumeOverlay.createOverlay(context);
   late final StreamSubscription subscription;
+  Timer? hoverTimer;
+  double? lastVolume;
 
   @override
   void initState() {
@@ -301,7 +312,14 @@ class _VolumeButtonState extends State<VolumeButton> {
             hoverTimer?.cancel();
           }
         },
-        onPressed: volumeOverlay.show,
+        onPressed: () {
+          if (audioPlayer.volume > 0) {
+            lastVolume = audioPlayer.volume;
+            audioPlayer.setVolume(0);
+          } else if (lastVolume != null) {
+            audioPlayer.setVolume(lastVolume!);
+          }
+        },
         icon: Icon(snapshot.data ?? getIconDataFromVolume(audioPlayer.volume)),
       ),
     ),
