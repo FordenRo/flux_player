@@ -17,17 +17,30 @@ class Player extends StatefulWidget {
   State<Player> createState() => _PlayerState();
 }
 
-class _PlayerState extends State<Player> {
+class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
   late final StreamSubscription subscription;
+  late final AnimationController playAnim = .new(
+    vsync: this,
+    duration: Durations.short2,
+  );
+  double nextBtnOffset = 0;
+  double prevBtnOffset = 0;
 
   @override
   void initState() {
     super.initState();
-    subscription = audioPlayer.stream.isPlaying.listen((_) => setState(() {}));
+    subscription = audioPlayer.stream.isPlaying.listen((_) {
+      setState(() {});
+      playAnim.animateTo(
+        audioPlayer.isPlaying ? 1 : 0,
+        duration: Durations.short2,
+      );
+    });
   }
 
   @override
   Future<void> dispose() async {
+    playAnim.dispose();
     super.dispose();
     await audioPlayer.dispose();
     await subscription.cancel();
@@ -146,37 +159,77 @@ class _PlayerState extends State<Player> {
       ),
 
       /// Previous
-      IconButton(
-        onPressed: audioPlayer.previous,
-        icon: const Icon(Icons.skip_previous_rounded),
+      StatefulBuilder(
+        builder: (context, setState) => AnimatedSlide(
+          offset: Offset(-prevBtnOffset / 10, 0),
+          duration: Durations.short2,
+          onEnd: () {
+            if (prevBtnOffset != 0) {
+              setState(() => prevBtnOffset = 0);
+            }
+          },
+          child: IconButton(
+            color: prevBtnOffset != 0
+                ? Theme.of(context).colorScheme.primary
+                : null,
+            onPressed: () => setState(() {
+              prevBtnOffset = 1;
+              audioPlayer.previous();
+            }),
+            icon: const Icon(Icons.skip_previous_rounded),
+          ),
+        ),
       ),
 
       /// Play/Pause
       IconButton(
         onPressed: () =>
             audioPlayer.isPlaying ? audioPlayer.pause() : audioPlayer.play(),
-        icon: Icon(
-          audioPlayer.isPlaying
-              ? Icons.pause_circle_outline_rounded
-              : Icons.play_circle_fill_rounded,
+        icon: AnimatedIcon(
+          icon: AnimatedIcons.play_pause,
+          progress: playAnim,
+          // audioPlayer.isPlaying
+          //     ? Icons.pause_circle_outline_rounded
+          //     : Icons.play_circle_fill_rounded,
         ),
       ),
 
       /// Next
-      IconButton(
-        onPressed: audioPlayer.next,
-        icon: const Icon(Icons.skip_next_rounded),
+      StatefulBuilder(
+        builder: (context, setState) => AnimatedSlide(
+          offset: Offset(nextBtnOffset / 10, 0),
+          duration: Durations.short2,
+          onEnd: () {
+            if (nextBtnOffset != 0) {
+              setState(() => nextBtnOffset = 0);
+            }
+          },
+          child: IconButton(
+            color: nextBtnOffset != 0
+                ? Theme.of(context).colorScheme.primary
+                : null,
+            onPressed: () => setState(() {
+              nextBtnOffset = 1;
+              audioPlayer.next();
+            }),
+            icon: const Icon(Icons.skip_next_rounded),
+          ),
+        ),
       ),
 
       /// Loop
       StreamBuilder(
         stream: audioPlayer.stream.looped,
-        builder: (context, asyncSnapshot) => IconButton(
-          color: audioPlayer.looped
-              ? Theme.of(context).colorScheme.primary
-              : null,
-          onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
-          icon: const Icon(Icons.loop_rounded),
+        builder: (context, asyncSnapshot) => AnimatedRotation(
+          duration: Durations.short3,
+          turns: audioPlayer.looped ? -0.5 : 0,
+          child: IconButton(
+            color: audioPlayer.looped
+                ? Theme.of(context).colorScheme.primary
+                : null,
+            onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
+            icon: const Icon(Icons.loop_rounded),
+          ),
         ),
       ),
     ],
@@ -190,16 +243,7 @@ class TrackPosition extends StatefulWidget {
   State<TrackPosition> createState() => _TrackPositionState();
 }
 
-class _TrackPositionState extends State<TrackPosition>
-    with SingleTickerProviderStateMixin {
-  late final animationController = AnimationController(
-    duration: const Duration(milliseconds: 200),
-    vsync: this,
-  );
-  late final heightAnimation = Tween<double>(
-    begin: 1,
-    end: 2,
-  ).animate(animationController);
+class _TrackPositionState extends State<TrackPosition> {
   late final List<StreamSubscription> subscriptions;
   double position = audioPlayer.position.inMilliseconds / 1000;
   double duration = audioPlayer.duration.inMilliseconds / 1000;
