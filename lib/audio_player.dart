@@ -139,11 +139,13 @@ class AudioPlayer {
         : currentIndex! + 1,
   );
 
-  Future<void> previous() => jump(
-    shuffled
-        ? _shuffledQueue![_shuffledQueue!.indexOf(currentIndex!) - 1]
-        : currentIndex! - 1,
-  );
+  Future<void> previous() => position.inSeconds < 10
+      ? jump(
+          shuffled
+              ? _shuffledQueue![_shuffledQueue!.indexOf(currentIndex!) - 1]
+              : currentIndex! - 1,
+        )
+      : seek(Duration.zero);
 
   Future<void> dispose() async {
     _shuffledQueue = null;

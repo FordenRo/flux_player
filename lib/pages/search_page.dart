@@ -31,8 +31,8 @@ class _SearchPageState extends State<SearchPage> {
       .where(
         (e) =>
             query.isEmpty ||
-            e.title.toLowerCase().contains(query) ||
-            e.author.toLowerCase().contains(query),
+            e.title.toLowerCase().startsWith(query) ||
+            e.author.toLowerCase().startsWith(query),
       )
       .toList();
 
