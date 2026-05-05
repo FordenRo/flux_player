@@ -8,24 +8,27 @@ import '../audio_player.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
-Future<void> _onFilesSelected(List<String> paths) => Isolate.run(
-  () async =>
-      importedTracks.addAll(await Future.wait(paths.map(AudioTrack.fromPath))),
-);
+Future<void> _onFilesSelected(List<String> paths) async {
+  importedTracks.addAll(
+    await Isolate.run(() => Future.wait(paths.map(AudioTrack.fromPath))),
+  );
+}
 
-Future<void> _onFolderSelected(String path) => Isolate.run(() async {
+Future<void> _onFolderSelected(String path) async {
   final folder = Directory(path);
   if (!await folder.exists()) {
     return;
   }
   importedTracks.addAll(
-    await folder
-        .list()
-        .where((e) => audioExtensions.contains(e.path.split('.').last))
-        .asyncMap((e) => AudioTrack.fromPath(e.path))
-        .toList(),
+    await Isolate.run(
+      () => folder
+          .list()
+          .where((e) => audioExtensions.contains(e.path.split('.').last))
+          .asyncMap((e) => AudioTrack.fromPath(e.path))
+          .toList(),
+    ),
   );
-});
+}
 
 class ImportMenu extends StatefulWidget {
   const ImportMenu({super.key});
