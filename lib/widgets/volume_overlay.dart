@@ -118,46 +118,40 @@ class _VolumeOverlayState extends State<VolumeOverlay>
                 height: 50,
                 child: FadeTransition(
                   opacity: fadeAnimation,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.secondary.withAlpha(100),
-                      ),
-                      borderRadius: .circular(16),
-                    ),
-                    elevation: 8,
-                    child: SliderTheme(
-                      data: SliderThemeData(
-                        activeTrackColor: Theme.of(
-                          context,
-                        ).colorScheme.primary.withAlpha(200),
-                        thumbShape: RoundSliderThumbShape(
-                          enabledThumbRadius: 8,
-                        ),
-                        overlayShape: RoundSliderOverlayShape(
-                          overlayRadius: 16,
-                        ),
-                      ),
-                      child: Slider(
-                        value: audioPlayer.volume,
-                        onChangeStart: (_) => sliding = true,
-                        onChangeEnd: (_) {
-                          sliding = false;
-                          if (!hovered) {
-                            hide();
-                          }
-                        },
-                        onChanged: audioPlayer.setVolume,
-                      ),
-                    ),
-                  ),
+                  child: buildCard(context),
                 ),
               ),
             ),
           ),
         ),
+      ),
+    ),
+  );
+
+  Card buildCard(BuildContext context) => Card(
+    shape: RoundedRectangleBorder(
+      side: BorderSide(
+        color: Theme.of(context).colorScheme.secondary.withAlpha(100),
+      ),
+      borderRadius: .circular(16),
+    ),
+    elevation: 8,
+    child: SliderTheme(
+      data: SliderThemeData(
+        activeTrackColor: Theme.of(context).colorScheme.primary.withAlpha(200),
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 16),
+      ),
+      child: Slider(
+        value: audioPlayer.volume,
+        onChangeStart: (_) => sliding = true,
+        onChangeEnd: (_) {
+          sliding = false;
+          if (!hovered) {
+            hide();
+          }
+        },
+        onChanged: audioPlayer.setVolume,
       ),
     ),
   );

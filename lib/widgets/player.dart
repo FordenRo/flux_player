@@ -29,21 +29,17 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    subscription = audioPlayer.stream.isPlaying.listen((_) {
-      setState(() {});
-      playAnim.animateTo(
-        audioPlayer.isPlaying ? 1 : 0,
-        duration: Durations.short2,
-      );
-    });
+    subscription = audioPlayer.stream.isPlaying.listen(
+      (_) => setState(() => playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0)),
+    );
   }
 
   @override
   Future<void> dispose() async {
     playAnim.dispose();
     super.dispose();
-    await audioPlayer.dispose();
     await subscription.cancel();
+    await audioPlayer.dispose();
   }
 
   @override
@@ -77,39 +73,11 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
                   ],
                 ),
               ),
-              TrackPosition(),
+              PositionSlider(),
             ],
           ),
         )
       : SizedBox();
-
-  Builder inputDeviceButton() => Builder(
-    builder: (context) => IconButton(
-      onPressed: () async {
-        var device = await showOverlayMenu(
-          context: context,
-          initialValue: audioPlayer.audioDevice,
-          style: .new(padding: .zero, itemStyle: .new(height: 30)),
-          items: audioPlayer.audioDevices
-              .map(
-                (e) => OverlayMenuItem(
-                  child: Padding(
-                    padding: const .symmetric(horizontal: 8),
-                    child: Text(e.description, style: .new(fontSize: 12)),
-                  ),
-                  value: e,
-                  enabled: e != audioPlayer.audioDevice,
-                ),
-              )
-              .toList(),
-        );
-        if (device != null) {
-          audioPlayer.setAudioDevice(device);
-        }
-      },
-      icon: const Icon(Icons.input_rounded),
-    ),
-  );
 
   Widget trackInfo(BuildContext context) => StreamBuilder(
     stream: audioPlayer.stream.currentTrack,
@@ -234,42 +202,60 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
       ),
     ],
   );
+
+  Widget inputDeviceButton() => Builder(
+    builder: (context) => IconButton(
+      onPressed: () async {
+        var device = await showOverlayMenu(
+          context: context,
+          initialValue: audioPlayer.audioDevice,
+          style: .new(padding: .zero, itemStyle: .new(height: 30)),
+          items: audioPlayer.audioDevices
+              .map(
+                (e) => OverlayMenuItem(
+                  child: Padding(
+                    padding: const .symmetric(horizontal: 8),
+                    child: Text(e.description, style: .new(fontSize: 12)),
+                  ),
+                  value: e,
+                  enabled: e != audioPlayer.audioDevice,
+                ),
+              )
+              .toList(),
+        );
+        if (device != null) {
+          audioPlayer.setAudioDevice(device);
+        }
+      },
+      icon: const Icon(Icons.input_rounded),
+    ),
+  );
 }
 
-class TrackPosition extends StatefulWidget {
-  const TrackPosition({super.key});
+class PositionSlider extends StatefulWidget {
+  const PositionSlider({super.key});
 
   @override
-  State<TrackPosition> createState() => _TrackPositionState();
+  State<PositionSlider> createState() => _PositionSliderState();
 }
 
-class _TrackPositionState extends State<TrackPosition> {
-  late final List<StreamSubscription> subscriptions;
-  double position = audioPlayer.position.inMilliseconds / 1000;
-  double duration = audioPlayer.duration.inMilliseconds / 1000;
+class _PositionSliderState extends State<PositionSlider> {
+  late final StreamController stream = .broadcast()
+    ..addStream(audioPlayer.stream.position)
+    ..addStream(audioPlayer.stream.duration)
+    ..stream.listen((_) => setState(() {}));
+
   var hovered = false;
   var sliding = false;
 
   bool get expanded => hovered || sliding;
-
-  @override
-  void initState() {
-    super.initState();
-
-    subscriptions = [
-      audioPlayer.stream.position.listen(
-        (e) => setState(() => position = e.inMilliseconds / 1000),
-      ),
-      audioPlayer.stream.duration.listen(
-        (e) => setState(() => duration = e.inMilliseconds / 1000),
-      ),
-    ];
-  }
+  double get position => audioPlayer.position.inMilliseconds / 1000;
+  double get duration => audioPlayer.duration.inMilliseconds / 1000;
 
   @override
   Future<void> dispose() async {
     super.dispose();
-    await Future.wait(subscriptions.map((e) => e.cancel()));
+    await stream.close();
   }
 
   @override
