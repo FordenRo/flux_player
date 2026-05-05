@@ -24,6 +24,7 @@ class _TrackLabelState extends State<TrackLabel>
   late final AnimationController playAnim = .new(
     vsync: this,
     duration: Durations.short2,
+    value: isPlaying ? 1 : 0,
   );
 
   int get index => widget.index;
@@ -42,6 +43,7 @@ class _TrackLabelState extends State<TrackLabel>
 
   @override
   Future<void> dispose() async {
+    playAnim.dispose();
     super.dispose();
     await Future.wait(subscriptions.map((e) => e.cancel()));
   }

@@ -29,9 +29,10 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    subscription = audioPlayer.stream.isPlaying.listen(
-      (_) => setState(() => playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0)),
-    );
+    subscription = audioPlayer.stream.isPlaying.listen((_) {
+      setState(() {});
+      playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0);
+    });
   }
 
   @override
@@ -240,10 +241,7 @@ class PositionSlider extends StatefulWidget {
 }
 
 class _PositionSliderState extends State<PositionSlider> {
-  late final StreamController stream = .broadcast()
-    ..addStream(audioPlayer.stream.position)
-    ..addStream(audioPlayer.stream.duration)
-    ..stream.listen((_) => setState(() {}));
+  late final StreamController stream;
 
   var hovered = false;
   var sliding = false;
@@ -251,6 +249,17 @@ class _PositionSliderState extends State<PositionSlider> {
   bool get expanded => hovered || sliding;
   double get position => audioPlayer.position.inMilliseconds / 1000;
   double get duration => audioPlayer.duration.inMilliseconds / 1000;
+
+  @override
+  void initState() {
+    super.initState();
+
+    stream = .broadcast()
+      ..addStream(
+        audioPlayer.stream.position,
+      ).then((_) => stream.addStream(audioPlayer.stream.duration))
+      ..stream.listen((_) => setState(() {}));
+  }
 
   @override
   Future<void> dispose() async {
