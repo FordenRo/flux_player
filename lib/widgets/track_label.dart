@@ -16,10 +16,15 @@ class TrackLabel extends StatefulWidget {
   State<TrackLabel> createState() => _TrackLabelState();
 }
 
-class _TrackLabelState extends State<TrackLabel> {
+class _TrackLabelState extends State<TrackLabel>
+    with SingleTickerProviderStateMixin {
   late var isSelected = audioPlayer.currentTrack == track;
   late var isPlaying = isSelected && audioPlayer.isPlaying;
   late final List<StreamSubscription> subscriptions;
+  late final AnimationController playAnim = .new(
+    vsync: this,
+    duration: Durations.short2,
+  );
 
   int get index => widget.index;
   List<AudioTrack> get playlist => widget.playlist;
@@ -41,15 +46,30 @@ class _TrackLabelState extends State<TrackLabel> {
     await Future.wait(subscriptions.map((e) => e.cancel()));
   }
 
-  void update() {
+  void update() => setState(() {
     final selected = audioPlayer.currentTrack == track;
     final playing = selected && audioPlayer.isPlaying;
 
     if (selected != isSelected || playing != isPlaying) {
-      setState(() {
-        isPlaying = playing;
-        isSelected = selected;
-      });
+      isPlaying = playing;
+      isSelected = selected;
+    }
+    playAnim.animateTo(playing ? 1 : 0);
+  });
+
+  Future<void> playPressed() async {
+    if (isSelected) {
+      if (isPlaying) {
+        await audioPlayer.pause();
+      } else {
+        await audioPlayer.play();
+      }
+    } else {
+      if (audioPlayer.queue != playlist) {
+        await audioPlayer.setQueue(playlist, index: index, play: true);
+      } else {
+        await audioPlayer.jump(index);
+      }
     }
   }
 
@@ -71,27 +91,10 @@ class _TrackLabelState extends State<TrackLabel> {
           spacing: 8,
           children: [
             IconButton(
-              onPressed: () async {
-                if (isSelected) {
-                  if (isPlaying) {
-                    await audioPlayer.pause();
-                  } else {
-                    await audioPlayer.play();
-                  }
-                } else {
-                  if (audioPlayer.queue != playlist) {
-                    await audioPlayer.setQueue(
-                      playlist,
-                      index: index,
-                      play: true,
-                    );
-                  } else {
-                    await audioPlayer.jump(index);
-                  }
-                }
-              },
-              icon: Icon(
-                isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              onPressed: playPressed,
+              icon: AnimatedIcon(
+                icon: AnimatedIcons.play_pause,
+                progress: playAnim,
               ),
               style: ButtonStyle(
                 minimumSize: .all(Size.zero),
