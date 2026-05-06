@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:metadata_audio/metadata_audio.dart' as audio_metadata;
+// import 'package:metadata_audio/metadata_audio.dart' as audio_metadata;
+import 'package:audio_metadata_reader/audio_metadata_reader.dart'
+    as audio_metadata;
 import 'package:media_kit/media_kit.dart' as media_kit;
 
 final audioPlayer = AudioPlayer._internal();
@@ -207,25 +209,27 @@ class AudioTrack {
   final String path;
   final AudioMetadata metadata;
 
-  String get title => metadata.common.title ?? 'Unnamed';
-  String get author => metadata.common.artist ?? 'No artist';
-  Duration get duration =>
-      Duration(milliseconds: (metadata.format.duration ?? 0 * 1000).toInt());
-  Picture? get picture => metadata.common.picture?.nonNulls.first;
+  String get title => metadata.title ?? 'Unnamed';
+  String get author => metadata.artist ?? 'No artist';
+  Duration get duration => metadata.duration ?? Duration.zero;
+  Picture? get picture => metadata.pictures.firstOrNull;
 
   AudioTrack._internal({required this.path, required this.metadata});
 
   static Future<AudioTrack> fromJson(dynamic json) async {
     final path = json['path'] as String;
-    final metadata = await audio_metadata.parseFile(path);
+    // final metadata = await audio_metadata.parseFile(path);
+    final metadata = audio_metadata.readMetadata(.new(path), getImage: true);
+    // print(metadata.pictures.length);
 
-    return AudioTrack._internal(path: path, metadata: metadata);
+    return ._internal(path: path, metadata: metadata);
   }
 
   static Future<AudioTrack> fromPath(String path) async {
-    final metadata = await audio_metadata.parseFile(path);
+    // final metadata = await audio_metadata.parseFile(path);
+    final metadata = audio_metadata.readMetadata(.new(path), getImage: true);
 
-    return AudioTrack._internal(path: path, metadata: metadata);
+    return ._internal(path: path, metadata: metadata);
   }
 
   dynamic toJson() => {'path': path};

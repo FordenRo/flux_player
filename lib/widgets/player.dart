@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
@@ -85,10 +84,7 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
       mainAxisSize: .min,
       children: [
         audioPlayer.currentTrack!.picture != null
-            ? Image.memory(
-                Uint8List.fromList(audioPlayer.currentTrack!.picture!.data),
-                width: 64,
-              )
+            ? Image.memory(audioPlayer.currentTrack!.picture!.bytes, width: 64)
             : SizedBox(width: 2),
         Column(
           mainAxisSize: .min,
