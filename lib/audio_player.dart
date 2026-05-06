@@ -133,19 +133,31 @@ class AudioPlayer {
 
   Future<void> _onEnd() => looped ? play() : next();
 
-  Future<void> next() => jump(
-    shuffled
-        ? _shuffledQueue![_shuffledQueue!.indexOf(currentIndex!) + 1]
-        : currentIndex! + 1,
-  );
+  Future<void> next() {
+    if (shuffled) {
+      var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!) + 1;
+      if (shuffledIndex >= _shuffledQueue!.length) {
+        shuffledIndex = 0;
+      }
+      return jump(_shuffledQueue![shuffledIndex]);
+    }
+    return jump(currentIndex! + 1);
+  }
 
-  Future<void> previous() => position.inSeconds < 10
-      ? jump(
-          shuffled
-              ? _shuffledQueue![_shuffledQueue!.indexOf(currentIndex!) - 1]
-              : currentIndex! - 1,
-        )
-      : seek(Duration.zero);
+  Future<void> previous() {
+    if (position.inSeconds > 10) {
+      return seek(Duration.zero);
+    }
+
+    if (shuffled) {
+      var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!) - 1;
+      if (shuffledIndex >= _shuffledQueue!.length) {
+        shuffledIndex = _shuffledQueue!.length;
+      }
+      return jump(_shuffledQueue![shuffledIndex]);
+    }
+    return jump(currentIndex! - 1);
+  }
 
   Future<void> dispose() async {
     _shuffledQueue = null;
