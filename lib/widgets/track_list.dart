@@ -46,9 +46,9 @@ class _TrackListState extends State<TrackList> {
 
   @override
   void setState(VoidCallback fn) {
+    super.setState(fn);
     tracks = getTracks();
     controller.tracks = tracks;
-    super.setState(fn);
   }
 
   @override
