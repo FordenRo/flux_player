@@ -96,22 +96,28 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
               ? Image.memory(audioPlayer.currentTrack!.picture!.bytes)
               : Icon(Icons.music_note_rounded, color: Colors.grey.shade400),
         ),
-        Column(
-          mainAxisSize: .min,
-          crossAxisAlignment: .start,
-          children: [
-            Text(audioPlayer.currentTrack!.title, overflow: .fade),
-            Text(
-              audioPlayer.currentTrack!.author,
-              softWrap: true,
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(
-                  context,
-                ).colorScheme.inverseSurface.withAlpha(170),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              Text(
+                audioPlayer.currentTrack!.title,
+                overflow: .ellipsis,
+                softWrap: false,
               ),
-            ),
-          ],
+              Text(
+                audioPlayer.currentTrack!.author,
+                overflow: .ellipsis,
+                softWrap: false,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.inverseSurface.withAlpha(170),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     ),
