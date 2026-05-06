@@ -57,7 +57,7 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
           child: Column(
             children: [
               Padding(
-                padding: const .all(8),
+                padding: const .only(top: 8, right: 8, left: 8, bottom: 4),
                 child: Row(
                   mainAxisAlignment: .center,
                   children: [
@@ -82,10 +82,20 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
     stream: audioPlayer.stream.currentTrack,
     builder: (context, asyncSnapshot) => Row(
       mainAxisSize: .min,
+      spacing: 8,
       children: [
-        audioPlayer.currentTrack!.picture != null
-            ? Image.memory(audioPlayer.currentTrack!.picture!.bytes, width: 64)
-            : SizedBox(width: 2),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: .circular(6),
+            border: .all(color: Colors.grey.shade600, width: 1, strokeAlign: 1),
+          ),
+          height: 40,
+          width: 40,
+          clipBehavior: .hardEdge,
+          child: audioPlayer.currentTrack!.picture != null
+              ? Image.memory(audioPlayer.currentTrack!.picture!.bytes)
+              : Icon(Icons.music_note_rounded, color: Colors.grey.shade400),
+        ),
         Column(
           mainAxisSize: .min,
           crossAxisAlignment: .start,
