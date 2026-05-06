@@ -24,7 +24,7 @@ class TrackListController extends ScrollController {
   void attach(ScrollPosition position) {
     super.attach(position);
 
-    if (watchCurrentTrack) {
+    if (watchCurrentTrack && audioPlayer.currentTrack != null) {
       animateToTrack(audioPlayer.currentTrack!);
     }
   }
