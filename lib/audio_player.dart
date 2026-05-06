@@ -66,13 +66,13 @@ class AudioPlayer {
       await _player.setVolume(max(min(volume, 1), 0) * 100);
 
   void setShuffled(bool shuffled) {
-    _shuffled = shuffled;
-    _shuffledController.add(shuffled);
     if (shuffled) {
       _shuffledQueue = List.generate(_queue.length, (e) => e)..shuffle();
     } else {
       _shuffledQueue = null;
     }
+    _shuffled = shuffled;
+    _shuffledController.add(shuffled);
   }
 
   void setLooped(bool looped) {
