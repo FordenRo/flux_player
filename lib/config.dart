@@ -29,8 +29,7 @@ Future<void> loadConfiguration() async {
 
   importedTracks = await Isolate.run(
     () => Future.wait(
-      (json['imported'] as List?)?.cast<String>().map(AudioTrack.fromPath) ??
-          [],
+      (json['imported'] as List?)?.map(AudioTrack.fromJson) ?? [],
     ),
   );
 
@@ -80,7 +79,7 @@ Future<void> saveConfiguration() async {
     jsonEncode({
       'device': audioPlayer.audioDevice.name,
       'volume': audioPlayer.volume,
-      'imported': importedTracks.map((e) => e.path).toList(),
+      'imported': importedTracks.map((e) => e.toJson()).toList(),
       'queue': audioPlayer.queue.map((e) => e.path).toList(),
       'index': audioPlayer.currentIndex,
       'pos': audioPlayer.position.inMilliseconds,

@@ -215,9 +215,18 @@ class AudioTrack {
 
   AudioTrack._internal({required this.path, required this.metadata});
 
+  static Future<AudioTrack> fromJson(dynamic json) async {
+    final path = json['path'] as String;
+    final metadata = await audio_metadata.parseFile(path);
+
+    return AudioTrack._internal(path: path, metadata: metadata);
+  }
+
   static Future<AudioTrack> fromPath(String path) async {
     final metadata = await audio_metadata.parseFile(path);
 
     return AudioTrack._internal(path: path, metadata: metadata);
   }
+
+  dynamic toJson() => {'path': path};
 }
