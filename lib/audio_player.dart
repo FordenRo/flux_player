@@ -97,11 +97,20 @@ class AudioPlayer {
   }
 
   void addToQueue(AudioTrack track) {
+    if (shuffled) {
+      _shuffledQueue!.add(_queue.indexOf(track));
+      return;
+    }
     _queue.add(track);
     _queueController.add(queue);
   }
 
   void addNext(AudioTrack track) {
+    if (shuffled) {
+      var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!);
+      _shuffledQueue!.insert(shuffledIndex + 1, _queue.indexOf(track));
+      return;
+    }
     _queue.insert(currentIndex! + 1, track);
     _queueController.add(queue);
   }
