@@ -93,6 +93,7 @@ class AudioPlayer {
       _currentIndex = null;
       _currentIndexController.add(null);
     }
+    setShuffled(shuffled);
   }
 
   void addToQueue(AudioTrack track) {
@@ -117,6 +118,7 @@ class AudioPlayer {
     _queueController.add([]);
     _currentIndex = null;
     _currentIndexController.add(null);
+    _shuffledQueue = null;
     return _player.stop();
   }
 
@@ -159,11 +161,13 @@ class AudioPlayer {
     return jump(currentIndex! - 1);
   }
 
-  Future<void> dispose() async {
-    _shuffledQueue = null;
-    await _player.dispose();
-    await _queueController.close();
-  }
+  Future<void> dispose() => Future.wait([
+    _player.dispose(),
+    _queueController.close(),
+    _currentIndexController.close(),
+    _shuffledController.close(),
+    _loopedController.close(),
+  ]);
 }
 
 class AudioPlayerStream {

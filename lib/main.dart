@@ -16,10 +16,7 @@ Future<void> main() async {
     title: 'Flux Music Player',
     titleBarStyle: .hidden,
   );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+  await windowManager.waitUntilReadyToShow(windowOptions, windowManager.show);
 
   await FlutterWindowClose.setWindowShouldCloseHandler(() async {
     await saveConfiguration();
