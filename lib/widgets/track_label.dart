@@ -18,8 +18,6 @@ class TrackLabel extends StatefulWidget {
 
 class _TrackLabelState extends State<TrackLabel>
     with SingleTickerProviderStateMixin {
-  late var isSelected = audioPlayer.currentTrack == track;
-  late var isPlaying = isSelected && audioPlayer.isPlaying;
   late final List<StreamSubscription> subscriptions;
   late final AnimationController playAnim = .new(
     vsync: this,
@@ -30,6 +28,8 @@ class _TrackLabelState extends State<TrackLabel>
   int get index => widget.index;
   List<AudioTrack> get playlist => widget.playlist;
   AudioTrack get track => playlist[index];
+  bool get isSelected => audioPlayer.currentTrack == track;
+  bool get isPlaying => isSelected && audioPlayer.isPlaying;
 
   @override
   void initState() {
@@ -48,16 +48,16 @@ class _TrackLabelState extends State<TrackLabel>
     await Future.wait(subscriptions.map((e) => e.cancel()));
   }
 
-  void update() => setState(() {
-    final selected = audioPlayer.currentTrack == track;
-    final playing = selected && audioPlayer.isPlaying;
+  void update() {
+    setState(() {});
+    playAnim.animateTo(isPlaying ? 1 : 0);
+  }
 
-    if (selected != isSelected || playing != isPlaying) {
-      isPlaying = playing;
-      isSelected = selected;
-    }
-    playAnim.animateTo(playing ? 1 : 0);
-  });
+  @override
+  void didUpdateWidget(covariant TrackLabel oldWidget) {
+    playAnim.value = isPlaying ? 1 : 0;
+    super.didUpdateWidget(oldWidget);
+  }
 
   Future<void> playPressed() async {
     if (isSelected) {
