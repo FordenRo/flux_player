@@ -4,9 +4,9 @@ import 'package:window_manager/window_manager.dart';
 import '../config.dart';
 import '../widgets/import_menu.dart';
 import '../widgets/player.dart';
+import 'all_tracks_page.dart';
 import 'loading_page.dart';
 import 'playlists_page.dart';
-import 'search_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
