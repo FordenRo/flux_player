@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_show_menu/flutter_show_menu.dart';
+
+final OverlayMenuStyle overlayMenuStyle = .new(
+  itemStyle: .new(height: 30),
+  padding: .zero,
+);
+
+Future<T?> showSimpleMenu<T>({
+  required BuildContext context,
+  required List<SimpleMenuItem<T>> items,
+  T? initialValue,
+  Offset offset = .zero,
+  MenuPosition position = .bottom,
+  MenuAlignment alignment = .start,
+  OverlayMenuController? controller,
+}) => showOverlayMenu(
+  context: context,
+  style: overlayMenuStyle,
+  items: items
+      .map(
+        (e) => OverlayMenuItem<T>(
+          child: Padding(
+            padding: const .symmetric(horizontal: 10),
+            child: Text(e.text),
+          ),
+          onTap: e.onTap,
+        ),
+      )
+      .toList(),
+  initialValue: initialValue,
+  position: position,
+  alignment: alignment,
+  controller: controller,
+  offset: offset,
+);
+
+class SimpleMenuItem<T> {
+  final T? value;
+  final String text;
+  final void Function() onTap;
+
+  const SimpleMenuItem({required this.text, required this.onTap, this.value});
+
+  OverlayMenuItem toOverlayItem() => OverlayMenuItem(
+    child: Padding(
+      padding: const .symmetric(horizontal: 10),
+      child: Text(text),
+    ),
+    onTap: onTap,
+  );
+}

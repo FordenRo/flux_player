@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../audio_player.dart';
+import '../config.dart';
+import 'overlay_menu.dart';
 
 class TrackLabel extends StatefulWidget {
-  const TrackLabel(this.playlist, this.index, {super.key, this.removeFrom});
+  const TrackLabel(this.playlist, this.index, {super.key, this.menuItems});
 
   final List<AudioTrack> playlist;
-  final void Function(AudioTrack track)? removeFrom;
+  final List<SimpleMenuItem>? menuItems;
   final int index;
 
   @override
@@ -130,34 +132,51 @@ class _TrackLabelState extends State<TrackLabel>
     ),
   );
 
-  Future<void> showMenu(BuildContext context, TapDownDetails e) =>
-      showOverlayMenu(
-        context: context,
-        style: .new(itemStyle: .new(height: 30), padding: .zero),
-        offset: e.localPosition.translate(0, -context.size!.height),
-        items: [
+  Future<void> showMenu(BuildContext context, TapDownDetails e) async {
+    final controller = OverlayMenuController();
+    final availablePlaylists = playlists.where(
+      (e) => !e.tracks.contains(track),
+    );
+    await showOverlayMenu(
+      context: context,
+      controller: controller,
+      style: overlayMenuStyle,
+      offset: e.localPosition.translate(0, -context.size!.height),
+      items: [
+        SimpleMenuItem(
+          text: 'Добавить в очередь',
+          onTap: () => audioPlayer.addToQueue(track),
+        ).toOverlayItem(),
+        SimpleMenuItem(
+          text: 'Играть следующим',
+          onTap: () => audioPlayer.addNext(track),
+        ).toOverlayItem(),
+        if (availablePlaylists.isNotEmpty)
           OverlayMenuItem(
-            child: Padding(
-              padding: const .symmetric(horizontal: 10),
-              child: Text('Добавить в очередь'),
-            ),
-            onTap: () => audioPlayer.addToQueue(track),
-          ),
-          OverlayMenuItem(
-            child: Padding(
-              padding: const .symmetric(horizontal: 10),
-              child: Text('Играть следующим'),
-            ),
-            onTap: () => audioPlayer.addNext(track),
-          ),
-          if (widget.removeFrom != null)
-            OverlayMenuItem(
+            child: OverlayMenuButton(
+              position: .right,
+              style: overlayMenuStyle,
+              items: availablePlaylists
+                  .map(
+                    (e) => SimpleMenuItem(
+                      text: e.title,
+                      onTap: () {
+                        e.tracks.add(track);
+                        controller.close();
+                      },
+                    ).toOverlayItem(),
+                  )
+                  .toList(),
               child: Padding(
                 padding: const .symmetric(horizontal: 10),
-                child: Text('Убрать из списка'),
+                child: Text('Добавить в плейлист'),
               ),
-              onTap: () => widget.removeFrom!(track),
             ),
-        ],
-      );
+          ),
+        if (widget.menuItems != null)
+          ...widget.menuItems!.map((e) => e.toOverlayItem()),
+      ],
+    );
+    controller.close();
+  }
 }

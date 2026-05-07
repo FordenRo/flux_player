@@ -6,8 +6,9 @@ import 'package:audio_metadata_reader/audio_metadata_reader.dart'
     as audio_metadata;
 import 'package:media_kit/media_kit.dart' as media_kit;
 
+import 'config.dart';
+
 final audioPlayer = AudioPlayer._internal();
-List<AudioTrack> importedTracks = [];
 
 typedef AudioDevice = media_kit.AudioDevice;
 typedef AudioMetadata = audio_metadata.AudioMetadata;
@@ -218,19 +219,42 @@ class AudioTrack {
 
   static Future<AudioTrack> fromJson(dynamic json) async {
     final path = json['path'] as String;
-    // final metadata = await audio_metadata.parseFile(path);
     final metadata = audio_metadata.readMetadata(.new(path), getImage: true);
-    // print(metadata.pictures.length);
 
     return ._internal(path: path, metadata: metadata);
   }
 
   static Future<AudioTrack> fromPath(String path) async {
-    // final metadata = await audio_metadata.parseFile(path);
     final metadata = audio_metadata.readMetadata(.new(path), getImage: true);
 
     return ._internal(path: path, metadata: metadata);
   }
 
   dynamic toJson() => {'path': path};
+}
+
+class Playlist {
+  String title;
+  List<AudioTrack> tracks;
+
+  Playlist({required this.title, List<AudioTrack>? tracks})
+    : tracks = tracks ?? [];
+
+  static Future<Playlist> fromJson(dynamic json) async => .new(
+    title: json['title'] as String,
+    tracks: (json['tracks'] as List?)
+        ?.cast<String>()
+        .map(
+          (path) => importedPlaylist.tracks
+              .where((track) => track.path == path)
+              .firstOrNull,
+        )
+        .nonNulls
+        .toList(),
+  );
+
+  dynamic toJson() => {
+    'title': title,
+    tracks: tracks.map((e) => e.path).toList(),
+  };
 }

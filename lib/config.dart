@@ -9,6 +9,9 @@ import 'package:window_manager/window_manager.dart';
 
 import 'audio_player.dart';
 
+Playlist importedPlaylist = .new(title: 'Imported');
+List<Playlist> playlists = [];
+
 Future<void> loadConfiguration() async {
   var dir = await getApplicationDocumentsDirectory();
 
@@ -27,12 +30,20 @@ Future<void> loadConfiguration() async {
     await windowManager.setPosition(Offset(wPos[0], wPos[1]));
   }
 
-  importedTracks = await Isolate.run(
+  importedPlaylist.tracks = await Isolate.run(
     () => Future.wait(
       (json['imported'] as List?)?.map(AudioTrack.fromJson) ?? [],
     ),
   );
 
+  playlists = await Isolate.run(
+    () => Future.wait(
+      (json['playlists'] as List?)?.map(Playlist.fromJson) ??
+          <Future<Playlist>>[],
+    ),
+  );
+
+  final importedTracks = importedPlaylist.tracks;
   var queue = await Isolate.run(
     () =>
         (json['queue'] as List?)
@@ -79,7 +90,8 @@ Future<void> saveConfiguration() async {
     jsonEncode({
       'device': audioPlayer.audioDevice.name,
       'volume': audioPlayer.volume,
-      'imported': importedTracks.map((e) => e.toJson()).toList(),
+      'imported': importedPlaylist.tracks.map((e) => e.toJson()).toList(),
+      'playlists': playlists.map((e) => e.toJson()).toList(),
       'queue': audioPlayer.queue.map((e) => e.path).toList(),
       'index': audioPlayer.currentIndex,
       'pos': audioPlayer.position.inMilliseconds,

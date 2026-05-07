@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../audio_player.dart';
+import '../config.dart';
+import 'overlay_menu.dart';
 import 'track_label.dart';
 import 'track_list/floating_actions_overlay.dart';
 import 'track_list/search_field.dart';
@@ -12,9 +14,9 @@ import 'track_list/track_list_controller.dart';
 enum Sorting { name, artist, dateAdded, lastPlayed, playCount }
 
 class TrackList extends StatefulWidget {
-  final List<AudioTrack> tracks;
+  final Playlist playlist;
 
-  const TrackList({super.key, required this.tracks});
+  const TrackList({super.key, required this.playlist});
 
   @override
   State<TrackList> createState() => _TrackListState();
@@ -22,13 +24,14 @@ class TrackList extends StatefulWidget {
 
 class _TrackListState extends State<TrackList> {
   late final TrackListController controller = .new(tracks);
+  late final StreamSubscription subscription;
   late var tracks = getTracks();
 
   var query = '';
   Sorting sort = .dateAdded;
 
   List<AudioTrack> getTracks() =>
-      widget.tracks
+      widget.playlist.tracks
           .where(
             (e) =>
                 query.isEmpty ||
@@ -45,6 +48,15 @@ class _TrackListState extends State<TrackList> {
         );
 
   @override
+  void initState() {
+    super.initState();
+    subscription = Stream.periodic(
+      const Duration(seconds: 1),
+      (_) => widget.playlist.tracks.length,
+    ).distinct().listen((_) => setState(() {}));
+  }
+
+  @override
   void setState(VoidCallback fn) {
     super.setState(fn);
     tracks = getTracks();
@@ -55,6 +67,7 @@ class _TrackListState extends State<TrackList> {
   Future<void> dispose() async {
     super.dispose();
     await controller.dispose();
+    await subscription.cancel();
   }
 
   @override
@@ -71,7 +84,9 @@ class _TrackListState extends State<TrackList> {
               child: SearchField(
                 onChanged: (value) {
                   setState(() => query = value);
-                  controller.animateToTrack(audioPlayer.currentTrack!);
+                  if (audioPlayer.currentTrack != null) {
+                    controller.animateToTrack(audioPlayer.currentTrack!);
+                  }
                 },
                 hint: 'Search',
               ),
@@ -79,7 +94,9 @@ class _TrackListState extends State<TrackList> {
             SortMenuButton(
               onSelected: (e) {
                 setState(() => sort = e);
-                controller.animateToTrack(audioPlayer.currentTrack!);
+                if (audioPlayer.currentTrack != null) {
+                  controller.animateToTrack(audioPlayer.currentTrack!);
+                }
               },
             ),
           ],
@@ -89,7 +106,18 @@ class _TrackListState extends State<TrackList> {
             itemCount: tracks.length,
             itemExtent: 50,
             controller: controller,
-            itemBuilder: (context, idx) => TrackLabel(tracks, idx),
+            itemBuilder: (context, idx) => TrackLabel(
+              tracks,
+              idx,
+              menuItems: [
+                SimpleMenuItem(
+                  text: widget.playlist != importedPlaylist
+                      ? 'Удалить из плейлиста'
+                      : 'Удалить песню',
+                  onTap: () => widget.playlist.tracks.remove(tracks[idx]),
+                ),
+              ],
+            ),
           ),
         ),
       ],

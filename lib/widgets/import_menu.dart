@@ -5,11 +5,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../audio_player.dart';
+import '../config.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
 Future<void> _onFilesSelected(List<String> paths) async {
-  importedTracks.addAll(
+  importedPlaylist.tracks.addAll(
     await Isolate.run(() => Future.wait(paths.map(AudioTrack.fromPath))),
   );
 }
@@ -19,7 +20,7 @@ Future<void> _onFolderSelected(String path) async {
   if (!await folder.exists()) {
     return;
   }
-  importedTracks.addAll(
+  importedPlaylist.tracks.addAll(
     await Isolate.run(
       () => folder
           .list()
