@@ -255,6 +255,6 @@ class Playlist {
 
   dynamic toJson() => {
     'title': title,
-    tracks: tracks.map((e) => e.path).toList(),
+    'tracks': tracks.map((e) => e.path).toList(),
   };
 }
