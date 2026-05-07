@@ -15,14 +15,35 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
+final mainPageController = MainPageController._internal();
+
+class MainPageController with ChangeNotifier {
+  var _pageIndex = 0;
+
+  int get pageIndex => _pageIndex;
+  set pageIndex(int value) {
+    _pageIndex = value;
+    notifyListeners();
+  }
+
+  MainPageController._internal();
+}
+
 class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   late final animation = AnimationController(
     duration: const Duration(seconds: 1),
     vsync: this,
   );
-  var pageIndex = 1;
   var isLoaded = false;
+
+  MainPageController get controller => mainPageController;
+
+  @override
+  void initState() {
+    super.initState();
+    mainPageController.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
@@ -82,7 +103,7 @@ class _MainPageState extends State<MainPage>
         : LoadingPage(future: loadConfiguration(), onLoad: onLoad),
   );
 
-  Widget buildPage() => switch (pageIndex) {
+  Widget buildPage() => switch (controller.pageIndex) {
     0 => AllTracksPage(),
     1 => PlaylistsPage(),
     _ => PlaylistsPage(),
@@ -110,8 +131,9 @@ class _MainPageState extends State<MainPage>
       child: Image.asset('assets/logo.png', width: 32),
     ),
     trailingAtBottom: true,
-    selectedIndex: pageIndex,
-    onDestinationSelected: (value) => setState(() => pageIndex = value),
+    selectedIndex: controller.pageIndex,
+    onDestinationSelected: (value) =>
+        setState(() => controller.pageIndex = value),
   );
 }
 

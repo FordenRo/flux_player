@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'audio_player.dart';
+import 'pages/main_page.dart';
 
 Playlist importedPlaylist = .new(title: 'Imported');
 List<Playlist> playlists = [];
@@ -64,6 +65,7 @@ Future<void> loadConfiguration() async {
   await audioPlayer.setVolume(json['volume'] ?? 1);
   audioPlayer.setLooped(json['lp'] as bool? ?? false);
   audioPlayer.setShuffled(json['sh'] as bool? ?? false);
+  mainPageController.pageIndex = json['page'] as int? ?? 0;
 
   await Future.microtask(() async {
     await audioPlayer.setAudioDevice(
@@ -98,6 +100,7 @@ Future<void> saveConfiguration() async {
       'wPos': [wPos.dx, wPos.dy],
       'lp': audioPlayer.looped,
       'sh': audioPlayer.shuffled,
+      'page': mainPageController.pageIndex,
     }),
   );
 }

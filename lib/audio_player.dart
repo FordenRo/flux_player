@@ -111,6 +111,7 @@ class AudioPlayer {
   void addNext(AudioTrack track) {
     if (shuffled) {
       var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!);
+      print(shuffledIndex);
       _shuffledQueue!.insert(shuffledIndex + 1, _queue.indexOf(track));
       return;
     }
@@ -150,6 +151,7 @@ class AudioPlayer {
   Future<void> next() {
     if (shuffled) {
       var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!) + 1;
+      print(shuffledIndex);
       if (shuffledIndex >= _shuffledQueue!.length) {
         shuffledIndex = 0;
       }
