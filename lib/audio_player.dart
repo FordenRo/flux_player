@@ -73,9 +73,10 @@ class AudioPlayer {
 
   void setShuffled(bool shuffled) {
     if (shuffled) {
+      final track = currentTrack;
       _queue.shuffle();
-      if (currentTrack != null) {
-        _currentIndex = _queue.indexOf(currentTrack!);
+      if (track != null) {
+        _currentIndex = _queue.indexOf(track);
         _currentIndexController.add(_currentIndex);
       }
     } else {
@@ -138,21 +139,29 @@ class AudioPlayer {
 
   Future<void> seek(Duration position) => _player.seek(position);
 
-  Future<void> jump(int index, {bool play = true}) async {
+  Future<void> jump(int index, {bool play = true}) {
+    if (shuffled) {
+      index = queue.indexOf(playlist!.tracks[index]);
+    }
+    return setIndex(index, play: play);
+  }
+
+  Future<void> setIndex(int index, {bool play = true}) {
     if (index < 0 || index >= queue.length) {
       index = 0;
     }
     _currentIndex = index;
     _currentIndexController.add(index);
-    await _player.open(media_kit.Media(queue[index].path), play: play);
+    return _player.open(media_kit.Media(queue[index].path), play: play);
   }
 
   Future<void> _onEnd() => looped ? play() : next();
 
-  Future<void> next() => jump(currentIndex! + 1);
+  Future<void> next() => setIndex(currentIndex! + 1);
 
-  Future<void> previous() =>
-      position.inSeconds > 10 ? seek(Duration.zero) : jump(currentIndex! - 1);
+  Future<void> previous() => position.inSeconds > 10
+      ? seek(Duration.zero)
+      : setIndex(currentIndex! - 1);
 
   Future<void> dispose() => Future.wait([
     _player.dispose(),
