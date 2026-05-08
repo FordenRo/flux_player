@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../audio_player.dart';
 import '../config.dart';
-import 'overlay_menu.dart';
+import '../utils/simple_menu.dart';
 import 'track_label.dart';
 import 'track_list/floating_actions_overlay.dart';
 import 'track_list/search_field.dart';

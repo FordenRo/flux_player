@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../audio_player.dart';
 import '../config.dart';
-import 'overlay_menu.dart';
+import '../utils/simple_menu.dart';
 
 class PlaylistLabel extends StatefulWidget {
   const PlaylistLabel(this.playlist, {super.key, this.onTap});

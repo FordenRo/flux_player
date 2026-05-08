@@ -25,6 +25,7 @@ Future<T?> showSimpleMenu<T>({
             child: Text(e.text),
           ),
           onTap: e.onTap,
+          value: e.value,
         ),
       )
       .toList(),
@@ -43,6 +44,7 @@ class SimpleMenuItem<T> {
   const SimpleMenuItem({required this.text, required this.onTap, this.value});
 
   OverlayMenuItem toOverlayItem() => OverlayMenuItem(
+    value: value,
     child: Padding(
       padding: const .symmetric(horizontal: 10),
       child: Text(text),

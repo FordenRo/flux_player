@@ -5,7 +5,7 @@ import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../audio_player.dart';
 import '../config.dart';
-import 'overlay_menu.dart';
+import '../utils/simple_menu.dart';
 
 class TrackLabel extends StatefulWidget {
   const TrackLabel(this.playlist, this.index, {super.key, this.menuItems});
