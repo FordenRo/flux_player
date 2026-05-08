@@ -107,8 +107,8 @@ class _TrackListState extends State<TrackList> {
             itemExtent: 50,
             controller: controller,
             itemBuilder: (context, idx) => TrackLabel(
-              tracks,
-              idx,
+              widget.playlist,
+              widget.playlist.tracks.indexOf(tracks[idx]),
               menuItems: [
                 SimpleMenuItem(
                   text: widget.playlist != importedPlaylist
