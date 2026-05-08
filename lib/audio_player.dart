@@ -26,7 +26,7 @@ class AudioPlayer {
   }
 
   List<AudioTrack> _queue = [];
-  List<int>? _shuffledQueue;
+  Playlist? _playlist;
   int? _currentIndex;
   var _shuffled = false;
   var _looped = false;
@@ -40,6 +40,7 @@ class AudioPlayer {
   AudioTrack? get currentTrack =>
       currentIndex != null ? queue[currentIndex!] : null;
   List<AudioTrack> get queue => _queue;
+  Playlist? get playlist => _playlist;
   double get volume => _player.state.volume / 100;
   Duration get duration => _player.state.duration;
   Duration get position => _player.state.position;
@@ -47,6 +48,7 @@ class AudioPlayer {
   bool get looped => _looped;
 
   final StreamController<List<AudioTrack>> _queueController = .broadcast();
+  final StreamController<Playlist?> _playlistController = .broadcast();
   final StreamController<int?> _currentIndexController = .broadcast();
   final StreamController<bool> _shuffledController = .broadcast();
   final StreamController<bool> _loopedController = .broadcast();
@@ -63,6 +65,7 @@ class AudioPlayer {
       (e) => e != null ? queue[e] : null,
     ),
     _loopedController.stream.distinct(),
+    _playlistController.stream.distinct(),
   );
 
   Future<void> setVolume(double volume) async =>
@@ -70,10 +73,15 @@ class AudioPlayer {
 
   void setShuffled(bool shuffled) {
     if (shuffled) {
-      _shuffledQueue = List.generate(_queue.length, (e) => e)..shuffle();
+      _queue.shuffle();
+      if (currentTrack != null) {
+        _currentIndex = _queue.indexOf(currentTrack!);
+        _currentIndexController.add(_currentIndex);
+      }
     } else {
-      _shuffledQueue = null;
+      _queue = List.of(playlist?.tracks ?? []);
     }
+    _queueController.add(_queue);
     _shuffled = shuffled;
     _shuffledController.add(shuffled);
   }
@@ -83,13 +91,15 @@ class AudioPlayer {
     _loopedController.add(looped);
   }
 
-  Future<void> setQueue(
-    List<AudioTrack> tracks, {
+  Future<void> setPlaylist(
+    Playlist playlist, {
     int? index,
     bool play = false,
   }) async {
-    _queue = List.of(tracks);
-    _queueController.add(tracks);
+    _playlist = playlist;
+    _playlistController.add(_playlist);
+    _queue = List.of(playlist.tracks);
+    _queueController.add(_queue);
     if (index != null) {
       await jump(index, play: play);
     } else {
@@ -100,21 +110,11 @@ class AudioPlayer {
   }
 
   void addToQueue(AudioTrack track) {
-    if (shuffled) {
-      _shuffledQueue!.add(_queue.indexOf(track));
-      return;
-    }
     _queue.add(track);
     _queueController.add(queue);
   }
 
   void addNext(AudioTrack track) {
-    if (shuffled) {
-      var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!);
-      print(shuffledIndex);
-      _shuffledQueue!.insert(shuffledIndex + 1, _queue.indexOf(track));
-      return;
-    }
     _queue.insert(currentIndex! + 1, track);
     _queueController.add(queue);
   }
@@ -127,11 +127,12 @@ class AudioPlayer {
   Future<void> pause() => _player.pause();
 
   Future<void> stop() {
+    _playlist = null;
+    _playlistController.add(null);
     _queue = [];
     _queueController.add([]);
     _currentIndex = null;
     _currentIndexController.add(null);
-    _shuffledQueue = null;
     return _player.stop();
   }
 
@@ -148,36 +149,15 @@ class AudioPlayer {
 
   Future<void> _onEnd() => looped ? play() : next();
 
-  Future<void> next() {
-    if (shuffled) {
-      var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!) + 1;
-      print(shuffledIndex);
-      if (shuffledIndex >= _shuffledQueue!.length) {
-        shuffledIndex = 0;
-      }
-      return jump(_shuffledQueue![shuffledIndex]);
-    }
-    return jump(currentIndex! + 1);
-  }
+  Future<void> next() => jump(currentIndex! + 1);
 
-  Future<void> previous() {
-    if (position.inSeconds > 10) {
-      return seek(Duration.zero);
-    }
-
-    if (shuffled) {
-      var shuffledIndex = _shuffledQueue!.indexOf(currentIndex!) - 1;
-      if (shuffledIndex >= _shuffledQueue!.length) {
-        shuffledIndex = _shuffledQueue!.length;
-      }
-      return jump(_shuffledQueue![shuffledIndex]);
-    }
-    return jump(currentIndex! - 1);
-  }
+  Future<void> previous() =>
+      position.inSeconds > 10 ? seek(Duration.zero) : jump(currentIndex! - 1);
 
   Future<void> dispose() => Future.wait([
     _player.dispose(),
     _queueController.close(),
+    _playlistController.close(),
     _currentIndexController.close(),
     _shuffledController.close(),
     _loopedController.close(),
@@ -194,6 +174,7 @@ class AudioPlayerStream {
   final Stream<bool> shuffled;
   final Stream<AudioTrack?> currentTrack;
   final Stream<bool> looped;
+  final Stream<Playlist?> playlist;
 
   AudioPlayerStream(
     this.volume,
@@ -205,6 +186,7 @@ class AudioPlayerStream {
     this.shuffled,
     this.currentTrack,
     this.looped,
+    this.playlist,
   );
 }
 
@@ -226,7 +208,7 @@ class AudioTrack {
     return ._internal(path: path, metadata: metadata);
   }
 
-  static Future<AudioTrack> fromPath(String path) async {
+  static AudioTrack fromPath(String path) {
     final metadata = audio_metadata.readMetadata(.new(path), getImage: true);
 
     return ._internal(path: path, metadata: metadata);
@@ -245,12 +227,8 @@ class Playlist {
   static Future<Playlist> fromJson(dynamic json) async => .new(
     title: json['title'] as String,
     tracks: (json['tracks'] as List?)
-        ?.cast<String>()
-        .map(
-          (path) => importedPlaylist.tracks
-              .where((track) => track.path == path)
-              .firstOrNull,
-        )
+        ?.cast<int>()
+        .map((idx) => importedPlaylist.tracks.elementAtOrNull(idx))
         .nonNulls
         .toList(),
   );
