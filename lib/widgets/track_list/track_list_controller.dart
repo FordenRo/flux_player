@@ -24,9 +24,11 @@ class TrackListController extends ScrollController {
   void attach(ScrollPosition position) {
     super.attach(position);
 
-    if (watchCurrentTrack && audioPlayer.currentTrack != null) {
-      animateToTrack(audioPlayer.currentTrack!);
-    }
+    Future.microtask(() {
+      if (watchCurrentTrack && audioPlayer.currentTrack != null) {
+        animateToTrack(audioPlayer.currentTrack!);
+      }
+    });
   }
 
   Future<void> animateToTrack(AudioTrack track) => animateTo(
