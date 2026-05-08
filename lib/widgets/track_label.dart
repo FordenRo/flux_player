@@ -10,7 +10,7 @@ import 'overlay_menu.dart';
 class TrackLabel extends StatefulWidget {
   const TrackLabel(this.playlist, this.index, {super.key, this.menuItems});
 
-  final List<AudioTrack> playlist;
+  final Playlist playlist;
   final List<SimpleMenuItem>? menuItems;
   final int index;
 
@@ -28,8 +28,8 @@ class _TrackLabelState extends State<TrackLabel>
   );
 
   int get index => widget.index;
-  List<AudioTrack> get playlist => widget.playlist;
-  AudioTrack get track => playlist[index];
+  Playlist get playlist => widget.playlist;
+  AudioTrack get track => playlist.tracks[index];
   bool get isSelected => audioPlayer.currentTrack == track;
   bool get isPlaying => isSelected && audioPlayer.isPlaying;
 
@@ -69,8 +69,8 @@ class _TrackLabelState extends State<TrackLabel>
         await audioPlayer.play();
       }
     } else {
-      if (audioPlayer.queue != playlist) {
-        await audioPlayer.setQueue(playlist, index: index, play: true);
+      if (audioPlayer.playlist != playlist) {
+        await audioPlayer.setPlaylist(playlist, index: index, play: true);
       } else {
         await audioPlayer.jump(index);
       }

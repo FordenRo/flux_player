@@ -128,11 +128,8 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
                 color: Theme.of(context).colorScheme.surface.withAlpha(100),
                 child: Center(
                   child: IconButton(
-                    onPressed: () => audioPlayer.setQueue(
-                      playlist.tracks,
-                      index: 0,
-                      play: true,
-                    ),
+                    onPressed: () =>
+                        audioPlayer.setPlaylist(playlist, index: 0, play: true),
                     iconSize: 32,
                     icon: Icon(Icons.play_arrow_rounded),
                   ),

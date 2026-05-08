@@ -11,7 +11,7 @@ const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
 Future<void> _onFilesSelected(List<String> paths) async {
   importedPlaylist.tracks.addAll(
-    await Isolate.run(() => Future.wait(paths.map(AudioTrack.fromPath))),
+    await Isolate.run(() => paths.map(AudioTrack.fromPath)),
   );
 }
 
