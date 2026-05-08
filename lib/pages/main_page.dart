@@ -7,6 +7,7 @@ import '../widgets/player.dart';
 import 'all_tracks_page.dart';
 import 'loading_page.dart';
 import 'playlists_page.dart';
+import 'settings_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -115,7 +116,8 @@ class _MainPageState extends State<MainPage>
   Widget buildPage() => switch (controller.pageIndex) {
     0 => AllTracksPage(),
     1 => PlaylistsPage(),
-    _ => PlaylistsPage(),
+    2 => SettingsPage(),
+    _ => AllTracksPage(),
   };
 
   NavigationRail buildNavigationRail() => NavigationRail(
@@ -130,17 +132,39 @@ class _MainPageState extends State<MainPage>
         label: const Text('Плейлисты'),
       ),
     ],
-    trailing: IconButton(
-      onPressed: () =>
-          showDialog(context: context, builder: (_) => ImportMenu()),
-      icon: const Icon(Icons.add_to_photos_rounded),
+    trailing: Expanded(
+      child: NavigationRail(
+        groupAlignment: 1,
+        labelType: .selected,
+        selectedIndex: controller.pageIndex >= 2
+            ? controller.pageIndex - 2
+            : null,
+        destinations: [
+          NavigationRailDestination(
+            icon: const Icon(Icons.settings_rounded),
+            label: const Text('Настройки'),
+          ),
+        ],
+        leadingAtTop: false,
+        leading: IconButton(
+          hoverColor: Theme.of(context).colorScheme.primary.withAlpha(10),
+          splashColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+          visualDensity: .compact,
+          padding: .symmetric(horizontal: 16),
+          onPressed: () =>
+              showDialog(context: context, builder: (_) => ImportMenu()),
+          icon: const Icon(Icons.add_to_photos_rounded),
+        ),
+        onDestinationSelected: (value) =>
+            setState(() => controller.pageIndex = value + 2),
+      ),
     ),
     leading: Padding(
       padding: const .only(bottom: 12),
       child: Image.asset('assets/logo.png', width: 32),
     ),
     trailingAtBottom: true,
-    selectedIndex: controller.pageIndex,
+    selectedIndex: controller.pageIndex < 2 ? controller.pageIndex : null,
     onDestinationSelected: (value) =>
         setState(() => controller.pageIndex = value),
   );
