@@ -69,10 +69,13 @@ Future<void> loadConfiguration() async {
 
   playlists = await Isolate.run(() {
     var playlists = <Playlist>[];
-    while (playlistsStream.length > playlistsStream.cursor) {
-      playlists.add(_loadPlaylist(playlistsStream, tracks: importedTracks));
+    try {
+      while (true) {
+        playlists.add(_loadPlaylist(playlistsStream, tracks: importedTracks));
+      }
+    } catch (_) {
+      return playlists;
     }
-    return playlists;
   });
 
   if (wasPlayingPlaylist) {
