@@ -131,7 +131,11 @@ Future<void> saveConfiguration() async {
             ? 255
             : playlists.indexOf(audioPlayer.playlist!)
       : null;
-  final playingIndex = wasPlayingPlaylist ? audioPlayer.currentIndex! : null;
+  final playingIndex = wasPlayingPlaylist
+      ? shuffled
+            ? audioPlayer.playlist!.tracks.indexOf(audioPlayer.currentTrack!)
+            : audioPlayer.currentIndex!
+      : null;
   final deviceName = audioPlayer.audioDevice.name;
   final position =
       audioPlayer.position.inMilliseconds / audioPlayer.duration.inMilliseconds;
