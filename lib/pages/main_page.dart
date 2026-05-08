@@ -36,6 +36,7 @@ class _MainPageState extends State<MainPage>
     vsync: this,
   );
   var isLoaded = false;
+  late final Future<void> future = loadConfiguration();
 
   MainPageController get controller => mainPageController;
 
@@ -100,7 +101,7 @@ class _MainPageState extends State<MainPage>
               ),
             ),
           )
-        : LoadingPage(future: loadConfiguration(), onLoad: onLoad),
+        : LoadingPage(future: future, onLoad: onLoad),
   );
 
   Widget buildPage() => switch (controller.pageIndex) {
