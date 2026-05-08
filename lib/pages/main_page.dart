@@ -68,34 +68,42 @@ class _MainPageState extends State<MainPage>
         ? Scaffold(
             body: FadeTransition(
               opacity: animation,
-              child: Row(
-                mainAxisSize: .max,
+              child: Column(
                 children: [
-                  Padding(
-                    padding: const .symmetric(vertical: 12),
-                    child: buildNavigationRail(),
-                  ),
-
-                  const VerticalDivider(width: 1),
-
                   Expanded(
-                    child: Padding(
-                      padding: const .all(8.0),
-                      child: Column(
-                        children: [
-                          CaptionWidget(title: 'Flux Music Player'),
+                    child: Row(
+                      mainAxisSize: .max,
+                      children: [
+                        Padding(
+                          padding: const .symmetric(vertical: 12),
+                          child: buildNavigationRail(),
+                        ),
 
-                          Expanded(
-                            child: Padding(
-                              padding: const .all(4),
-                              child: buildPage(),
+                        const VerticalDivider(width: 1),
+
+                        Expanded(
+                          child: Padding(
+                            padding: const .only(right: 8, left: 8, top: 8),
+                            child: Column(
+                              children: [
+                                CaptionWidget(title: 'Flux Music Player'),
+
+                                Expanded(
+                                  child: Padding(
+                                    padding: const .all(4),
+                                    child: buildPage(),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-
-                          Player(),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
+                  Padding(
+                    padding: const .only(right: 4, left: 4, bottom: 4),
+                    child: Player(),
                   ),
                 ],
               ),
