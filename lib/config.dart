@@ -11,6 +11,7 @@ import 'pages/main_page.dart';
 import 'utils/bitstream.dart';
 
 Playlist importedPlaylist = .new(title: 'Imported');
+Playlist? mainPlaylist;
 List<Playlist> playlists = [];
 
 Future<void> loadConfiguration() async {
@@ -32,6 +33,11 @@ Future<void> loadConfiguration() async {
   final playingIndex = wasPlayingPlaylist ? stream.read(16) : null;
   final deviceName = stream.readString(6);
   final position = stream.read(10) / 255;
+  var hasMainPlaylist = false;
+  try {
+    hasMainPlaylist = stream.readBool();
+  } catch (_) {}
+  final mainPlaylistIdx = hasMainPlaylist ? stream.read(8) : null;
 
   await windowManager.setPosition(Offset(wPosX, wPosY));
   await audioPlayer.setVolume(volume);
@@ -78,6 +84,10 @@ Future<void> loadConfiguration() async {
     }
   }
 
+  if (hasMainPlaylist) {
+    mainPlaylist = playlists.elementAtOrNull(mainPlaylistIdx!);
+  }
+
   await Future.microtask(() async {
     await audioPlayer.setAudioDevice(
       audioPlayer.audioDevices.firstWhere(
@@ -122,6 +132,7 @@ Future<void> saveConfiguration() async {
   final deviceName = audioPlayer.audioDevice.name;
   final position =
       audioPlayer.position.inMilliseconds / audioPlayer.duration.inMilliseconds;
+  final hasMainPlaylist = mainPlaylist != null;
 
   stream.write(wPosX.toInt() + 32768, 16);
   stream.write(wPosY.toInt() + 32768, 16);
@@ -136,6 +147,10 @@ Future<void> saveConfiguration() async {
   }
   stream.writeString(deviceName, 6);
   stream.write((position * 255).toInt(), 10);
+  stream.writeBool(hasMainPlaylist);
+  if (hasMainPlaylist) {
+    stream.write(playlists.indexOf(mainPlaylist!), 8);
+  }
   await file.writeAsBytes(stream.toBytes());
 
   final tracksFile = File('${dir.path}/Flux Player/tracks');

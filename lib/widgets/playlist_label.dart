@@ -148,6 +148,11 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
         offset: e.localPosition.translate(0, -context.size!.height),
         items: [
           SimpleMenuItem(text: 'Переименовать', onTap: focusNode.requestFocus),
+          if (mainPlaylist != playlist)
+            SimpleMenuItem(
+              text: 'Сделать главным',
+              onTap: () => mainPlaylist = playlist,
+            ),
           SimpleMenuItem(
             text: 'Удалить',
             onTap: () => playlists.remove(playlist),
