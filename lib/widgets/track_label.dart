@@ -117,6 +117,66 @@ class _TrackLabelState extends State<TrackLabel>
               ),
             ),
             const Expanded(child: SizedBox()),
+            if (playlists.isNotEmpty)
+              StatefulBuilder(
+                builder: (context, setState) => InkWell(
+                  customBorder: CircleBorder(),
+                  onTap: () async {
+                    final isSelected = await showSimpleMenu(
+                      context: context,
+                      items: playlists
+                          .where((e) => !e.tracks.contains(track))
+                          .map(
+                            (e) => SimpleMenuItem(
+                              text: e.title,
+                              value: true,
+                              onTap: () => e.tracks.add(track),
+                            ),
+                          )
+                          .followedBy(
+                            playlists
+                                .where((e) => e.tracks.contains(track))
+                                .map(
+                                  (e) => SimpleMenuItem(
+                                    text: '-${e.title}',
+                                    value: true,
+                                    onTap: () => e.tracks.remove(track),
+                                  ),
+                                ),
+                          )
+                          .toList(),
+                    );
+                    if (isSelected != null) {
+                      setState(() {});
+                    }
+                  },
+                  onSecondaryTap: () {
+                    if (mainPlaylist == null) {
+                      return;
+                    }
+                    if (mainPlaylist!.tracks.contains(track)) {
+                      setState(() => mainPlaylist!.tracks.remove(track));
+                    } else {
+                      setState(() => mainPlaylist!.tracks.add(track));
+                    }
+                  },
+                  child: Padding(
+                    padding: const .all(6),
+                    child: Icon(
+                      mainPlaylist?.tracks.contains(track) ??
+                              playlists
+                                  .where((e) => e.tracks.contains(track))
+                                  .isNotEmpty
+                          ? Icons.playlist_add_check_rounded
+                          : Icons.playlist_add_rounded,
+                      size: 20,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(200),
+                    ),
+                  ),
+                ),
+              ),
             Text(
               '${track.duration.inMinutes.toString().padLeft(2, '0')}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
