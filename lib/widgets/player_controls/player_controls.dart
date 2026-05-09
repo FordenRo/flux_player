@@ -113,9 +113,7 @@ class _PlayerControlsState extends State<PlayerControls>
                 softWrap: false,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.inverseSurface.withAlpha(170),
+                  color: colorScheme.inverseSurface.withAlpha(170),
                 ),
               ),
             ],

@@ -213,7 +213,7 @@ void _savePlaylist(
   stream.writeString(playlist.title, 6);
   stream.write(playlist.tracks.length, 16);
   playlist.tracks
-      .map((e) => tracks.indexOf(e))
-      .where((e) => e != -1)
-      .forEach((e) => stream.write(e, 16));
+      .map((track) => tracks.indexOf(track))
+      .where((idx) => idx != -1)
+      .forEach((idx) => stream.write(idx, 16));
 }

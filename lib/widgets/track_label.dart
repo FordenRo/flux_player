@@ -114,9 +114,7 @@ class _TrackLabelState extends State<TrackLabel>
               track.author,
               style: TextStyle(
                 fontSize: 12,
-                color: Theme.of(
-                  context,
-                ).colorScheme.inverseSurface.withAlpha(170),
+                color: colorScheme.inverseSurface.withAlpha(170),
               ),
             ),
             const Expanded(child: SizedBox()),
@@ -173,9 +171,7 @@ class _TrackLabelState extends State<TrackLabel>
                           ? Icons.playlist_add_check_rounded
                           : Icons.playlist_add_rounded,
                       size: 20,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withAlpha(200),
+                      color: colorScheme.onSurface.withAlpha(200),
                     ),
                   ),
                 ),
@@ -184,9 +180,7 @@ class _TrackLabelState extends State<TrackLabel>
               '${track.duration.inMinutes.toString().padLeft(2, '0')}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 13,
-                color: Theme.of(
-                  context,
-                ).colorScheme.inverseSurface.withAlpha(200),
+                color: colorScheme.inverseSurface.withAlpha(200),
               ),
             ),
           ],

@@ -68,11 +68,7 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
                     alignment: .bottomLeft,
                     child: Text(
                       '${playlist.tracks.length} треков',
-                      style: .new(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withAlpha(180),
-                      ),
+                      style: .new(color: colorScheme.onSurface.withAlpha(180)),
                     ),
                   ),
                   Align(
@@ -81,11 +77,7 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
                       overallDuration.inMinutes > 100
                           ? '${(overallDuration.inMinutes / 60).toStringAsFixed(1)} часов'
                           : '${overallDuration.inMinutes} минут',
-                      style: .new(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withAlpha(180),
-                      ),
+                      style: .new(color: colorScheme.onSurface.withAlpha(180)),
                     ),
                   ),
                 ],

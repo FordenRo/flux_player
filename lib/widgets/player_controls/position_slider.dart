@@ -51,9 +51,7 @@ class _PositionSliderState extends State<PositionSlider> {
         data: SliderThemeData(
           trackHeight: 8,
           padding: .all(0),
-          activeTrackColor: Theme.of(
-            context,
-          ).colorScheme.primary.withAlpha(200),
+          activeTrackColor: colorScheme.primary.withAlpha(200),
           thumbColor: colorScheme.primary,
           thumbShape: RoundSliderThumbShape(
             enabledThumbRadius: expanded ? 6 : 0,
