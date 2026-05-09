@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../audio_player.dart';
-import '../config.dart';
+import '../core/config.dart';
+import '../core/constants.dart';
+import '../core/audio_player/playlist.dart';
 import '../widgets/playlist_label.dart';
-import '../widgets/track_list.dart';
-import 'main_page.dart';
+import '../widgets/track_list/track_list.dart';
+import 'main/caption_widget.dart';
 
 class PlaylistsPage extends StatefulWidget {
   const PlaylistsPage({super.key});
@@ -30,8 +31,8 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
             onPressed: () => playlists.add(.new(title: 'Новый плейлист')),
             shape: CircleBorder(),
             backgroundColor: .alphaBlend(
-              Theme.of(context).colorScheme.primaryContainer.withAlpha(100),
-              Theme.of(context).colorScheme.surface,
+              colorScheme.primaryContainer.withAlpha(100),
+              colorScheme.surface,
             ),
             child: const Icon(Icons.add),
           ),

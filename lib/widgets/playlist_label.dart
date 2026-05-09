@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../audio_player.dart';
-import '../config.dart';
-import '../utils/simple_menu.dart';
+import '../core/audio_player/audio_player.dart';
+import '../core/config.dart';
+import '../core/constants.dart';
+import '../core/audio_player/playlist.dart';
+import '../features/simple_menu.dart';
 
 class PlaylistLabel extends StatefulWidget {
   const PlaylistLabel(this.playlist, {super.key, this.onTap});
@@ -125,7 +127,7 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
               opacity: iconHovered ? 1 : 0,
               duration: Durations.short2,
               child: ColoredBox(
-                color: Theme.of(context).colorScheme.surface.withAlpha(100),
+                color: colorScheme.surface.withAlpha(100),
                 child: Center(
                   child: IconButton(
                     onPressed: () =>

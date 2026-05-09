@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
 
-import '../config.dart';
-import '../widgets/import_menu.dart';
-import '../widgets/player.dart';
-import 'all_tracks_page.dart';
-import 'loading_page.dart';
-import 'playlists_page.dart';
-import 'settings_page.dart';
+import '../../core/config.dart';
+import '../../core/constants.dart';
+import '../../widgets/import_menu.dart';
+import '../../widgets/player_controls/player_controls.dart';
+import '../all_tracks_page.dart';
+import '../loading_page.dart';
+import '../playlists_page.dart';
+import '../settings_page.dart';
+import 'caption_widget.dart';
+import 'main_page_controller.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-final mainPageController = MainPageController._internal();
-
-class MainPageController with ChangeNotifier {
-  var _pageIndex = 0;
-
-  int get pageIndex => _pageIndex;
-  set pageIndex(int value) {
-    _pageIndex = value;
-    notifyListeners();
-  }
-
-  MainPageController._internal();
-}
-
-class _MainPageState extends State<MainPage>
+class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   late final animation = AnimationController(
     duration: const Duration(seconds: 1),
@@ -104,7 +92,7 @@ class _MainPageState extends State<MainPage>
                   ),
                   Padding(
                     padding: const .only(right: 4, left: 4, bottom: 4),
-                    child: Player(),
+                    child: PlayerControls(),
                   ),
                 ],
               ),
@@ -147,8 +135,8 @@ class _MainPageState extends State<MainPage>
         ],
         leadingAtTop: false,
         leading: IconButton(
-          hoverColor: Theme.of(context).colorScheme.primary.withAlpha(10),
-          splashColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+          hoverColor: colorScheme.primary.withAlpha(10),
+          splashColor: colorScheme.primary.withAlpha(100),
           visualDensity: .compact,
           padding: .symmetric(horizontal: 16),
           onPressed: () =>
@@ -168,97 +156,4 @@ class _MainPageState extends State<MainPage>
     onDestinationSelected: (value) =>
         setState(() => controller.pageIndex = value),
   );
-}
-
-class CaptionWidget extends StatefulWidget {
-  final String title;
-
-  const CaptionWidget({super.key, required this.title});
-
-  @override
-  State<CaptionWidget> createState() => _CaptionWidgetState();
-}
-
-class _CaptionWidgetState extends State<CaptionWidget> {
-  List<Widget Function(BuildContext)> captionButtons = [];
-
-  @override
-  void initState() {
-    super.initState();
-    captionController._onButtonAdd = (builder, controller) {
-      setState(() => captionButtons.add(builder));
-      controller._onRemove = () {
-        controller._onRemove = null;
-        Future.microtask(() => setState(() => captionButtons.remove(builder)));
-      };
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) => IconButtonTheme(
-    data: .new(
-      style: .new(
-        padding: .all(.zero),
-        shape: .all(RoundedRectangleBorder(borderRadius: .circular(6))),
-      ),
-    ),
-    child: SizedBox(
-      height: 28,
-      child: Padding(
-        padding: const .symmetric(horizontal: 10, vertical: 2),
-        child: Row(
-          children: [
-            AnimatedSize(
-              duration: Durations.medium1,
-              curve: Curves.easeOutCubic,
-              child: Row(
-                children: captionButtons.map((e) => e(context)).toList(),
-              ),
-            ),
-            Expanded(
-              child: DragToMoveArea(
-                child: Text(widget.title, textAlign: .center),
-              ),
-            ),
-            IconButton(
-              onPressed: windowManager.minimize,
-              icon: const Icon(Icons.minimize_rounded),
-            ),
-            IconButton(
-              hoverColor: Colors.red.shade600.withAlpha(200),
-              onPressed: windowManager.close,
-              icon: const Icon(Icons.close_rounded),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-final captionController = CaptionController._internal();
-
-class CaptionButtonController {
-  void Function()? _onRemove;
-
-  CaptionButtonController();
-
-  void remove() => _onRemove!();
-
-  void dispose() => _onRemove?.call();
-}
-
-class CaptionController {
-  void Function(
-    Widget Function(BuildContext context) builder,
-    CaptionButtonController controller,
-  )?
-  _onButtonAdd;
-
-  CaptionController._internal();
-
-  void addIconButton({
-    required IconButton Function(BuildContext context) builder,
-    required CaptionButtonController controller,
-  }) => _onButtonAdd!(builder, controller);
 }

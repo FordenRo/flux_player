@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
-import '../audio_player.dart';
-import '../config.dart';
-import '../utils/simple_menu.dart';
+import '../core/audio_player/audio_player.dart';
+import '../core/audio_player/track.dart';
+import '../core/config.dart';
+import '../core/constants.dart';
+import '../core/audio_player/playlist.dart';
+import '../features/simple_menu.dart';
 
 class TrackLabel extends StatefulWidget {
   const TrackLabel(this.playlist, this.index, {super.key, this.menuItems});
@@ -29,7 +32,7 @@ class _TrackLabelState extends State<TrackLabel>
 
   int get index => widget.index;
   Playlist get playlist => widget.playlist;
-  AudioTrack get track => playlist.tracks[index];
+  Track get track => playlist.tracks[index];
   bool get isSelected => audioPlayer.currentTrack == track;
   bool get isPlaying => isSelected && audioPlayer.isPlaying;
 
@@ -69,7 +72,7 @@ class _TrackLabelState extends State<TrackLabel>
         await audioPlayer.play();
       }
     } else {
-      if (audioPlayer.playlist != playlist) {
+      if (audioPlayer.currentPlaylist != playlist) {
         await audioPlayer.setPlaylist(playlist, index: index, play: true);
       } else {
         await audioPlayer.jump(index);
@@ -85,9 +88,7 @@ class _TrackLabelState extends State<TrackLabel>
       clipBehavior: .hardEdge,
       shape: RoundedRectangleBorder(
         borderRadius: .circular(12),
-        side: isSelected
-            ? BorderSide(color: Theme.of(context).colorScheme.primary)
-            : .none,
+        side: isSelected ? BorderSide(color: colorScheme.primary) : .none,
       ),
       child: Padding(
         padding: const .symmetric(horizontal: 8),

@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../audio_player.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/track.dart';
 
 class TrackListController extends ScrollController {
   var watchCurrentTrack = true;
-  List<AudioTrack> tracks;
+  List<Track> tracks;
   late final StreamSubscription _subscription;
 
   TrackListController(this.tracks, {super.onAttach, super.onDetach}) {
@@ -31,7 +32,7 @@ class TrackListController extends ScrollController {
     });
   }
 
-  Future<void> animateToTrack(AudioTrack track) => animateTo(
+  Future<void> animateToTrack(Track track) => animateTo(
     (tracks.indexOf(track) - 1) * 50,
     duration: Durations.long2,
     curve: Curves.easeOutQuart,

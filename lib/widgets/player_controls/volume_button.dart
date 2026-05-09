@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import '../../audio_player.dart';
+import '../../core/audio_player/audio_player.dart';
 import 'volume_overlay.dart';
 
 class VolumeButton extends StatefulWidget {

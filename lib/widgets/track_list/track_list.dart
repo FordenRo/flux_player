@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../audio_player.dart';
-import '../config.dart';
-import '../utils/simple_menu.dart';
-import 'track_label.dart';
-import 'track_list/floating_actions_overlay.dart';
-import 'track_list/search_field.dart';
-import 'track_list/sort_menu_button.dart';
-import 'track_list/track_list_controller.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/track.dart';
+import '../../core/config.dart';
+import '../../core/audio_player/playlist.dart';
+import '../../features/simple_menu.dart';
+import '../track_label.dart';
+import 'floating_actions_overlay.dart';
+import 'search_field.dart';
+import 'sort_menu_button.dart';
+import 'track_list_controller.dart';
 
 enum Sorting { name, artist, dateAdded, lastPlayed, playCount }
 
@@ -30,7 +32,7 @@ class _TrackListState extends State<TrackList> {
   var query = '';
   Sorting sort = .dateAdded;
 
-  List<AudioTrack> getTracks() =>
+  List<Track> getTracks() =>
       widget.playlist.tracks
           .where(
             (e) =>

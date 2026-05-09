@@ -6,9 +6,11 @@ import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'audio_player.dart';
-import 'pages/main_page.dart';
-import 'utils/bitstream.dart';
+import '../features/main/main_page_controller.dart';
+import 'audio_player/audio_player.dart';
+import 'audio_player/track.dart';
+import 'bitstream.dart';
+import 'audio_player/playlist.dart';
 
 Playlist importedPlaylist = .new(title: 'Imported');
 Playlist? mainPlaylist;
@@ -52,7 +54,7 @@ Future<void> loadConfiguration() async {
   final tracksStream = BitStream(bytes: await tracksFile.readAsBytes());
 
   final importedTracks = await Isolate.run(() {
-    var tracks = <AudioTrack>[];
+    var tracks = <Track>[];
     while (tracksStream.length > tracksStream.cursor) {
       tracks.add(_loadTrack(tracksStream));
     }
@@ -125,15 +127,17 @@ Future<void> saveConfiguration() async {
   final pageIndex = mainPageController.pageIndex;
   final shuffled = audioPlayer.shuffled;
   final looped = audioPlayer.looped;
-  final wasPlayingPlaylist = audioPlayer.playlist != null;
+  final wasPlayingPlaylist = audioPlayer.currentPlaylist != null;
   final playingPlaylistIdx = wasPlayingPlaylist
-      ? audioPlayer.playlist! == importedPlaylist
+      ? audioPlayer.currentPlaylist! == importedPlaylist
             ? 255
-            : playlists.indexOf(audioPlayer.playlist!)
+            : playlists.indexOf(audioPlayer.currentPlaylist!)
       : null;
   final playingIndex = wasPlayingPlaylist
       ? shuffled
-            ? audioPlayer.playlist!.tracks.indexOf(audioPlayer.currentTrack!)
+            ? audioPlayer.currentPlaylist!.tracks.indexOf(
+                audioPlayer.currentTrack!,
+              )
             : audioPlayer.currentIndex!
       : null;
   final deviceName = audioPlayer.audioDevice.name;
@@ -179,16 +183,16 @@ Future<void> saveConfiguration() async {
   await playlistsFile.writeAsBytes(playlistsStream.toBytes());
 }
 
-AudioTrack _loadTrack(BitStream stream) {
+Track _loadTrack(BitStream stream) {
   final path = stream.readString(8);
-  return AudioTrack.fromPath(path);
+  return Track.fromPath(path);
 }
 
-void _saveTrack(BitStream stream, AudioTrack track) {
+void _saveTrack(BitStream stream, Track track) {
   stream.writeString(track.path, 8);
 }
 
-Playlist _loadPlaylist(BitStream stream, {required List<AudioTrack> tracks}) {
+Playlist _loadPlaylist(BitStream stream, {required List<Track> tracks}) {
   final title = stream.readString(6);
   final trackCount = stream.read(16);
   final trackIndices = List.generate(trackCount, (_) => stream.read(16));
@@ -204,7 +208,7 @@ Playlist _loadPlaylist(BitStream stream, {required List<AudioTrack> tracks}) {
 void _savePlaylist(
   BitStream stream,
   Playlist playlist, {
-  required List<AudioTrack> tracks,
+  required List<Track> tracks,
 }) {
   stream.writeString(playlist.title, 6);
   stream.write(playlist.tracks.length, 16);

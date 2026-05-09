@@ -4,14 +4,15 @@ import 'dart:isolate';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../audio_player.dart';
-import '../config.dart';
+import '../core/audio_player/track.dart';
+import '../core/config.dart';
+import '../core/constants.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
 Future<void> _onFilesSelected(List<String> paths) async {
   importedPlaylist.tracks.addAll(
-    await Isolate.run(() => paths.map(AudioTrack.fromPath)),
+    await Isolate.run(() => paths.map(Track.fromPath)),
   );
 }
 
@@ -25,7 +26,7 @@ Future<void> _onFolderSelected(String path) async {
       () => folder
           .list()
           .where((e) => audioExtensions.contains(e.path.split('.').last))
-          .asyncMap((e) => AudioTrack.fromPath(e.path))
+          .asyncMap((e) => Track.fromPath(e.path))
           .toList(),
     ),
   );
@@ -107,7 +108,7 @@ class _ImportMenuState extends State<ImportMenu> {
     required String text,
     required void Function() onTap,
   }) => Card(
-    color: Theme.of(context).colorScheme.primary.withAlpha(50),
+    color: colorScheme.primary.withAlpha(50),
     clipBehavior: .hardEdge,
     child: InkWell(
       onTap: onTap,

@@ -3,8 +3,9 @@ import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
-import 'config.dart';
-import 'pages/main_page.dart';
+import 'core/config.dart';
+import 'core/constants.dart';
+import 'features/main/main_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,11 +33,8 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'Flux',
-    onGenerateTitle: (context) => 'Flux',
     color: Colors.red,
-    theme: ThemeData(
-      colorScheme: .fromSeed(seedColor: Colors.red.shade700, brightness: .dark),
-    ),
-    home: MainPage(),
+    theme: ThemeData(colorScheme: colorScheme),
+    home: MainScreen(),
   );
 }

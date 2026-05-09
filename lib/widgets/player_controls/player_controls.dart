@@ -4,18 +4,20 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
-import '../audio_player.dart';
-import 'player/position_slider.dart';
-import 'player/volume_button.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/constants.dart';
+import 'position_slider.dart';
+import 'volume_button.dart';
 
-class Player extends StatefulWidget {
-  const Player({super.key});
+class PlayerControls extends StatefulWidget {
+  const PlayerControls({super.key});
 
   @override
-  State<Player> createState() => _PlayerState();
+  State<PlayerControls> createState() => _PlayerControlsState();
 }
 
-class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
+class _PlayerControlsState extends State<PlayerControls>
+    with SingleTickerProviderStateMixin {
   late final StreamSubscription subscription;
   late final AnimationController playAnim = .new(
     vsync: this,
@@ -49,8 +51,8 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
             borderRadius: .circular(12),
             side: BorderSide(
               color: audioPlayer.isPlaying
-                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
-                  : Theme.of(context).colorScheme.secondary.withAlpha(100),
+                  ? colorScheme.primary.withAlpha(200)
+                  : colorScheme.secondary.withAlpha(100),
             ),
           ),
           elevation: 2,
@@ -130,9 +132,7 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
       StreamBuilder(
         stream: audioPlayer.stream.shuffled,
         builder: (context, asyncSnapshot) => IconButton(
-          color: audioPlayer.shuffled
-              ? Theme.of(context).colorScheme.primary
-              : null,
+          color: audioPlayer.shuffled ? colorScheme.primary : null,
           onPressed: () => audioPlayer.setShuffled(!audioPlayer.shuffled),
           icon: const Icon(Icons.shuffle_rounded),
         ),
@@ -149,9 +149,7 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
             }
           },
           child: IconButton(
-            color: prevBtnOffset != 0
-                ? Theme.of(context).colorScheme.primary
-                : null,
+            color: prevBtnOffset != 0 ? colorScheme.primary : null,
             onPressed: () => setState(() {
               prevBtnOffset = 1;
               audioPlayer.previous();
@@ -185,9 +183,7 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
             }
           },
           child: IconButton(
-            color: nextBtnOffset != 0
-                ? Theme.of(context).colorScheme.primary
-                : null,
+            color: nextBtnOffset != 0 ? colorScheme.primary : null,
             onPressed: () => setState(() {
               nextBtnOffset = 1;
               audioPlayer.next();
@@ -204,9 +200,7 @@ class _PlayerState extends State<Player> with SingleTickerProviderStateMixin {
           duration: Durations.short3,
           turns: audioPlayer.looped ? -0.5 : 0,
           child: IconButton(
-            color: audioPlayer.looped
-                ? Theme.of(context).colorScheme.primary
-                : null,
+            color: audioPlayer.looped ? colorScheme.primary : null,
             onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
             icon: const Icon(Icons.loop_rounded),
           ),

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../audio_player.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/constants.dart';
 
 class VolumeOverlay extends StatefulWidget {
   const VolumeOverlay({super.key, required this.onHide});
@@ -130,15 +131,13 @@ class _VolumeOverlayState extends State<VolumeOverlay>
 
   Card buildCard(BuildContext context) => Card(
     shape: RoundedRectangleBorder(
-      side: BorderSide(
-        color: Theme.of(context).colorScheme.secondary.withAlpha(100),
-      ),
+      side: BorderSide(color: colorScheme.secondary.withAlpha(100)),
       borderRadius: .circular(16),
     ),
     elevation: 8,
     child: SliderTheme(
       data: SliderThemeData(
-        activeTrackColor: Theme.of(context).colorScheme.primary.withAlpha(200),
+        activeTrackColor: colorScheme.primary.withAlpha(200),
         thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
         overlayShape: RoundSliderOverlayShape(overlayRadius: 16),
       ),

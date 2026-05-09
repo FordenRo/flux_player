@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../audio_player.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/track.dart';
+import '../../core/constants.dart';
 import 'track_list_controller.dart';
 
 class FloatingActionsOverlay extends StatefulWidget {
   final TrackListController scrollController;
-  final List<AudioTrack> tracks;
+  final List<Track> tracks;
 
   const FloatingActionsOverlay({
     super.key,
@@ -82,12 +84,12 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
             style: .new(
               backgroundColor: .all(
                 Color.alphaBlend(
-                  Theme.of(context).colorScheme.secondary.withAlpha(100),
-                  Theme.of(context).colorScheme.surface,
+                  colorScheme.secondary.withAlpha(100),
+                  colorScheme.surface,
                 ),
               ),
             ),
-            color: Theme.of(context).colorScheme.onSurface,
+            color: colorScheme.onSurface,
             icon: const Icon(Icons.arrow_upward_rounded),
           ),
         ),
@@ -109,12 +111,12 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
           style: .new(
             backgroundColor: .all(
               Color.alphaBlend(
-                Theme.of(context).colorScheme.primary.withAlpha(120),
-                Theme.of(context).colorScheme.surface,
+                colorScheme.primary.withAlpha(120),
+                colorScheme.surface,
               ),
             ),
           ),
-          color: Theme.of(context).colorScheme.onSurface,
+          color: colorScheme.onSurface,
           icon: const Icon(Icons.music_note_rounded),
         ),
       ),
