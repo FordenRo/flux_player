@@ -33,7 +33,7 @@ abstract interface class AudioPlayer {
 
   Future<void> setVolume(double volume);
 
-  Future<void> setShuffled(bool shuffled);
+  void setShuffled(bool shuffled);
 
   void setLooped(bool looped);
 

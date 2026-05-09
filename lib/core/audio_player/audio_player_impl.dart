@@ -80,10 +80,10 @@ class AudioPlayerImpl implements AudioPlayer {
       await _player.setVolume(max(min(volume, 1), 0) * 100);
 
   @override
-  Future<void> setShuffled(bool shuffled) async {
+  void setShuffled(bool shuffled) {
     if (shuffled) {
       final track = currentTrack;
-      await Isolate.run(() => _queue.shuffle());
+      _queue.shuffle();
       if (track != null) {
         _currentIndex = _queue.indexOf(track);
         _currentIndexController.add(_currentIndex);
