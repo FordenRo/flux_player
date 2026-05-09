@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:math';
 import 'package:media_kit/media_kit.dart' as media_kit;
 import 'audio_player.dart';

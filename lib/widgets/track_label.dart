@@ -41,8 +41,14 @@ class _TrackLabelState extends State<TrackLabel>
     super.initState();
 
     subscriptions = [
-      audioPlayer.stream.isPlaying.listen((_) => update()),
-      audioPlayer.stream.currentTrack.listen((_) => update()),
+      audioPlayer.stream.isPlaying
+          .map((e) => isSelected && e)
+          .distinct()
+          .listen((_) => update()),
+      audioPlayer.stream.currentTrack
+          .map((e) => e == track)
+          .distinct()
+          .listen((_) => update()),
     ];
   }
 
