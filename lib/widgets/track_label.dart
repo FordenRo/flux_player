@@ -72,11 +72,7 @@ class _TrackLabelState extends State<TrackLabel>
         await audioPlayer.play();
       }
     } else {
-      if (audioPlayer.currentPlaylist != playlist) {
-        await audioPlayer.setPlaylist(playlist, index: index, play: true);
-      } else {
-        await audioPlayer.jump(index);
-      }
+      await audioPlayer.setPlaylist(playlist, index: index, play: true);
     }
   }
 

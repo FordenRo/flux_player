@@ -5,10 +5,10 @@ import '../../core/audio_player/track.dart';
 
 class TrackListController extends ScrollController {
   var watchCurrentTrack = true;
-  List<Track> tracks;
+  List<Track> tracks = [];
   late final StreamSubscription _subscription;
 
-  TrackListController(this.tracks, {super.onAttach, super.onDetach}) {
+  TrackListController({super.onAttach, super.onDetach}) {
     addListener(() {
       if (watchCurrentTrack && position.userScrollDirection != .idle) {
         watchCurrentTrack = false;
