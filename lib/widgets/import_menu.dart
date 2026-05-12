@@ -58,7 +58,7 @@ class _ImportMenuState extends State<ImportMenu> {
                     buildButton(
                       context,
                       icon: Icons.file_copy_rounded,
-                      text: 'Add files',
+                      text: 'Добавить файлы',
                       onTap: () async {
                         var result = await FilePicker.pickFiles(
                           type: .custom,
@@ -80,7 +80,7 @@ class _ImportMenuState extends State<ImportMenu> {
                     buildButton(
                       context,
                       icon: Icons.folder_copy_rounded,
-                      text: 'Add folder',
+                      text: 'Добавить папки',
                       onTap: () async {
                         var result = await FilePicker.getDirectoryPath(
                           dialogTitle: 'Flux Import Folder',
@@ -113,13 +113,19 @@ class _ImportMenuState extends State<ImportMenu> {
     child: InkWell(
       onTap: onTap,
       child: SizedBox(
-        width: 100,
-        height: 100,
-        child: Column(
-          spacing: 6,
-          mainAxisAlignment: .center,
-          mainAxisSize: .min,
-          children: [Icon(icon, size: 42), Text(text)],
+        width: 120,
+        height: 120,
+        child: Padding(
+          padding: const .all(8.0),
+          child: Column(
+            spacing: 6,
+            mainAxisAlignment: .center,
+            mainAxisSize: .min,
+            children: [
+              Icon(icon, size: 42),
+              Text(text, textAlign: .center),
+            ],
+          ),
         ),
       ),
     ),

@@ -47,59 +47,52 @@ class _MainScreenState extends State<MainScreen>
   });
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'Flux Music Player',
-    color: Colors.red,
-    theme: ThemeData(
-      colorScheme: .fromSeed(seedColor: Colors.red.shade700, brightness: .dark),
-    ),
-    home: isLoaded
-        ? Scaffold(
-            body: FadeTransition(
-              opacity: animation,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: .max,
-                      children: [
-                        Padding(
-                          padding: const .symmetric(vertical: 12),
-                          child: buildNavigationRail(),
-                        ),
+  Widget build(BuildContext context) => isLoaded
+      ? Scaffold(
+          body: FadeTransition(
+            opacity: animation,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisSize: .max,
+                    children: [
+                      Padding(
+                        padding: const .symmetric(vertical: 12),
+                        child: buildNavigationRail(),
+                      ),
 
-                        const VerticalDivider(width: 1),
+                      const VerticalDivider(width: 1),
 
-                        Expanded(
-                          child: Padding(
-                            padding: const .only(right: 8, left: 8, top: 8),
-                            child: Column(
-                              children: [
-                                CaptionWidget(title: 'Flux Music Player'),
+                      Expanded(
+                        child: Padding(
+                          padding: const .only(right: 8, left: 8, top: 8),
+                          child: Column(
+                            children: [
+                              CaptionWidget(title: 'Flux Music Player'),
 
-                                Expanded(
-                                  child: Padding(
-                                    padding: const .all(4),
-                                    child: buildPage(),
-                                  ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const .all(4),
+                                  child: buildPage(),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const .only(right: 4, left: 4, bottom: 4),
-                    child: PlayerControls(),
-                  ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const .only(right: 4, left: 4, bottom: 4),
+                  child: PlayerControls(),
+                ),
+              ],
             ),
-          )
-        : LoadingPage(future: future, onLoad: onLoad),
-  );
+          ),
+        )
+      : LoadingPage(future: future, onLoad: onLoad);
 
   Widget buildPage() => switch (controller.pageIndex) {
     0 => AllTracksPage(),

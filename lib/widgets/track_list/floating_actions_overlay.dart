@@ -25,17 +25,13 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
   int? get currentTrackPos => audioPlayer.currentTrack != null
       ? (widget.tracks.indexOf(audioPlayer.currentTrack!) - 1) * 50
       : null;
-  bool get watchCurrentTrack => controller.watchCurrentTrack;
 
-  late bool showWatchTrack = canShowWatchTrack();
-  late bool showGoTop = canShowGoTop();
+  late var showWatchTrack = canShowWatchTrack();
+  late var showGoTop = canShowGoTop();
+  late var watchCurrentTrack = controller.watchCurrentTrack;
   late final StreamSubscription subscription;
 
-  bool canShowWatchTrack() =>
-      currentTrackPos != null &&
-      !watchCurrentTrack &&
-      (currentTrackPos! - controller.offset).abs() > 80;
-
+  bool canShowWatchTrack() => currentTrackPos != null;
   bool canShowGoTop() => controller.offset > 1000;
 
   @override
@@ -49,10 +45,13 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
   void update() {
     var canShowWatch = canShowWatchTrack();
     var canShowTop = canShowGoTop();
-    if (canShowWatch != showWatchTrack || canShowTop != showGoTop) {
+    if (canShowWatch != showWatchTrack ||
+        canShowTop != showGoTop ||
+        controller.watchCurrentTrack != watchCurrentTrack) {
       setState(() {
         showWatchTrack = canShowWatch;
         showGoTop = canShowTop;
+        watchCurrentTrack = controller.watchCurrentTrack;
       });
     }
   }
@@ -76,7 +75,7 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
           opacity: showGoTop ? 1 : 0,
           duration: Durations.medium1,
           child: IconButton.filled(
-            onPressed: controller.animateToTop,
+            onPressed: showGoTop ? controller.animateToTop : null,
             iconSize: 20,
             padding: .zero,
             splashRadius: 10,
@@ -98,12 +97,12 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
         opacity: showWatchTrack ? 1 : 0,
         duration: Durations.medium1,
         child: IconButton.filled(
-          onPressed: () {
-            showWatchTrack
-                ? controller.animateToTrack(audioPlayer.currentTrack!)
-                : controller.animateToTop();
-            controller.watchCurrentTrack = showWatchTrack;
-          },
+          onPressed: showWatchTrack
+              ? () {
+                  controller.watchCurrentTrack = !controller.watchCurrentTrack;
+                  update();
+                }
+              : null,
           iconSize: 22,
           padding: .zero,
           splashRadius: 10,
@@ -114,6 +113,17 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
                 colorScheme.primary.withAlpha(120),
                 colorScheme.surface,
               ),
+            ),
+            side: .all(
+              watchCurrentTrack
+                  ? .new(
+                      color: Color.alphaBlend(
+                        colorScheme.onSurface.withAlpha(180),
+                        colorScheme.surface,
+                      ),
+                      width: 2,
+                    )
+                  : .none,
             ),
           ),
           color: colorScheme.onSurface,

@@ -9,6 +9,7 @@ import '../core/config.dart';
 import '../core/constants.dart';
 import '../core/audio_player/playlist.dart';
 import '../features/simple_menu.dart';
+import 'add_to_playlist_button.dart';
 
 class TrackLabel extends StatefulWidget {
   const TrackLabel(this.playlist, this.index, {super.key, this.menuItems});
@@ -109,61 +110,27 @@ class _TrackLabelState extends State<TrackLabel>
                 padding: .all(.all(4)),
               ),
             ),
-            Text(track.title),
-            Text(
-              track.author,
-              style: TextStyle(
-                fontSize: 12,
-                color: colorScheme.inverseSurface.withAlpha(170),
+            Expanded(
+              child: Row(
+                spacing: 8,
+                children: [
+                  Flexible(child: Text(track.title, overflow: .ellipsis)),
+                  Text(
+                    track.author,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.onSurface.withAlpha(170),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const Expanded(child: SizedBox()),
-            if (playlists.isNotEmpty)
-              StatefulBuilder(
-                builder: (context, setState) => InkWell(
-                  customBorder: CircleBorder(),
-                  onTap: () async {
-                    final isSelected = await showSimpleMenu(
-                      context: context,
-                      items: playlists
-                          .where((e) => !e.tracks.contains(track))
-                          .map(
-                            (e) => SimpleMenuItem(
-                              text: e.title,
-                              value: true,
-                              onTap: () => e.tracks.add(track),
-                            ),
-                          )
-                          .followedBy(
-                            playlists
-                                .where((e) => e.tracks.contains(track))
-                                .map(
-                                  (e) => SimpleMenuItem(
-                                    text: '-${e.title}',
-                                    value: true,
-                                    onTap: () => e.tracks.remove(track),
-                                  ),
-                                ),
-                          )
-                          .toList(),
-                    );
-                    if (isSelected != null) {
-                      setState(() {});
-                    }
-                  },
-                  onSecondaryTap: () {
-                    if (mainPlaylist == null) {
-                      return;
-                    }
-                    if (mainPlaylist!.tracks.contains(track)) {
-                      setState(() => mainPlaylist!.tracks.remove(track));
-                    } else {
-                      setState(() => mainPlaylist!.tracks.add(track));
-                    }
-                  },
-                  child: Padding(
-                    padding: const .all(6),
-                    child: Icon(
+            Row(
+              children: [
+                if (playlists.isNotEmpty)
+                  AddToPlaylistButton(
+                    track: track,
+                    builder: (context) => Icon(
                       mainPlaylist?.tracks.contains(track) ??
                               playlists
                                   .where((e) => e.tracks.contains(track))
@@ -174,13 +141,23 @@ class _TrackLabelState extends State<TrackLabel>
                       color: colorScheme.onSurface.withAlpha(200),
                     ),
                   ),
+                IconButton(
+                  onPressed: () => audioPlayer.addNext(track),
+                  icon: const Icon(Icons.navigate_next_rounded),
+                  color: colorScheme.onSurface.withAlpha(200),
+                  style: ButtonStyle(
+                    minimumSize: .all(Size.zero),
+                    iconSize: .all(24),
+                    padding: .all(.all(4)),
+                  ),
                 ),
-              ),
+              ],
+            ),
             Text(
               '${track.duration.inMinutes.toString().padLeft(2, '0')}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 13,
-                color: colorScheme.inverseSurface.withAlpha(200),
+                color: colorScheme.onSurface.withAlpha(200),
               ),
             ),
           ],

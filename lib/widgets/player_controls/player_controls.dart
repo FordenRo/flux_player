@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/track.dart';
+import '../../core/config.dart';
 import '../../core/constants.dart';
+import '../add_to_playlist_button.dart';
 import 'position_slider.dart';
 import 'volume_button.dart';
 
@@ -25,6 +28,8 @@ class _PlayerControlsState extends State<PlayerControls>
   );
   double nextBtnOffset = 0;
   double prevBtnOffset = 0;
+
+  Track get track => audioPlayer.currentTrack!;
 
   @override
   void initState() {
@@ -94,31 +99,39 @@ class _PlayerControlsState extends State<PlayerControls>
           height: 40,
           width: 40,
           clipBehavior: .hardEdge,
-          child: audioPlayer.currentTrack!.picture != null
-              ? Image.memory(audioPlayer.currentTrack!.picture!.bytes)
+          child: track.picture != null
+              ? Image.memory(track.picture!.bytes)
               : Icon(Icons.music_note_rounded, color: Colors.grey.shade400),
         ),
-        Expanded(
+        Flexible(
           child: Column(
             crossAxisAlignment: .start,
             children: [
+              Text(track.title, overflow: .ellipsis),
               Text(
-                audioPlayer.currentTrack!.title,
+                track.author,
                 overflow: .ellipsis,
-                softWrap: false,
-              ),
-              Text(
-                audioPlayer.currentTrack!.author,
-                overflow: .ellipsis,
-                softWrap: false,
                 style: TextStyle(
                   fontSize: 12,
-                  color: colorScheme.inverseSurface.withAlpha(170),
+                  color: colorScheme.onSurface.withAlpha(170),
                 ),
               ),
             ],
           ),
         ),
+        if (playlists.isNotEmpty)
+          AddToPlaylistButton(
+            track: track,
+            builder: (context) => Icon(
+              mainPlaylist?.tracks.contains(track) ??
+                      playlists
+                          .where((e) => e.tracks.contains(track))
+                          .isNotEmpty
+                  ? Icons.playlist_add_check_rounded
+                  : Icons.playlist_add_rounded,
+              color: colorScheme.onSurface.withAlpha(200),
+            ),
+          ),
       ],
     ),
   );

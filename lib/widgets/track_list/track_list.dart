@@ -13,7 +13,7 @@ import 'search_field.dart';
 import 'sort_menu_button.dart';
 import 'track_list_controller.dart';
 
-enum Sorting { name, artist, dateAdded, lastPlayed, playCount }
+enum Sorting { name, artist }
 
 class TrackList extends StatefulWidget {
   final Playlist playlist;
@@ -27,19 +27,18 @@ class TrackList extends StatefulWidget {
 class _TrackListState extends State<TrackList> {
   late final TrackListController controller = .new();
   late final StreamSubscription subscription;
+  late var tracks = getTracks();
 
   var query = '';
-  Sorting _sort = .name;
+  late Sorting _sort;
 
   Sorting get sort => _sort;
-
   set sort(Sorting value) {
     _sort = value;
     widget.playlist.tracks.sort(
       (a, b) => switch (sort) {
         .name => a.title.compareTo(b.title),
         .artist => a.author.compareTo(b.author),
-        _ => a.title.compareTo(b.title),
       },
     );
   }
@@ -56,6 +55,8 @@ class _TrackListState extends State<TrackList> {
   @override
   void initState() {
     super.initState();
+    sort = .name;
+    controller.tracks = tracks;
     subscription = Stream.periodic(
       const Duration(seconds: 1),
       (_) => widget.playlist.tracks.length,
@@ -69,61 +70,67 @@ class _TrackListState extends State<TrackList> {
     await subscription.cancel();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final tracks = getTracks();
+  void update() {
+    tracks = getTracks();
     controller.tracks = tracks;
-    return Scaffold(
-      floatingActionButton: FloatingActionsOverlay(
-        scrollController: controller,
-        tracks: tracks,
-      ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: SearchField(
-                  onChanged: (value) {
-                    setState(() => query = value);
-                    if (audioPlayer.currentTrack != null) {
-                      controller.animateToTrack(audioPlayer.currentTrack!);
-                    }
-                  },
-                  hint: 'Search',
-                ),
-              ),
-              SortMenuButton(
-                onSelected: (e) {
-                  setState(() => sort = e);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    floatingActionButton: FloatingActionsOverlay(
+      scrollController: controller,
+      tracks: tracks,
+    ),
+    body: Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: SearchField(
+                onChanged: (value) {
+                  query = value;
+                  update();
+                  controller.jumpTo(0);
                   if (audioPlayer.currentTrack != null) {
                     controller.animateToTrack(audioPlayer.currentTrack!);
                   }
                 },
-              ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tracks.length,
-              itemExtent: 50,
-              controller: controller,
-              itemBuilder: (context, idx) => TrackLabel(
-                widget.playlist,
-                widget.playlist.tracks.indexOf(tracks[idx]),
-                menuItems: [
-                  SimpleMenuItem(
-                    text: widget.playlist != importedPlaylist
-                        ? 'Удалить из плейлиста'
-                        : 'Удалить песню',
-                    onTap: () => widget.playlist.tracks.remove(tracks[idx]),
-                  ),
-                ],
+                hint: 'Поиск треков',
               ),
             ),
+            SortMenuButton(
+              value: sort,
+              onSelected: (e) {
+                sort = e;
+                update();
+                if (audioPlayer.currentTrack != null) {
+                  controller.animateToTrack(audioPlayer.currentTrack!);
+                }
+              },
+            ),
+          ],
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: tracks.length,
+            itemExtent: 50,
+            controller: controller,
+            itemBuilder: (context, idx) => TrackLabel(
+              widget.playlist,
+              widget.playlist.tracks.indexOf(tracks[idx]),
+              menuItems: [
+                SimpleMenuItem(
+                  text: widget.playlist != importedPlaylist
+                      ? 'Удалить из плейлиста'
+                      : 'Удалить песню',
+                  onTap: () => widget.playlist.tracks.remove(tracks[idx]),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }

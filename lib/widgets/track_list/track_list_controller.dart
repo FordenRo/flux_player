@@ -4,9 +4,19 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
 
 class TrackListController extends ScrollController {
-  var watchCurrentTrack = true;
+  var _watchCurrentTrack = true;
   List<Track> tracks = [];
   late final StreamSubscription _subscription;
+
+  bool get watchCurrentTrack => _watchCurrentTrack;
+  set watchCurrentTrack(bool value) {
+    if (value != _watchCurrentTrack) {
+      _watchCurrentTrack = value;
+      if (value) {
+        animateToTrack(audioPlayer.currentTrack!);
+      }
+    }
+  }
 
   TrackListController({super.onAttach, super.onDetach}) {
     addListener(() {
@@ -38,8 +48,10 @@ class TrackListController extends ScrollController {
     curve: Curves.easeOutQuart,
   );
 
-  Future<void> animateToTop() =>
-      animateTo(0, duration: Durations.long2, curve: Curves.easeOutQuart);
+  Future<void> animateToTop() {
+    watchCurrentTrack = false;
+    return animateTo(0, duration: Durations.long2, curve: Curves.easeOutQuart);
+  }
 
   @override
   Future<void> dispose() async {

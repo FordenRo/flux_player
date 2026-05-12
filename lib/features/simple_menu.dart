@@ -39,11 +39,11 @@ Future<T?> showSimpleMenu<T>({
 class SimpleMenuItem<T> {
   final T? value;
   final String text;
-  final void Function() onTap;
+  final void Function()? onTap;
 
-  const SimpleMenuItem({required this.text, required this.onTap, this.value});
+  const SimpleMenuItem({required this.text, this.onTap, this.value});
 
-  OverlayMenuItem toOverlayItem() => OverlayMenuItem(
+  OverlayMenuItem<T> toOverlayItem() => OverlayMenuItem<T>(
     value: value,
     child: Padding(
       padding: const .symmetric(horizontal: 10),
