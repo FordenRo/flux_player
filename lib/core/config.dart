@@ -69,16 +69,13 @@ Future<void> loadConfiguration() async {
   }
   final playlistsStream = BitStream(bytes: await playlistsFile.readAsBytes());
 
-  playlists = await Isolate.run(() {
-    var playlists = <Playlist>[];
-    try {
-      while (true) {
-        playlists.add(_loadPlaylist(playlistsStream, tracks: importedTracks));
-      }
-    } catch (_) {
-      return playlists;
-    }
-  });
+  final playlistsCount = playlistsStream.read(8);
+  playlists = await Isolate.run(
+    () => List.generate(
+      playlistsCount,
+      (_) => _loadPlaylist(playlistsStream, tracks: importedTracks),
+    ),
+  );
 
   if (wasPlayingPlaylist) {
     final playlist = playingPlaylistIdx! == 255
@@ -141,8 +138,10 @@ Future<void> saveConfiguration() async {
             : audioPlayer.currentIndex!
       : null;
   final deviceName = audioPlayer.audioDevice.name;
-  final position =
-      audioPlayer.position.inMilliseconds / audioPlayer.duration.inMilliseconds;
+  final position = audioPlayer.duration.inMilliseconds > 0
+      ? audioPlayer.position.inMilliseconds /
+            audioPlayer.duration.inMilliseconds
+      : 0.0;
   final hasMainPlaylist = mainPlaylist != null;
 
   stream.write(wPosX.toInt() + 32768, 16);
@@ -177,6 +176,7 @@ Future<void> saveConfiguration() async {
   await playlistsFile.create(recursive: true);
   final playlistsStream = BitStream();
 
+  playlistsStream.write(playlists.length, 8);
   for (var playlist in playlists) {
     _savePlaylist(playlistsStream, playlist, tracks: importedPlaylist.tracks);
   }
