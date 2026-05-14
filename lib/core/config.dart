@@ -70,11 +70,9 @@ Future<void> loadConfiguration() async {
   final playlistsStream = BitStream(bytes: await playlistsFile.readAsBytes());
 
   final playlistsCount = playlistsStream.read(8);
-  playlists = await Isolate.run(
-    () => List.generate(
-      playlistsCount,
-      (_) => _loadPlaylist(playlistsStream, tracks: importedTracks),
-    ),
+  playlists = List.generate(
+    playlistsCount,
+    (_) => _loadPlaylist(playlistsStream, tracks: importedTracks),
   );
 
   if (wasPlayingPlaylist) {
@@ -211,9 +209,11 @@ void _savePlaylist(
   required List<Track> tracks,
 }) {
   stream.writeString(playlist.title, 6);
-  stream.write(playlist.tracks.length, 16);
-  playlist.tracks
+  final mappedTracks = playlist.tracks
       .map((track) => tracks.indexOf(track))
-      .where((idx) => idx != -1)
-      .forEach((idx) => stream.write(idx, 16));
+      .where((idx) => idx != -1);
+  stream.write(mappedTracks.length, 16);
+  for (var idx in mappedTracks) {
+    stream.write(idx, 16);
+  }
 }
