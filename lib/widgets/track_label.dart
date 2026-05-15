@@ -8,6 +8,7 @@ import '../core/audio_player/track.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
 import '../core/audio_player/playlist.dart';
+import '../core/utils.dart';
 import '../features/simple_menu.dart';
 import 'add_to_playlist_button.dart';
 
@@ -140,6 +141,8 @@ class _TrackLabelState extends State<TrackLabel>
                       size: 20,
                       color: colorScheme.onSurface.withAlpha(200),
                     ),
+                    countBuilder: (context, child) =>
+                        Transform.translate(offset: .new(-12, 8), child: child),
                   ),
                 IconButton(
                   onPressed: () => audioPlayer.addNext(track),
@@ -168,9 +171,6 @@ class _TrackLabelState extends State<TrackLabel>
 
   Future<void> showMenu(BuildContext context, TapDownDetails e) async {
     final controller = OverlayMenuController();
-    final availablePlaylists = playlists.where(
-      (e) => !e.tracks.contains(track),
-    );
     await showOverlayMenu(
       context: context,
       controller: controller,
@@ -185,20 +185,36 @@ class _TrackLabelState extends State<TrackLabel>
           text: 'Играть следующим',
           onTap: () => audioPlayer.addNext(track),
         ).toOverlayItem(),
-        if (availablePlaylists.isNotEmpty)
+        if (playlists.isNotEmpty)
           OverlayMenuItem(
             child: OverlayMenuButton(
               position: .right,
               style: overlayMenuStyle,
-              items: availablePlaylists
+              items: playlists
+                  .where((e) => !e.tracks.contains(track))
                   .map(
                     (e) => SimpleMenuItem(
                       text: e.title,
                       onTap: () {
                         e.tracks.add(track);
+                        trackPlaylistChanged.add(track);
                         controller.close();
                       },
                     ).toOverlayItem(),
+                  )
+                  .followedBy(
+                    playlists
+                        .where((e) => e.tracks.contains(track))
+                        .map(
+                          (e) => SimpleMenuItem(
+                            text: '-${e.title}',
+                            onTap: () {
+                              e.tracks.remove(track);
+                              trackPlaylistChanged.add(track);
+                              controller.close();
+                            },
+                          ).toOverlayItem(),
+                        ),
                   )
                   .toList(),
               child: Padding(

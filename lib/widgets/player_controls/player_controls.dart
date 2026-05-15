@@ -131,6 +131,8 @@ class _PlayerControlsState extends State<PlayerControls>
                   : Icons.playlist_add_rounded,
               color: colorScheme.onSurface.withAlpha(200),
             ),
+            countBuilder: (context, child) =>
+                Transform.translate(offset: .new(-14, 10), child: child),
           ),
       ],
     ),
