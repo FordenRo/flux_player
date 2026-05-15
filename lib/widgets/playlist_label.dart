@@ -4,7 +4,7 @@ import '../core/audio_player/audio_player.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
 import '../core/audio_player/playlist.dart';
-import '../features/simple_menu.dart';
+import 'simple_menu.dart';
 
 class PlaylistLabel extends StatefulWidget {
   const PlaylistLabel(this.playlist, {super.key, this.onTap});

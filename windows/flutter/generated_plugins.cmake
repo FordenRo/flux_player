@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audio_service_win
   flutter_window_close
   media_kit_libs_windows_audio
   screen_retriever_windows

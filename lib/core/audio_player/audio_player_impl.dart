@@ -1,10 +1,85 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:audio_service/audio_service.dart'
+    show BaseAudioHandler, SeekHandler, MediaItem;
+import 'package:audio_session/audio_session.dart' show AudioSession;
 import 'package:media_kit/media_kit.dart' as media_kit;
 import 'audio_player.dart';
 import 'audio_player_stream.dart';
 import 'track.dart';
 import 'playlist.dart';
+
+class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
+  final _player = AudioPlayerImpl.instance;
+
+  AudioHandlerImpl() {
+    _init();
+  }
+
+  void _init() {
+    _player.stream.currentTrack.listen((track) {
+      final item = track?.toMediaItem();
+      mediaItem.add(item);
+      queue.add([item].nonNulls.toList());
+      _updateState();
+    });
+    _player.stream.isPlaying.listen((_) => _updateState());
+
+    _initSession();
+  }
+
+  Future<void> _initSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(const .music());
+  }
+
+  void _updateState() => playbackState.add(
+    .new(
+      controls: [
+        .skipToPrevious,
+        _player.isPlaying ? .pause : .play,
+        .skipToNext,
+        .fastForward,
+      ],
+      processingState: .idle,
+      systemActions: const {.skipToPrevious, .playPause, .skipToNext, .seek},
+      androidCompactActionIndices: [0, 1, 2],
+      updatePosition: _player.position,
+      updateTime: DateTime.now(),
+      playing: _player.isPlaying,
+      bufferedPosition: _player.duration,
+      shuffleMode: _player.shuffled ? .all : .none,
+      repeatMode: _player.looped ? .one : .all,
+      speed: 1,
+      queueIndex: 0,
+    ),
+  );
+
+  @override
+  Future<void> play() => _player.play();
+
+  @override
+  Future<void> pause() => _player.pause();
+
+  @override
+  Future<void> skipToNext() => _player.next();
+
+  @override
+  Future<void> skipToPrevious() => _player.previous();
+
+  @override
+  Future<void> seek(Duration position) => _player.seek(position);
+}
+
+extension MediaItemAdapter on Track {
+  MediaItem toMediaItem() => MediaItem(
+    id: 'testid',
+    title: title,
+    album: '',
+    artist: author,
+    duration: duration,
+  );
+}
 
 class AudioPlayerImpl implements AudioPlayer {
   final _player = media_kit.Player();

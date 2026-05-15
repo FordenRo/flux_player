@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
-import '../../features/simple_menu.dart';
+import '../simple_menu.dart';
 import 'track_list.dart';
 
 class SortMenuButton extends StatelessWidget {
