@@ -73,7 +73,14 @@ class _PlayerControlsState extends State<PlayerControls>
                     Expanded(
                       child: Row(
                         mainAxisAlignment: .end,
-                        children: [inputDeviceButton(), VolumeButton()],
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.queue_music_rounded),
+                          ),
+                          inputDeviceButton(),
+                          VolumeButton(),
+                        ],
                       ),
                     ),
                   ],
