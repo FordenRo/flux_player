@@ -5,7 +5,7 @@ import '../core/constants.dart';
 import '../core/audio_player/playlist.dart';
 import '../widgets/playlist_label.dart';
 import '../widgets/track_list/track_list.dart';
-import 'main/caption_widget.dart';
+import '../app/caption_widget.dart';
 
 class PlaylistsPage extends StatefulWidget {
   const PlaylistsPage({super.key});

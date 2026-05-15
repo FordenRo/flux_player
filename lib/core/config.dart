@@ -6,7 +6,7 @@ import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../features/main/main_page_controller.dart';
+import '../app/app_controller.dart';
 import 'audio_player/audio_player.dart';
 import 'audio_player/track.dart';
 import 'bitstream.dart';

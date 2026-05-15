@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-final mainPageController = MainPageController._internal();
+final mainPageController = AppController._internal();
 
-class MainPageController with ChangeNotifier {
+class AppController with ChangeNotifier {
   var _pageIndex = 0;
 
   int get pageIndex => _pageIndex;
@@ -11,5 +11,5 @@ class MainPageController with ChangeNotifier {
     notifyListeners();
   }
 
-  MainPageController._internal();
+  AppController._internal();
 }

@@ -5,7 +5,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/config.dart';
 import 'core/constants.dart';
-import 'features/main/main_screen.dart';
+import 'app/app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +35,6 @@ class MainApp extends StatelessWidget {
     title: 'Flux',
     color: Colors.red,
     theme: ThemeData(colorScheme: colorScheme),
-    home: MainScreen(),
+    home: App(),
   );
 }
