@@ -9,6 +9,7 @@ import '../core/config.dart';
 import '../core/constants.dart';
 import '../core/audio_player/playlist.dart';
 import '../core/utils.dart';
+import 'track_details.dart';
 import 'simple_menu.dart';
 import 'add_to_playlist_button.dart';
 
@@ -225,6 +226,13 @@ class _TrackLabelState extends State<TrackLabel>
           ),
         if (widget.menuItems != null)
           ...widget.menuItems!.map((e) => e.toOverlayItem()),
+        SimpleMenuItem(
+          text: 'Свойства',
+          onTap: () => showDialog(
+            context: context,
+            builder: (context) => TrackDetails(track),
+          ),
+        ).toOverlayItem(),
       ],
     );
     controller.close();
