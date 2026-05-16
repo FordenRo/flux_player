@@ -113,18 +113,20 @@ class _TrackLabelState extends State<TrackLabel>
               ),
             ),
             Expanded(
-              child: Row(
-                spacing: 8,
-                children: [
-                  Flexible(child: Text(track.title, overflow: .ellipsis)),
-                  Text(
-                    track.author,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colorScheme.onSurface.withAlpha(170),
+              child: RichText(
+                text: TextSpan(
+                  text: '${track.title}  ',
+                  children: [
+                    TextSpan(
+                      text: track.author,
+                      style: .new(
+                        fontSize: 12,
+                        color: colorScheme.onSurface.withAlpha(170),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                overflow: .ellipsis,
               ),
             ),
             Row(
