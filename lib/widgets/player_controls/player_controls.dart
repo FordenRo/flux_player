@@ -8,6 +8,7 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
 import '../../core/constants.dart';
+import '../../features/queue_list.dart';
 import '../add_to_playlist_button.dart';
 import 'position_slider.dart';
 import 'volume_button.dart';
@@ -75,7 +76,10 @@ class _PlayerControlsState extends State<PlayerControls>
                         mainAxisAlignment: .end,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => QueueList(),
+                            ),
                             icon: const Icon(Icons.queue_music_rounded),
                           ),
                           inputDeviceButton(),
