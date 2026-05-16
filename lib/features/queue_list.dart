@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/audio_player/audio_player.dart';
 import '../core/audio_player/playlist.dart';
 import '../core/constants.dart';
-import '../widgets/track_list/track_list.dart';
+import 'track_list/track_list.dart';
 
 class QueueList extends StatelessWidget {
   const QueueList({super.key});

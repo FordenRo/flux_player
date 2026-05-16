@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/config.dart';
-import '../widgets/track_list/track_list.dart';
+import 'track_list/track_list.dart';
 
 class AllTracksPage extends StatefulWidget {
   const AllTracksPage({super.key});

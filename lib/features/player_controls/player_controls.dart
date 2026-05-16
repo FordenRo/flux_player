@@ -8,8 +8,8 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
 import '../../core/constants.dart';
-import '../../features/queue_list.dart';
-import '../add_to_playlist_button.dart';
+import '../queue_list.dart';
+import '../../widgets/add_to_playlist_button.dart';
 import 'position_slider.dart';
 import 'volume_button.dart';
 

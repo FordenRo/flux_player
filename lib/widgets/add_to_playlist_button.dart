@@ -6,7 +6,7 @@ import '../core/audio_player/track.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
 import '../core/utils.dart';
-import 'simple_menu.dart';
+import '../features/simple_menu.dart';
 
 class AddToPlaylistButton extends StatefulWidget {
   final Track track;

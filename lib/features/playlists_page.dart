@@ -4,7 +4,7 @@ import '../core/config.dart';
 import '../core/constants.dart';
 import '../core/audio_player/playlist.dart';
 import '../widgets/playlist_label.dart';
-import '../widgets/track_list/track_list.dart';
+import 'track_list/track_list.dart';
 import '../app/caption_widget.dart';
 
 class PlaylistsPage extends StatefulWidget {

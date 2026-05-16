@@ -7,7 +7,7 @@ import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
 import '../../core/audio_player/playlist.dart';
 import '../simple_menu.dart';
-import '../track_label.dart';
+import '../../widgets/track_label.dart';
 import 'floating_actions_overlay.dart';
 import 'search_field.dart';
 import 'sort_menu_button.dart';
