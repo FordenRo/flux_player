@@ -9,16 +9,15 @@ import '../core/utils.dart';
 import '../features/simple_menu.dart';
 
 class AddToPlaylistButton extends StatefulWidget {
-  final Track track;
-  final Widget Function(BuildContext context) builder;
-  final Widget Function(BuildContext context, Widget child) countBuilder;
-
   const AddToPlaylistButton({
-    super.key,
     required this.track,
     required this.builder,
     required this.countBuilder,
+    super.key,
   });
+  final Track track;
+  final Widget Function(BuildContext context) builder;
+  final Widget Function(BuildContext context, Widget child) countBuilder;
 
   @override
   State<AddToPlaylistButton> createState() => _AddToPlaylistButtonState();
@@ -92,8 +91,9 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
     final playlistCount = playlists
         .where((e) => e.tracks.contains(track))
         .length;
+
     return InkWell(
-      customBorder: CircleBorder(),
+      customBorder: const CircleBorder(),
       onTap: onTap,
       onSecondaryTap: onSecondaryTap,
       child: Padding(

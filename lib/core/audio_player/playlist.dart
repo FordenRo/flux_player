@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'track.dart';
+
 import '../config.dart';
+import 'track.dart';
 
 class Playlist {
+  Playlist({required this.title, List<Track>? tracks}) : tracks = tracks ?? [];
   String title;
   List<Track> tracks;
 
-  Playlist({required this.title, List<Track>? tracks}) : tracks = tracks ?? [];
-
-  static Future<Playlist> fromJson(dynamic json) async => .new(
+  static Future<Playlist> fromJson(Map<String, dynamic> json) async => .new(
     title: json['title'] as String,
     tracks: (json['tracks'] as List?)
         ?.cast<int>()

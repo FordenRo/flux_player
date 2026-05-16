@@ -4,9 +4,8 @@ import 'package:window_manager/window_manager.dart';
 part 'caption_controller.dart';
 
 class CaptionWidget extends StatefulWidget {
+  const CaptionWidget({required this.title, super.key});
   final String title;
-
-  const CaptionWidget({super.key, required this.title});
 
   @override
   State<CaptionWidget> createState() => _CaptionWidgetState();

@@ -4,14 +4,13 @@ import '../simple_menu.dart';
 import 'track_list.dart';
 
 class SortMenuButton extends StatelessWidget {
-  final void Function(Sorting sort) onSelected;
-  final Sorting value;
-
   const SortMenuButton({
-    super.key,
     required this.onSelected,
     required this.value,
+    super.key,
   });
+  final void Function(Sorting sort) onSelected;
+  final Sorting value;
 
   @override
   Widget build(BuildContext context) => OverlayMenuButton(
@@ -26,7 +25,7 @@ class SortMenuButton extends StatelessWidget {
       child: Row(
         spacing: 8,
         children: [
-          SizedBox(),
+          const SizedBox(),
           Text(value.title, style: .new(color: Colors.grey.shade500)),
           Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey.shade500),
         ],

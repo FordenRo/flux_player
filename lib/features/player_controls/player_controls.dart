@@ -8,8 +8,8 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
 import '../../core/constants.dart';
-import '../queue_list.dart';
 import '../../widgets/add_to_playlist_button.dart';
+import '../queue_list.dart';
 import 'position_slider.dart';
 import 'volume_button.dart';
 
@@ -78,23 +78,23 @@ class _PlayerControlsState extends State<PlayerControls>
                           IconButton(
                             onPressed: () => showDialog(
                               context: context,
-                              builder: (context) => QueueList(),
+                              builder: (context) => const QueueList(),
                             ),
                             icon: const Icon(Icons.queue_music_rounded),
                           ),
                           inputDeviceButton(),
-                          VolumeButton(),
+                          const VolumeButton(),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              PositionSlider(),
+              const PositionSlider(),
             ],
           ),
         )
-      : SizedBox();
+      : const SizedBox();
 
   Widget trackInfo(BuildContext context) => StreamBuilder(
     stream: audioPlayer.stream.currentTrack,
@@ -143,7 +143,7 @@ class _PlayerControlsState extends State<PlayerControls>
               color: colorScheme.onSurface.withAlpha(200),
             ),
             countBuilder: (context, child) =>
-                Transform.translate(offset: .new(-14, 10), child: child),
+                Transform.translate(offset: const .new(-14, 10), child: child),
           ),
       ],
     ),
@@ -236,16 +236,16 @@ class _PlayerControlsState extends State<PlayerControls>
   Widget inputDeviceButton() => Builder(
     builder: (context) => IconButton(
       onPressed: () async {
-        var device = await showOverlayMenu(
+        final device = await showOverlayMenu(
           context: context,
           initialValue: audioPlayer.audioDevice,
-          style: .new(padding: .zero, itemStyle: .new(height: 30)),
+          style: const .new(padding: .zero, itemStyle: .new(height: 30)),
           items: audioPlayer.audioDevices
               .map(
                 (e) => OverlayMenuItem(
                   child: Padding(
                     padding: const .symmetric(horizontal: 8),
-                    child: Text(e.description, style: .new(fontSize: 12)),
+                    child: Text(e.description, style: const .new(fontSize: 12)),
                   ),
                   value: e,
                   enabled: e != audioPlayer.audioDevice,
@@ -254,7 +254,7 @@ class _PlayerControlsState extends State<PlayerControls>
               .toList(),
         );
         if (device != null) {
-          audioPlayer.setAudioDevice(device);
+          await audioPlayer.setAudioDevice(device);
         }
       },
       icon: const Icon(Icons.input_rounded),

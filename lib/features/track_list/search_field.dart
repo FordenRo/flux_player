@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SearchField extends StatefulWidget {
+  const SearchField({required this.onChanged, required this.hint, super.key});
   final void Function(String query) onChanged;
   final String hint;
-
-  const SearchField({super.key, required this.onChanged, required this.hint});
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -25,7 +24,7 @@ class _SearchFieldState extends State<SearchField> {
     child: TextField(
       controller: controller,
       onChanged: widget.onChanged,
-      style: .new(fontSize: 14),
+      style: const .new(fontSize: 14),
       decoration: .new(
         icon: Icon(Icons.search, color: Colors.grey.shade600, size: 18),
         hintText: widget.hint,
@@ -41,7 +40,7 @@ class _SearchFieldState extends State<SearchField> {
                 },
               )
             : null,
-        contentPadding: .symmetric(vertical: 12),
+        contentPadding: const .symmetric(vertical: 12),
       ),
     ),
   );

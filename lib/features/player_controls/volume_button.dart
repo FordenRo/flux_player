@@ -26,6 +26,7 @@ class _VolumeButtonState extends State<VolumeButton> {
   void dispose() {
     volumeOverlay.dispose();
     hoverTimer?.cancel();
+    subscription.cancel();
     super.dispose();
   }
 
@@ -48,7 +49,10 @@ class _VolumeButtonState extends State<VolumeButton> {
       builder: (context, snapshot) => IconButton(
         onHover: (hovered) {
           if (hovered) {
-            hoverTimer = Timer(Duration(milliseconds: 300), volumeOverlay.show);
+            hoverTimer = Timer(
+              const Duration(milliseconds: 300),
+              volumeOverlay.show,
+            );
           } else {
             hoverTimer?.cancel();
           }

@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../core/audio_player/audio_player.dart';
+import '../core/audio_player/playlist.dart';
 import '../core/audio_player/track.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
-import '../core/audio_player/playlist.dart';
 import '../core/utils.dart';
-import '../features/track_details.dart';
 import '../features/simple_menu.dart';
+import '../features/track_details.dart';
 import 'add_to_playlist_button.dart';
 
 class TrackLabel extends StatefulWidget {
@@ -109,7 +109,7 @@ class _TrackLabelState extends State<TrackLabel>
               style: ButtonStyle(
                 minimumSize: .all(Size.zero),
                 iconSize: .all(24),
-                padding: .all(.all(4)),
+                padding: .all(const .all(4)),
               ),
             ),
             Expanded(
@@ -144,8 +144,10 @@ class _TrackLabelState extends State<TrackLabel>
                       size: 20,
                       color: colorScheme.onSurface.withAlpha(200),
                     ),
-                    countBuilder: (context, child) =>
-                        Transform.translate(offset: .new(-12, 8), child: child),
+                    countBuilder: (context, child) => Transform.translate(
+                      offset: const .new(-12, 8),
+                      child: child,
+                    ),
                   ),
                 IconButton(
                   onPressed: () => audioPlayer.addNext(track),
@@ -154,13 +156,15 @@ class _TrackLabelState extends State<TrackLabel>
                   style: ButtonStyle(
                     minimumSize: .all(Size.zero),
                     iconSize: .all(24),
-                    padding: .all(.all(4)),
+                    padding: .all(const .all(4)),
                   ),
                 ),
               ],
             ),
             Text(
-              '${track.duration.inMinutes.toString().padLeft(2, '0')}:${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
+              '${track.duration.inMinutes.toString().padLeft(2, '0')}'
+              ':'
+              '${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 13,
                 color: colorScheme.onSurface.withAlpha(200),
@@ -220,8 +224,8 @@ class _TrackLabelState extends State<TrackLabel>
                         ),
                   )
                   .toList(),
-              child: Padding(
-                padding: const .symmetric(horizontal: 10),
+              child: const Padding(
+                padding: .symmetric(horizontal: 10),
                 child: Text('Добавить в плейлист'),
               ),
             ),

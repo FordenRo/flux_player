@@ -9,12 +9,11 @@ final TextStyle _keyStyle = .new(
   color: colorScheme.onSurface.withAlpha(200),
   fontSize: 12,
 );
-final TextStyle _valueStyle = .new(fontSize: 14);
+const TextStyle _valueStyle = .new(fontSize: 14);
 
 class TrackDetails extends StatelessWidget {
-  final Track track;
-
   const TrackDetails(this.track, {super.key});
+  final Track track;
 
   @override
   Widget build(BuildContext context) => Center(
@@ -22,12 +21,12 @@ class TrackDetails extends StatelessWidget {
       padding: const .all(100),
       child: Card(
         child: Padding(
-          padding: const .all(8.0),
+          padding: const .all(8),
           child: SingleChildScrollView(
             padding: const .all(10),
             child: Column(
               children: [
-                Text('Свойства\n'),
+                const Text('Свойства\n'),
                 _buildDetailsText(),
                 TextButton(
                   onPressed: () =>

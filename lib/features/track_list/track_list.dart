@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/playlist.dart';
 import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
-import '../../core/audio_player/playlist.dart';
-import '../simple_menu.dart';
 import '../../widgets/track_label.dart';
+import '../simple_menu.dart';
 import 'floating_actions_overlay.dart';
 import 'search_field.dart';
 import 'sort_menu_button.dart';
@@ -16,9 +16,8 @@ import 'track_list_controller.dart';
 enum Sorting { name, artist }
 
 class TrackList extends StatefulWidget {
+  const TrackList({required this.playlist, super.key});
   final Playlist playlist;
-
-  const TrackList({super.key, required this.playlist});
 
   @override
   State<TrackList> createState() => _TrackListState();
@@ -27,7 +26,7 @@ class TrackList extends StatefulWidget {
 class _TrackListState extends State<TrackList> {
   late final TrackListController controller = .new();
   late final StreamSubscription subscription;
-  late var tracks = getTracks();
+  late List<Track> tracks = getTracks();
 
   var query = '';
   late Sorting _sort;

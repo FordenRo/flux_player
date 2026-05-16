@@ -7,14 +7,13 @@ import '../../core/constants.dart';
 import 'track_list_controller.dart';
 
 class FloatingActionsOverlay extends StatefulWidget {
-  final TrackListController scrollController;
-  final List<Track> tracks;
-
   const FloatingActionsOverlay({
-    super.key,
     required this.scrollController,
     required this.tracks,
+    super.key,
   });
+  final TrackListController scrollController;
+  final List<Track> tracks;
 
   @override
   State<FloatingActionsOverlay> createState() => _FloatingActionsOverlayState();
@@ -26,9 +25,9 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
       ? (widget.tracks.indexOf(audioPlayer.currentTrack!) - 1) * 50
       : null;
 
-  late var showWatchTrack = canShowWatchTrack();
-  late var showGoTop = canShowGoTop();
-  late var watchCurrentTrack = controller.watchCurrentTrack;
+  late bool showWatchTrack = canShowWatchTrack();
+  late bool showGoTop = canShowGoTop();
+  late bool watchCurrentTrack = controller.watchCurrentTrack;
   late final StreamSubscription subscription;
 
   bool canShowWatchTrack() => currentTrackPos != null;
@@ -43,8 +42,8 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
   }
 
   void update() {
-    var canShowWatch = canShowWatchTrack();
-    var canShowTop = canShowGoTop();
+    final canShowWatch = canShowWatchTrack();
+    final canShowTop = canShowGoTop();
     if (canShowWatch != showWatchTrack ||
         canShowTop != showGoTop ||
         controller.watchCurrentTrack != watchCurrentTrack) {

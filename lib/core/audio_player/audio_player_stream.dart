@@ -1,19 +1,9 @@
 import 'dart:async';
-import 'track.dart';
+
 import 'playlist.dart';
+import 'track.dart';
 
 class AudioPlayerStream {
-  final Stream<double> volume;
-  final Stream<int?> currentIndex;
-  final Stream<List<Track>> queue;
-  final Stream<Duration> position;
-  final Stream<Duration> duration;
-  final Stream<bool> isPlaying;
-  final Stream<bool> shuffled;
-  final Stream<Track?> currentTrack;
-  final Stream<bool> looped;
-  final Stream<Playlist?> currentPlaylist;
-
   AudioPlayerStream(
     this.volume,
     this.currentIndex,
@@ -26,4 +16,14 @@ class AudioPlayerStream {
     this.looped,
     this.currentPlaylist,
   );
+  final Stream<double> volume;
+  final Stream<int?> currentIndex;
+  final Stream<List<Track>> queue;
+  final Stream<Duration> position;
+  final Stream<Duration> duration;
+  final Stream<bool> isPlaying;
+  final Stream<bool> shuffled;
+  final Stream<Track?> currentTrack;
+  final Stream<bool> looped;
+  final Stream<Playlist?> currentPlaylist;
 }

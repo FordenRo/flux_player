@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../app/caption_widget.dart';
+import '../core/audio_player/playlist.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
-import '../core/audio_player/playlist.dart';
 import '../widgets/playlist_label.dart';
 import 'track_list/track_list.dart';
-import '../app/caption_widget.dart';
 
 class PlaylistsPage extends StatefulWidget {
   const PlaylistsPage({super.key});
@@ -29,7 +29,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
       ? Scaffold(
           floatingActionButton: FloatingActionButton.small(
             onPressed: () => playlists.add(.new(title: 'Новый плейлист')),
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
             backgroundColor: .alphaBlend(
               colorScheme.primaryContainer.withAlpha(100),
               colorScheme.surface,

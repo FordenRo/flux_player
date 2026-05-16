@@ -3,6 +3,13 @@ import 'dart:typed_data';
 
 /// Allows bit reading and writing
 class BitStream {
+  /// Initialises with an empty stream or with [bytes]
+  BitStream({Uint8List? bytes}) {
+    if (bytes != null) {
+      _stream = bytes;
+      _bitLength = _stream.length * 8;
+    }
+  }
   var _stream = <int>[];
   var _bitLength = 0;
 
@@ -11,30 +18,22 @@ class BitStream {
   /// Cursor position in bits
   var cursor = 0;
 
-  /// Initialises with an empty stream or with [bytes]
-  BitStream({Uint8List? bytes}) {
-    if (bytes != null) {
-      _stream = bytes;
-      _bitLength = _stream.length * 8;
-    }
-  }
-
   /// Gets the current stream
   Uint8List toBytes() => .fromList(_stream);
 
   /// Writes an int to the stream of length [bytes] and [bits]
   void write(int input, int bits) {
     var len = bits;
-    var all = pow(2, len).toInt() - 1;
+    final all = pow(2, len).toInt() - 1;
     input = input & all;
     var thisByte = _bitLength ~/ 8;
     var thisBit = _bitLength % 8;
     while (len > 0) {
-      var thisLen = min(len, 8 - thisBit);
+      final thisLen = min(len, 8 - thisBit);
       if (thisByte + 1 > _stream.length) {
         _stream.add(0);
       }
-      var shiftAmt = 8 - (thisBit + len);
+      final shiftAmt = 8 - (thisBit + len);
       _stream[thisByte] =
           _stream[thisByte] |
           (shiftAmt > 0 ? (input << shiftAmt) : (input >> (0 - shiftAmt)));
@@ -53,13 +52,13 @@ class BitStream {
 
   /// Writes a byte array to the stream of length [bytes] and [bits]
   void writeBytes(Uint8List input, int bits) {
-    var len = bits;
-    var totBytes = len ~/ 8;
-    var remBits = len % 8;
+    final len = bits;
+    final totBytes = len ~/ 8;
+    final remBits = len % 8;
 
-    var numBytes = input.lengthInBytes;
+    final numBytes = input.lengthInBytes;
     if (remBits > 0) {
-      var firstByte = (numBytes - totBytes) - 1;
+      final firstByte = (numBytes - totBytes) - 1;
       write(input[firstByte], remBits);
     }
     for (var x = numBytes - totBytes; x < numBytes; x++) {
@@ -79,8 +78,8 @@ class BitStream {
     var thisBit = cursor % 8;
     var output = 0;
     while (len > 0) {
-      var thisLen = min(len, 8 - thisBit);
-      var all = pow(2, thisLen).toInt() - 1;
+      final thisLen = min(len, 8 - thisBit);
+      final all = pow(2, thisLen).toInt() - 1;
       var bit = _stream[thisByte];
       if (thisBit + thisLen < 8) {
         bit = bit >> (8 - (thisBit + thisLen));
@@ -107,7 +106,7 @@ class BitStream {
   }
 
   String readString(int bits) {
-    var length = read(bits);
+    final length = read(bits);
     try {
       return String.fromCharCodes(
         Uint16List.fromList(List.generate(length, (i) => read(16))),
@@ -123,9 +122,9 @@ class BitStream {
   }
 
   void writeString(String input, int bits) {
-    var bytes = Uint16List.fromList(input.codeUnits);
+    final bytes = Uint16List.fromList(input.codeUnits);
     write(bytes.length, bits);
-    for (var e in bytes) {
+    for (final e in bytes) {
       write(e, 16);
     }
   }
@@ -133,8 +132,8 @@ class BitStream {
   /// Checks if [bit] is set or not
   bool checkBit(int bit) {
     bit = (_bitLength - bit) - 1;
-    var thisByte = bit ~/ 8;
-    var thisBit = bit % 8;
+    final thisByte = bit ~/ 8;
+    final thisBit = bit % 8;
     return (_stream[thisByte] & (1 << (7 - thisBit))) != 0;
   }
 
@@ -142,10 +141,10 @@ class BitStream {
 
   /// Reads a byte array from the stream of length [bytes] and [bits]
   Uint8List readBytes(int bits) {
-    var len = bits;
-    var totBytes = len ~/ 8;
-    var remBits = len % 8;
-    var op = <int>[];
+    final len = bits;
+    final totBytes = len ~/ 8;
+    final remBits = len % 8;
+    final op = <int>[];
     if (remBits > 0) {
       op.add(read(remBits));
     }
@@ -157,8 +156,7 @@ class BitStream {
 
   /// Reads a BitStream object from the stream of length [bytes] and [bits]
   BitStream readBitStream(int bits) {
-    var op = BitStream();
-    op.writeBytes(readBytes(bits), bits);
+    final op = BitStream()..writeBytes(readBytes(bits), bits);
     return op;
   }
 

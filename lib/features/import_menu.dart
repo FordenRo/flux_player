@@ -18,7 +18,7 @@ Future<void> _onFilesSelected(List<String> paths) async {
 
 Future<void> _onFolderSelected(String path) async {
   final folder = Directory(path);
-  if (!await folder.exists()) {
+  if (!folder.existsSync()) {
     return;
   }
   importedPlaylist.tracks.addAll(
@@ -60,7 +60,7 @@ class _ImportMenuState extends State<ImportMenu> {
                       icon: Icons.file_copy_rounded,
                       text: 'Добавить файлы',
                       onTap: () async {
-                        var result = await FilePicker.pickFiles(
+                        final result = await FilePicker.pickFiles(
                           type: .custom,
                           dialogTitle: 'Flux Import Files',
                           allowedExtensions: audioExtensions,
@@ -82,7 +82,7 @@ class _ImportMenuState extends State<ImportMenu> {
                       icon: Icons.folder_copy_rounded,
                       text: 'Добавить папки',
                       onTap: () async {
-                        var result = await FilePicker.getDirectoryPath(
+                        final result = await FilePicker.getDirectoryPath(
                           dialogTitle: 'Flux Import Folder',
                         );
                         if (result != null) {
@@ -96,7 +96,7 @@ class _ImportMenuState extends State<ImportMenu> {
                     ),
                   ],
                 )
-              : CircularProgressIndicator(),
+              : const CircularProgressIndicator(),
         ),
       ),
     ),
@@ -116,7 +116,7 @@ class _ImportMenuState extends State<ImportMenu> {
         width: 120,
         height: 120,
         child: Padding(
-          padding: const .all(8.0),
+          padding: const .all(8),
           child: Column(
             spacing: 6,
             mainAxisAlignment: .center,

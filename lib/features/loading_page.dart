@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 class LoadingPage extends StatefulWidget {
+  const LoadingPage({required this.future, required this.onLoad, super.key});
   final Future future;
   final void Function() onLoad;
-
-  const LoadingPage({super.key, required this.future, required this.onLoad});
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();
@@ -27,7 +26,6 @@ class _LoadingPageState extends State<LoadingPage>
   @override
   void initState() {
     super.initState();
-
     start();
   }
 
@@ -37,7 +35,7 @@ class _LoadingPageState extends State<LoadingPage>
     super.dispose();
   }
 
-  void start() async {
+  Future<void> start() async {
     await controller.forward();
     await widget.future;
     await controller.animateBack(0);

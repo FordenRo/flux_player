@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
-final OverlayMenuStyle overlayMenuStyle = .new(
+const OverlayMenuStyle overlayMenuStyle = .new(
   itemStyle: .new(height: 30),
   padding: .zero,
 );
@@ -37,11 +37,10 @@ Future<T?> showSimpleMenu<T>({
 );
 
 class SimpleMenuItem<T> {
+  const SimpleMenuItem({required this.text, this.onTap, this.value});
   final T? value;
   final String text;
   final void Function()? onTap;
-
-  const SimpleMenuItem({required this.text, this.onTap, this.value});
 
   OverlayMenuItem<T> toOverlayItem() => OverlayMenuItem<T>(
     value: value,

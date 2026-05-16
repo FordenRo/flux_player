@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class AppTheme {
+  AppTheme._internal();
   final StreamController<ThemeData> _controller = .broadcast();
   late final Stream<ThemeData> stream = _controller.stream.distinct();
   ThemeData _themeData = .new(colorScheme: colorScheme);
@@ -14,8 +15,6 @@ class AppTheme {
     _themeData = value;
     _controller.add(value);
   }
-
-  AppTheme._internal();
 
   static final instance = AppTheme._internal();
 }

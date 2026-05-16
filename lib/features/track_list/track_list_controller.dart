@@ -4,6 +4,18 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
 
 class TrackListController extends ScrollController {
+  TrackListController({super.onAttach, super.onDetach}) {
+    addListener(() {
+      if (watchCurrentTrack && position.userScrollDirection != .idle) {
+        watchCurrentTrack = false;
+      }
+    });
+    _subscription = audioPlayer.stream.currentIndex.listen((_) {
+      if (watchCurrentTrack) {
+        animateToTrack(audioPlayer.currentTrack!);
+      }
+    });
+  }
   var _watchCurrentTrack = true;
   List<Track> tracks = [];
   late final StreamSubscription _subscription;
@@ -16,19 +28,6 @@ class TrackListController extends ScrollController {
         animateToTrack(audioPlayer.currentTrack!);
       }
     }
-  }
-
-  TrackListController({super.onAttach, super.onDetach}) {
-    addListener(() {
-      if (watchCurrentTrack && position.userScrollDirection != .idle) {
-        watchCurrentTrack = false;
-      }
-    });
-    _subscription = audioPlayer.stream.currentIndex.listen((_) {
-      if (watchCurrentTrack) {
-        animateToTrack(audioPlayer.currentTrack!);
-      }
-    });
   }
 
   @override

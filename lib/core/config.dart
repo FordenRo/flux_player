@@ -8,9 +8,9 @@ import 'package:window_manager/window_manager.dart';
 
 import '../app/app_controller.dart';
 import 'audio_player/audio_player.dart';
+import 'audio_player/playlist.dart';
 import 'audio_player/track.dart';
 import 'bitstream.dart';
-import 'audio_player/playlist.dart';
 
 Playlist importedPlaylist = .new(title: 'Imported');
 Playlist? mainPlaylist;
@@ -19,7 +19,7 @@ List<Playlist> playlists = [];
 Future<void> loadConfiguration() async {
   final dir = await getApplicationDocumentsDirectory();
   final file = File('${dir.path}/Flux Player/config');
-  if (!await file.exists()) {
+  if (!file.existsSync()) {
     return;
   }
   final stream = BitStream(bytes: await file.readAsBytes());
@@ -43,18 +43,19 @@ Future<void> loadConfiguration() async {
 
   await windowManager.setPosition(Offset(wPosX, wPosY));
   await audioPlayer.setVolume(volume);
-  audioPlayer.setShuffled(shuffled);
-  audioPlayer.setLooped(looped);
+  audioPlayer
+    ..setShuffled(shuffled)
+    ..setLooped(looped);
   mainPageController.pageIndex = pageIndex;
 
   final tracksFile = File('${dir.path}/Flux Player/tracks');
-  if (!await tracksFile.exists()) {
+  if (!tracksFile.existsSync()) {
     return;
   }
   final tracksStream = BitStream(bytes: await tracksFile.readAsBytes());
 
   final importedTracks = await Isolate.run(() {
-    var tracks = <Track>[];
+    final tracks = <Track>[];
     while (tracksStream.length > tracksStream.cursor) {
       tracks.add(_loadTrack(tracksStream));
     }
@@ -64,7 +65,7 @@ Future<void> loadConfiguration() async {
   importedPlaylist.tracks = importedTracks;
 
   final playlistsFile = File('${dir.path}/Flux Player/playlists');
-  if (!await playlistsFile.exists()) {
+  if (!playlistsFile.existsSync()) {
     return;
   }
   final playlistsStream = BitStream(bytes: await playlistsFile.readAsBytes());
@@ -80,7 +81,7 @@ Future<void> loadConfiguration() async {
         ? importedPlaylist
         : playlists.elementAtOrNull(playingPlaylistIdx);
     if (playlist != null) {
-      await audioPlayer.setPlaylist(playlist, index: playingIndex!);
+      await audioPlayer.setPlaylist(playlist, index: playingIndex);
     }
   }
 
@@ -142,20 +143,23 @@ Future<void> saveConfiguration() async {
       : 0.0;
   final hasMainPlaylist = mainPlaylist != null;
 
-  stream.write(wPosX.toInt() + 32768, 16);
-  stream.write(wPosY.toInt() + 32768, 16);
-  stream.write((volume * 255).toInt(), 8);
-  stream.write(pageIndex, 8);
-  stream.writeBool(shuffled);
-  stream.writeBool(looped);
-  stream.writeBool(wasPlayingPlaylist);
+  stream
+    ..write(wPosX.toInt() + 32768, 16)
+    ..write(wPosY.toInt() + 32768, 16)
+    ..write((volume * 255).toInt(), 8)
+    ..write(pageIndex, 8)
+    ..writeBool(shuffled)
+    ..writeBool(looped)
+    ..writeBool(wasPlayingPlaylist);
   if (wasPlayingPlaylist) {
-    stream.write(playingPlaylistIdx!, 8);
-    stream.write(playingIndex!, 16);
+    stream
+      ..write(playingPlaylistIdx!, 8)
+      ..write(playingIndex!, 16);
   }
-  stream.writeString(deviceName, 6);
-  stream.write((position * 255).toInt(), 10);
-  stream.writeBool(hasMainPlaylist);
+  stream
+    ..writeString(deviceName, 6)
+    ..write((position * 255).toInt(), 10)
+    ..writeBool(hasMainPlaylist);
   if (hasMainPlaylist) {
     stream.write(playlists.indexOf(mainPlaylist!), 8);
   }
@@ -165,17 +169,15 @@ Future<void> saveConfiguration() async {
   await tracksFile.create(recursive: true);
   final tracksStream = BitStream();
 
-  for (var track in importedPlaylist.tracks) {
+  for (final track in importedPlaylist.tracks) {
     _saveTrack(tracksStream, track);
   }
   await tracksFile.writeAsBytes(tracksStream.toBytes());
 
   final playlistsFile = File('${dir.path}/Flux Player/playlists');
   await playlistsFile.create(recursive: true);
-  final playlistsStream = BitStream();
-
-  playlistsStream.write(playlists.length, 8);
-  for (var playlist in playlists) {
+  final playlistsStream = BitStream()..write(playlists.length, 8);
+  for (final playlist in playlists) {
     _savePlaylist(playlistsStream, playlist, tracks: importedPlaylist.tracks);
   }
   await playlistsFile.writeAsBytes(playlistsStream.toBytes());
@@ -213,7 +215,7 @@ void _savePlaylist(
       .map((track) => tracks.indexOf(track))
       .where((idx) => idx != -1);
   stream.write(mappedTracks.length, 16);
-  for (var idx in mappedTracks) {
+  for (final idx in mappedTracks) {
     stream.write(idx, 16);
   }
 }

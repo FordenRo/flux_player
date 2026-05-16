@@ -1,20 +1,21 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:audio_service/audio_service.dart'
-    show BaseAudioHandler, SeekHandler, MediaItem;
+    show BaseAudioHandler, MediaItem, SeekHandler;
 import 'package:audio_session/audio_session.dart' show AudioSession;
 import 'package:media_kit/media_kit.dart' as media_kit;
+
 import 'audio_player.dart';
 import 'audio_player_stream.dart';
-import 'track.dart';
 import 'playlist.dart';
+import 'track.dart';
 
 class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
-  final _player = AudioPlayerImpl.instance;
-
   AudioHandlerImpl() {
     _init();
   }
+  final _player = AudioPlayerImpl.instance;
 
   void _init() {
     _player.stream.currentTrack.listen((track) {
@@ -37,7 +38,7 @@ class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
     .new(
       controls: [
         .skipToPrevious,
-        _player.isPlaying ? .pause : .play,
+        if (_player.isPlaying) .pause else .play,
         .skipToNext,
         .fastForward,
       ],
@@ -82,17 +83,16 @@ extension MediaItemAdapter on Track {
 }
 
 class AudioPlayerImpl implements AudioPlayer {
-  final _player = media_kit.Player();
-
-  static final AudioPlayer instance = AudioPlayerImpl._internal();
-
   AudioPlayerImpl._internal() {
-    _player.stream.completed.listen((completed) async {
+    _player.stream.completed.listen((completed) {
       if (completed) {
-        return _onEnd();
+        _onEnd();
       }
     });
   }
+  final _player = media_kit.Player();
+
+  static final AudioPlayer instance = AudioPlayerImpl._internal();
 
   List<Track> _queue = [];
   Playlist? _currentPlaylist;
@@ -150,8 +150,8 @@ class AudioPlayerImpl implements AudioPlayer {
   );
 
   @override
-  Future<void> setVolume(double volume) async =>
-      await _player.setVolume(max(min(volume, 1), 0) * 100);
+  Future<void> setVolume(double volume) =>
+      _player.setVolume(max(min(volume, 1), 0) * 100);
 
   @override
   void setShuffled(bool shuffled) {

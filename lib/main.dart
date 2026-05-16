@@ -6,9 +6,9 @@ import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
+import 'app/app.dart';
 import 'core/audio_player/audio_player_impl.dart';
 import 'core/config.dart';
-import 'app/app.dart';
 import 'core/themes/app_theme.dart';
 
 Future<void> main() async {
@@ -16,7 +16,7 @@ Future<void> main() async {
   MediaKit.ensureInitialized();
   await windowManager.ensureInitialized();
 
-  final windowOptions = WindowOptions(
+  const windowOptions = WindowOptions(
     size: Size(720, 480),
     title: 'Flux Music Player',
     titleBarStyle: .hidden,
@@ -68,6 +68,6 @@ class _MainAppState extends State<MainApp> {
     title: 'Flux',
     color: themeData.primaryColor,
     theme: themeData,
-    home: App(),
+    home: const App(),
   );
 }

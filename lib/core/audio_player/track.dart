@@ -4,6 +4,7 @@ import 'package:audio_metadata_reader/audio_metadata_reader.dart'
 import 'audio_player.dart';
 
 class Track {
+  Track._internal({required this.path, required this.metadata});
   final String path;
   final AudioMetadata metadata;
 
@@ -12,10 +13,8 @@ class Track {
   Duration get duration => metadata.duration ?? Duration.zero;
   Picture? get picture => metadata.pictures.firstOrNull;
 
-  Track._internal({required this.path, required this.metadata});
-
   static Future<Track> fromJson(dynamic json) async {
-    final path = json['path'] as String;
+    final path = (json as Map<String, dynamic>)['path'] as String;
     final metadata = audio_metadata.readMetadata(.new(path), getImage: true);
 
     return ._internal(path: path, metadata: metadata);

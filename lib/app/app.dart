@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../core/config.dart';
 import '../core/constants.dart';
-import '../features/import_menu.dart';
-import '../features/player_controls/player_controls.dart';
 import '../features/all_tracks_page.dart';
+import '../features/import_menu.dart';
 import '../features/loading_page.dart';
+import '../features/player_controls/player_controls.dart';
 import '../features/playlists_page.dart';
 import '../features/settings_page.dart';
-import 'caption_widget.dart';
 import 'app_controller.dart';
+import 'caption_widget.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -41,7 +41,7 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
   }
 
   void onLoad() => setState(() {
-    animation.animateTo(1.0, curve: Curves.easeInOut);
+    animation.animateTo(1, curve: Curves.easeInOut);
     isLoaded = true;
   });
 
@@ -54,7 +54,6 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
               children: [
                 Expanded(
                   child: Row(
-                    mainAxisSize: .max,
                     children: [
                       Padding(
                         padding: const .symmetric(vertical: 12),
@@ -68,7 +67,7 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
                           padding: const .only(right: 8, left: 8, top: 8),
                           child: Column(
                             children: [
-                              CaptionWidget(title: 'Flux Music Player'),
+                              const CaptionWidget(title: 'Flux Music Player'),
 
                               Expanded(
                                 child: Padding(
@@ -83,8 +82,8 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const .only(right: 4, left: 4, bottom: 4),
+                const Padding(
+                  padding: .only(right: 4, left: 4, bottom: 4),
                   child: PlayerControls(),
                 ),
               ],
@@ -94,22 +93,22 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
       : LoadingPage(future: future, onLoad: onLoad);
 
   Widget buildPage() => switch (controller.pageIndex) {
-    0 => AllTracksPage(),
-    1 => PlaylistsPage(),
-    2 => SettingsPage(),
-    _ => AllTracksPage(),
+    0 => const AllTracksPage(),
+    1 => const PlaylistsPage(),
+    2 => const SettingsPage(),
+    _ => const AllTracksPage(),
   };
 
   NavigationRail buildNavigationRail() => NavigationRail(
     labelType: .selected,
-    destinations: [
+    destinations: const [
       NavigationRailDestination(
-        icon: const Icon(Icons.music_note_rounded),
-        label: const Text('Все треки'),
+        icon: Icon(Icons.music_note_rounded),
+        label: Text('Все треки'),
       ),
       NavigationRailDestination(
-        icon: const Icon(Icons.library_music_rounded),
-        label: const Text('Плейлисты'),
+        icon: Icon(Icons.library_music_rounded),
+        label: Text('Плейлисты'),
       ),
     ],
     trailing: Expanded(
@@ -119,10 +118,10 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
         selectedIndex: controller.pageIndex >= 2
             ? controller.pageIndex - 2
             : null,
-        destinations: [
+        destinations: const [
           NavigationRailDestination(
-            icon: const Icon(Icons.settings_rounded),
-            label: const Text('Настройки'),
+            icon: Icon(Icons.settings_rounded),
+            label: Text('Настройки'),
           ),
         ],
         leadingAtTop: false,
@@ -130,9 +129,9 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
           hoverColor: colorScheme.primary.withAlpha(10),
           splashColor: colorScheme.primary.withAlpha(100),
           visualDensity: .compact,
-          padding: .symmetric(horizontal: 16),
+          padding: const .symmetric(horizontal: 16),
           onPressed: () =>
-              showDialog(context: context, builder: (_) => ImportMenu()),
+              showDialog(context: context, builder: (_) => const ImportMenu()),
           icon: const Icon(Icons.add_to_photos_rounded),
         ),
         onDestinationSelected: (value) =>

@@ -7,8 +7,8 @@ import 'package:media_kit/media_kit.dart' as media_kit;
 
 import 'audio_player_impl.dart';
 import 'audio_player_stream.dart';
-import 'track.dart';
 import 'playlist.dart';
+import 'track.dart';
 
 final AudioPlayer audioPlayer = AudioPlayerImpl.instance;
 

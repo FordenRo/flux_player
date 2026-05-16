@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../core/audio_player/audio_player.dart';
+import '../core/audio_player/playlist.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
-import '../core/audio_player/playlist.dart';
 import '../features/simple_menu.dart';
 
 class PlaylistLabel extends StatefulWidget {
@@ -42,50 +42,46 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
       onSecondaryTapDown: (e) => showMenu(context, e),
       child: Padding(
         padding: const .all(10),
-        child: Row(
-          spacing: 20,
-          children: [
-            buildIcon(),
-            Expanded(
-              child: Stack(
-                children: [
-                  Center(
-                    child: TextField(
-                      selectAllOnFocus: true,
-                      ignorePointers: !focusNode.hasFocus,
-                      focusNode: focusNode,
-                      mouseCursor: WidgetStateMouseCursor.fromMap({
-                        WidgetState.focused: SystemMouseCursors.text,
-                        WidgetState.any: .defer,
-                      }),
-                      onEditingComplete: () => playlist.title = controller.text,
-                      controller: controller,
-                      style: .new(fontSize: 18),
-                      decoration: .new(hintText: 'Название', border: .none),
-                    ),
-                  ),
-                  Align(
-                    alignment: .bottomLeft,
-                    child: Text(
-                      '${playlist.tracks.length} треков',
-                      style: .new(color: colorScheme.onSurface.withAlpha(180)),
-                    ),
-                  ),
-                  Align(
-                    alignment: .bottomRight,
-                    child: Text(
-                      overallDuration.inMinutes > 100
-                          ? '${(overallDuration.inMinutes / 60).toStringAsFixed(1)} часов'
-                          : '${overallDuration.inMinutes} минут',
-                      style: .new(color: colorScheme.onSurface.withAlpha(180)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+        child: Row(spacing: 20, children: [buildIcon(), buildInfo()]),
       ),
+    ),
+  );
+
+  Expanded buildInfo() => Expanded(
+    child: Stack(
+      children: [
+        Center(
+          child: TextField(
+            selectAllOnFocus: true,
+            ignorePointers: !focusNode.hasFocus,
+            focusNode: focusNode,
+            mouseCursor: const WidgetStateMouseCursor.fromMap({
+              WidgetState.focused: SystemMouseCursors.text,
+              WidgetState.any: .defer,
+            }),
+            onEditingComplete: () => playlist.title = controller.text,
+            controller: controller,
+            style: const .new(fontSize: 18),
+            decoration: const .new(hintText: 'Название', border: .none),
+          ),
+        ),
+        Align(
+          alignment: .bottomLeft,
+          child: Text(
+            '${playlist.tracks.length} треков',
+            style: .new(color: colorScheme.onSurface.withAlpha(180)),
+          ),
+        ),
+        Align(
+          alignment: .bottomRight,
+          child: Text(
+            overallDuration.inMinutes > 100
+                ? '${(overallDuration.inMinutes / 60).toStringAsFixed(1)} часов'
+                : '${overallDuration.inMinutes} минут',
+            style: .new(color: colorScheme.onSurface.withAlpha(180)),
+          ),
+        ),
+      ],
     ),
   );
 
@@ -125,7 +121,7 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
                     onPressed: () =>
                         audioPlayer.setPlaylist(playlist, index: 0, play: true),
                     iconSize: 32,
-                    icon: Icon(Icons.play_arrow_rounded),
+                    icon: const Icon(Icons.play_arrow_rounded),
                   ),
                 ),
               ),

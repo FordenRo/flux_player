@@ -50,14 +50,14 @@ class _PositionSliderState extends State<PositionSlider> {
       child: SliderTheme(
         data: SliderThemeData(
           trackHeight: 8,
-          padding: .all(0),
+          padding: .zero,
           activeTrackColor: colorScheme.primary.withAlpha(200),
           thumbColor: colorScheme.primary,
           thumbShape: RoundSliderThumbShape(
             enabledThumbRadius: expanded ? 6 : 0,
             elevation: 4,
           ),
-          overlayShape: RoundSliderOverlayShape(overlayRadius: 12),
+          overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
         ),
         child: Slider(
           value: duration > 0 ? max(min(position / duration, 1), 0) : 0,

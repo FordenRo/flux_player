@@ -7,12 +7,12 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/constants.dart';
 
 class VolumeOverlay extends StatefulWidget {
-  const VolumeOverlay({super.key, required this.onHide});
+  const VolumeOverlay({required this.onHide, super.key});
 
   final void Function() onHide;
 
   static VolumeOverlayEntry createOverlay(BuildContext context) {
-    var entry = VolumeOverlayEntry._internal(context);
+    final entry = VolumeOverlayEntry._internal(context);
     entry.entry = .new(
       builder: (context) => VolumeOverlay(onHide: entry.remove),
     );
@@ -24,10 +24,9 @@ class VolumeOverlay extends StatefulWidget {
 }
 
 class VolumeOverlayEntry {
+  VolumeOverlayEntry._internal(this.context);
   late final OverlayEntry entry;
   final BuildContext context;
-
-  VolumeOverlayEntry._internal(this.context);
 
   void show() {
     if (!entry.mounted) {
@@ -92,7 +91,7 @@ class _VolumeOverlayState extends State<VolumeOverlay>
   Widget build(BuildContext context) => Align(
     alignment: .bottomRight,
     child: Transform.translate(
-      offset: Offset(15, -55),
+      offset: const Offset(15, -55),
       child: SizedBox(
         width: 250,
         height: 100,
@@ -138,8 +137,8 @@ class _VolumeOverlayState extends State<VolumeOverlay>
     child: SliderTheme(
       data: SliderThemeData(
         activeTrackColor: colorScheme.primary.withAlpha(200),
-        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
-        overlayShape: RoundSliderOverlayShape(overlayRadius: 16),
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
       ),
       child: Slider(
         value: audioPlayer.volume,
