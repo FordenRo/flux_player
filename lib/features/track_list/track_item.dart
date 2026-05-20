@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
-import '../core/audio_player/audio_player.dart';
-import '../core/audio_player/track.dart';
-import '../core/config.dart';
-import '../core/constants.dart';
-import '../core/utils.dart';
-import '../features/simple_menu.dart';
-import '../features/track_details.dart';
-import 'add_to_playlist_button.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/track.dart';
+import '../../core/config.dart';
+import '../../core/constants.dart';
+import '../../core/utils.dart';
+import '../simple_menu.dart';
+import '../track_details.dart';
+import '../../widgets/add_to_playlist_button.dart';
 
 class TrackItem extends StatefulWidget {
   const TrackItem(
