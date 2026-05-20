@@ -2,13 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/constants.dart';
 import '../../../core/models/track.dart';
 
-final TextStyle _keyStyle = .new(
-  color: colorScheme.onSurface.withAlpha(200),
-  fontSize: 12,
-);
 const TextStyle _valueStyle = .new(fontSize: 14);
 
 class TrackDetails extends StatelessWidget {
@@ -27,7 +22,7 @@ class TrackDetails extends StatelessWidget {
             child: Column(
               children: [
                 const Text('Свойства\n'),
-                _buildDetailsText(),
+                _buildDetailsText(context),
                 TextButton(
                   onPressed: () =>
                       Process.run('explorer', ['/select,', track.path]),
@@ -41,7 +36,12 @@ class TrackDetails extends StatelessWidget {
     ),
   );
 
-  RichText _buildDetailsText() {
+  RichText _buildDetailsText(BuildContext context) {
+    final keyStyle = TextStyle(
+      color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+      fontSize: 12,
+    );
+
     final fields = {
       'Название': track.metadata.title,
       'Исполнители': track.metadata.artist?.split('/').join('\n'),
@@ -61,7 +61,7 @@ class TrackDetails extends StatelessWidget {
             .map(
               (e) => TextSpan(
                 children: [
-                  TextSpan(text: '${e.key}\n', style: _keyStyle),
+                  TextSpan(text: '${e.key}\n', style: keyStyle),
                   TextSpan(text: '${e.value}\n\n', style: _valueStyle),
                 ],
               ),

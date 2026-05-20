@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/constants.dart';
 import '../../../core/models/track.dart';
 import '../../../core/services/config_service.dart';
 import '../../../core/utils.dart';
@@ -113,7 +112,9 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
                     playlistCount.toString(),
                     style: .new(
                       fontSize: 9,
-                      color: colorScheme.onSurface.withAlpha(200),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(200),
                     ),
                   ),
                 ),

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/audio_player/audio_player.dart';
-import '../../../core/constants.dart';
 import '../../../core/models/playlist.dart';
 import '../../../core/services/config_service.dart';
 import '../../../widgets/simple_menu.dart';
@@ -51,7 +50,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
     shape: RoundedRectangleBorder(
       borderRadius: .circular(12),
       side: audioPlayer.currentPlaylist == playlist
-          ? .new(color: colorScheme.primary)
+          ? .new(color: Theme.of(context).colorScheme.primary)
           : .none,
     ),
     child: GestureDetector(
@@ -87,7 +86,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
           alignment: .bottomLeft,
           child: Text(
             '${playlist.tracks.length} треков',
-            style: .new(color: colorScheme.onSurface.withAlpha(180)),
+            style: .new(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+            ),
           ),
         ),
         Align(
@@ -96,13 +97,18 @@ class _PlaylistTileState extends State<PlaylistTile> {
             overallDuration.inMinutes > 100
                 ? '${(overallDuration.inMinutes / 60).toStringAsFixed(1)} часов'
                 : '${overallDuration.inMinutes} минут',
-            style: .new(color: colorScheme.onSurface.withAlpha(180)),
+            style: .new(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+            ),
           ),
         ),
         if (mainPlaylist == playlist)
           Align(
             alignment: .topRight,
-            child: Icon(Icons.star_rounded, color: colorScheme.tertiary),
+            child: Icon(
+              Icons.star_rounded,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
           ),
       ],
     ),
@@ -220,7 +226,7 @@ class _PlayButtonState extends State<_PlayButton>
       opacity: isVisible ? 1 : 0,
       duration: Durations.short2,
       child: ColoredBox(
-        color: colorScheme.surface.withAlpha(100),
+        color: Theme.of(context).colorScheme.surface.withAlpha(100),
         child: Center(
           child: IconButton(
             onPressed: playPressed,

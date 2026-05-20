@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../core/constants.dart';
 import '../core/services/config_service.dart';
 import '../pages/all_tracks_page.dart';
 import '../pages/import_menu.dart';
@@ -46,54 +45,51 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
   });
 
   @override
-  Widget build(BuildContext context) => Theme(
-    data: controller.themeData,
-    child: isLoaded
-        ? Scaffold(
-            body: FadeTransition(
-              opacity: animation,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const .symmetric(vertical: 12),
-                          child: buildNavigationRail(),
-                        ),
+  Widget build(BuildContext context) => isLoaded
+      ? Scaffold(
+          body: FadeTransition(
+            opacity: animation,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const .symmetric(vertical: 12),
+                        child: buildNavigationRail(),
+                      ),
 
-                        const VerticalDivider(width: 1),
+                      const VerticalDivider(width: 1),
 
-                        Expanded(
-                          child: Padding(
-                            padding: const .only(right: 8, left: 8, top: 8),
-                            child: Column(
-                              children: [
-                                const CaptionWidget(title: 'Flux Music Player'),
+                      Expanded(
+                        child: Padding(
+                          padding: const .only(right: 8, left: 8, top: 8),
+                          child: Column(
+                            children: [
+                              const CaptionWidget(title: 'Flux Music Player'),
 
-                                Expanded(
-                                  child: Padding(
-                                    padding: const .all(4),
-                                    child: buildPage(),
-                                  ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const .all(4),
+                                  child: buildPage(),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const Padding(
-                    padding: .only(right: 4, left: 4, bottom: 4),
-                    child: PlayerControls(),
-                  ),
-                ],
-              ),
+                ),
+                const Padding(
+                  padding: .only(right: 4, left: 4, bottom: 4),
+                  child: PlayerControls(),
+                ),
+              ],
             ),
-          )
-        : LoadingPage(future: future, onLoad: onLoad),
-  );
+          ),
+        )
+      : LoadingPage(future: future, onLoad: onLoad);
 
   Widget buildPage() => switch (controller.pageIndex) {
     0 => const AllTracksPage(),
@@ -129,8 +125,8 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
         ],
         leadingAtTop: false,
         leading: IconButton(
-          hoverColor: colorScheme.primary.withAlpha(10),
-          splashColor: colorScheme.primary.withAlpha(100),
+          hoverColor: Theme.of(context).colorScheme.primary.withAlpha(10),
+          splashColor: Theme.of(context).colorScheme.primary.withAlpha(100),
           visualDensity: .compact,
           padding: const .symmetric(horizontal: 16),
           onPressed: () =>
@@ -143,10 +139,12 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
     ),
     leading: Padding(
       padding: const .only(bottom: 12),
-      child: Image.asset(
-        'assets/logo.png',
-        width: 32,
-        color: colorScheme.primary,
+      child: Builder(
+        builder: (context) => Image.asset(
+          'assets/logo.png',
+          width: 32,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     ),
     trailingAtBottom: true,

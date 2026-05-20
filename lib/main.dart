@@ -7,6 +7,7 @@ import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
+import 'app/app_controller.dart';
 import 'core/audio_player/audio_player_impl.dart';
 import 'core/services/config_service.dart';
 
@@ -39,10 +40,24 @@ Future<void> main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const MaterialApp(title: 'Flux', home: App());
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+    appController.addListener(() => setState(() {}));
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    title: 'Flux',
+    theme: appController.themeData,
+    home: const App(),
+  );
 }

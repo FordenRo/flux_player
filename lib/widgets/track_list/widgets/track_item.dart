@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../../../core/audio_player/audio_player.dart';
-import '../../../core/constants.dart';
 import '../../../core/models/track.dart';
 import '../../../core/services/config_service.dart';
 import '../../../core/utils.dart';
@@ -85,7 +84,9 @@ class _TrackItemState extends State<TrackItem>
       clipBehavior: .hardEdge,
       shape: RoundedRectangleBorder(
         borderRadius: .circular(12),
-        side: isSelected ? BorderSide(color: colorScheme.primary) : .none,
+        side: isSelected
+            ? BorderSide(color: Theme.of(context).colorScheme.primary)
+            : .none,
       ),
       child: Padding(
         padding: const .only(left: 6, right: 10),
@@ -101,7 +102,7 @@ class _TrackItemState extends State<TrackItem>
               '${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 13,
-                color: colorScheme.onSurface.withAlpha(200),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
               ),
             ),
           ],
@@ -144,7 +145,7 @@ class _TrackItemState extends State<TrackItem>
             text: track.author,
             style: .new(
               fontSize: 12,
-              color: colorScheme.onSurface.withAlpha(170),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(170),
             ),
           ),
         ],
@@ -165,7 +166,7 @@ class _TrackItemState extends State<TrackItem>
                 ? Icons.playlist_add_check_rounded
                 : Icons.playlist_add_rounded,
             size: 20,
-            color: colorScheme.onSurface.withAlpha(200),
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
           ),
           countBuilder: (context, child) =>
               Transform.translate(offset: const .new(-12, 8), child: child),
@@ -173,7 +174,7 @@ class _TrackItemState extends State<TrackItem>
       IconButton(
         onPressed: () => audioPlayer.addNext(track),
         icon: const Icon(Icons.navigate_next_rounded),
-        color: colorScheme.onSurface.withAlpha(200),
+        color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
         style: ButtonStyle(
           minimumSize: .all(Size.zero),
           iconSize: .all(24),
@@ -296,12 +297,12 @@ class _PlayButtonState extends State<_PlayButton>
         opacity: isVisible ? 1 : 0,
         duration: Durations.short2,
         child: ColoredBox(
-          color: colorScheme.surface.withAlpha(100),
+          color: Theme.of(context).colorScheme.surface.withAlpha(100),
           child: Center(
             child: AnimatedIcon(
               icon: AnimatedIcons.play_pause,
               size: 20,
-              color: colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.onSurface,
               progress: playAnim,
             ),
           ),

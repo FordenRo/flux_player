@@ -4,7 +4,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/audio_player/audio_player.dart';
-import '../../../../core/constants.dart';
 
 class VolumeOverlay extends StatefulWidget {
   const VolumeOverlay({required this.onHide, super.key});
@@ -60,7 +59,6 @@ class _VolumeOverlayState extends State<VolumeOverlay>
   @override
   void initState() {
     super.initState();
-
     timer = Timer(const Duration(seconds: 5), hide);
     subscription = audioPlayer.stream.volume.listen((_) => setState(() {}));
     show();
@@ -82,7 +80,6 @@ class _VolumeOverlayState extends State<VolumeOverlay>
     if (sliding) {
       return;
     }
-
     await fadeAnimation.animateTo(0, curve: Curves.easeInOut);
     widget.onHide();
   }
@@ -118,7 +115,7 @@ class _VolumeOverlayState extends State<VolumeOverlay>
                 height: 50,
                 child: FadeTransition(
                   opacity: fadeAnimation,
-                  child: buildCard(context),
+                  child: buildCard(),
                 ),
               ),
             ),
@@ -128,28 +125,34 @@ class _VolumeOverlayState extends State<VolumeOverlay>
     ),
   );
 
-  Card buildCard(BuildContext context) => Card(
-    shape: RoundedRectangleBorder(
-      side: BorderSide(color: colorScheme.secondary.withAlpha(100)),
-      borderRadius: .circular(16),
-    ),
-    elevation: 8,
-    child: SliderTheme(
-      data: SliderThemeData(
-        activeTrackColor: colorScheme.primary.withAlpha(200),
-        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-        overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+  Builder buildCard() => Builder(
+    builder: (context) => Card(
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.secondary.withAlpha(100),
+        ),
+        borderRadius: .circular(16),
       ),
-      child: Slider(
-        value: audioPlayer.volume,
-        onChangeStart: (_) => sliding = true,
-        onChangeEnd: (_) {
-          sliding = false;
-          if (!hovered) {
-            hide();
-          }
-        },
-        onChanged: audioPlayer.setVolume,
+      elevation: 8,
+      child: SliderTheme(
+        data: SliderThemeData(
+          activeTrackColor: Theme.of(
+            context,
+          ).colorScheme.primary.withAlpha(200),
+          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+          overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+        ),
+        child: Slider(
+          value: audioPlayer.volume,
+          onChangeStart: (_) => sliding = true,
+          onChangeEnd: (_) {
+            sliding = false;
+            if (!hovered) {
+              hide();
+            }
+          },
+          onChanged: audioPlayer.setVolume,
+        ),
       ),
     ),
   );

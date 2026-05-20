@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/audio_player/audio_player.dart';
-import '../../../core/constants.dart';
 import '../../track_list/track_list.dart';
 
 class QueueList extends StatelessWidget {
@@ -16,7 +15,7 @@ class QueueList extends StatelessWidget {
         width: 500,
         height: 400,
         child: Card(
-          color: colorScheme.surface,
+          color: Theme.of(context).colorScheme.surface,
           child: Padding(
             padding: const .all(12),
             child: TrackList(

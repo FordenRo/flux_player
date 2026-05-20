@@ -4,7 +4,6 @@ import 'dart:isolate';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../core/constants.dart';
 import '../core/models/track.dart';
 import '../core/services/config_service.dart';
 
@@ -108,7 +107,7 @@ class _ImportMenuState extends State<ImportMenu> {
     required String text,
     required void Function() onTap,
   }) => Card(
-    color: colorScheme.primary.withAlpha(50),
+    color: Theme.of(context).colorScheme.primary.withAlpha(50),
     clipBehavior: .hardEdge,
     child: InkWell(
       onTap: onTap,

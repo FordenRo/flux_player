@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app/caption_widget/caption_widget.dart';
 import '../../core/audio_player/audio_player.dart';
-import '../../core/constants.dart';
 import '../../core/models/playlist.dart';
 import '../../core/services/config_service.dart';
 import '../../widgets/track_list/track_list.dart';
@@ -32,8 +31,8 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
             onPressed: () => playlists.add(.new(title: 'Новый плейлист')),
             shape: const CircleBorder(),
             backgroundColor: .alphaBlend(
-              colorScheme.primaryContainer.withAlpha(100),
-              colorScheme.surface,
+              Theme.of(context).colorScheme.primaryContainer.withAlpha(100),
+              Theme.of(context).colorScheme.surface,
             ),
             child: const Icon(Icons.add),
           ),

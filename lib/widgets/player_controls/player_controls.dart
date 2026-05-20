@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../../core/audio_player/audio_player.dart';
-import '../../core/constants.dart';
 import '../../core/models/track.dart';
 import '../../core/services/config_service.dart';
 import '../../pages/playlists_page/widgets/add_to_playlist_button.dart';
@@ -57,8 +56,8 @@ class _PlayerControlsState extends State<PlayerControls>
             borderRadius: .circular(12),
             side: BorderSide(
               color: audioPlayer.isPlaying
-                  ? colorScheme.primary.withAlpha(200)
-                  : colorScheme.secondary.withAlpha(100),
+                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                  : Theme.of(context).colorScheme.secondary.withAlpha(100),
             ),
           ),
           elevation: 2,
@@ -124,7 +123,7 @@ class _PlayerControlsState extends State<PlayerControls>
                 overflow: .ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: colorScheme.onSurface.withAlpha(170),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(170),
                 ),
               ),
             ],
@@ -140,7 +139,7 @@ class _PlayerControlsState extends State<PlayerControls>
                           .isNotEmpty
                   ? Icons.playlist_add_check_rounded
                   : Icons.playlist_add_rounded,
-              color: colorScheme.onSurface.withAlpha(200),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
             ),
             countBuilder: (context, child) =>
                 Transform.translate(offset: const .new(-14, 10), child: child),
@@ -156,7 +155,9 @@ class _PlayerControlsState extends State<PlayerControls>
       StreamBuilder(
         stream: audioPlayer.stream.shuffled,
         builder: (context, asyncSnapshot) => IconButton(
-          color: audioPlayer.shuffled ? colorScheme.primary : null,
+          color: audioPlayer.shuffled
+              ? Theme.of(context).colorScheme.primary
+              : null,
           onPressed: () => audioPlayer.setShuffled(!audioPlayer.shuffled),
           icon: const Icon(Icons.shuffle_rounded),
         ),
@@ -173,7 +174,9 @@ class _PlayerControlsState extends State<PlayerControls>
             }
           },
           child: IconButton(
-            color: prevBtnOffset != 0 ? colorScheme.primary : null,
+            color: prevBtnOffset != 0
+                ? Theme.of(context).colorScheme.primary
+                : null,
             onPressed: () => setState(() {
               prevBtnOffset = 1;
               audioPlayer.previous();
@@ -207,7 +210,9 @@ class _PlayerControlsState extends State<PlayerControls>
             }
           },
           child: IconButton(
-            color: nextBtnOffset != 0 ? colorScheme.primary : null,
+            color: nextBtnOffset != 0
+                ? Theme.of(context).colorScheme.primary
+                : null,
             onPressed: () => setState(() {
               nextBtnOffset = 1;
               audioPlayer.next();
@@ -224,7 +229,9 @@ class _PlayerControlsState extends State<PlayerControls>
           duration: Durations.short3,
           turns: audioPlayer.looped ? -0.5 : 0,
           child: IconButton(
-            color: audioPlayer.looped ? colorScheme.primary : null,
+            color: audioPlayer.looped
+                ? Theme.of(context).colorScheme.primary
+                : null,
             onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
             icon: const Icon(Icons.loop_rounded),
           ),

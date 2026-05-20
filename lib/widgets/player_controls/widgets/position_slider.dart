@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 import '../../../core/audio_player/audio_player.dart';
-import '../../../core/constants.dart';
 
 class PositionSlider extends StatefulWidget {
   const PositionSlider({super.key});
@@ -51,8 +50,10 @@ class _PositionSliderState extends State<PositionSlider> {
         data: SliderThemeData(
           trackHeight: 8,
           padding: .zero,
-          activeTrackColor: colorScheme.primary.withAlpha(200),
-          thumbColor: colorScheme.primary,
+          activeTrackColor: Theme.of(
+            context,
+          ).colorScheme.primary.withAlpha(200),
+          thumbColor: Theme.of(context).colorScheme.primary,
           thumbShape: RoundSliderThumbShape(
             enabledThumbRadius: expanded ? 6 : 0,
             elevation: 4,

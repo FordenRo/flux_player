@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/audio_player/audio_player.dart';
-import '../../../core/constants.dart';
 import '../../../core/models/track.dart';
 import '../track_list_controller.dart';
 
@@ -83,12 +82,12 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
             style: .new(
               backgroundColor: .all(
                 Color.alphaBlend(
-                  colorScheme.secondary.withAlpha(100),
-                  colorScheme.surface,
+                  Theme.of(context).colorScheme.secondary.withAlpha(100),
+                  Theme.of(context).colorScheme.surface,
                 ),
               ),
             ),
-            color: colorScheme.onSurface,
+            color: Theme.of(context).colorScheme.onSurface,
             icon: const Icon(Icons.arrow_upward_rounded),
           ),
         ),
@@ -110,23 +109,23 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
           style: .new(
             backgroundColor: .all(
               Color.alphaBlend(
-                colorScheme.primary.withAlpha(120),
-                colorScheme.surface,
+                Theme.of(context).colorScheme.primary.withAlpha(120),
+                Theme.of(context).colorScheme.surface,
               ),
             ),
             side: .all(
               watchCurrentTrack
                   ? .new(
                       color: Color.alphaBlend(
-                        colorScheme.onSurface.withAlpha(180),
-                        colorScheme.surface,
+                        Theme.of(context).colorScheme.onSurface.withAlpha(180),
+                        Theme.of(context).colorScheme.surface,
                       ),
                       width: 2,
                     )
                   : .none,
             ),
           ),
-          color: colorScheme.onSurface,
+          color: Theme.of(context).colorScheme.onSurface,
           icon: const Icon(Icons.music_note_rounded),
         ),
       ),
