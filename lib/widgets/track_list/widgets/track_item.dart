@@ -116,7 +116,11 @@ class _TrackItemState extends State<TrackItem>
     clipBehavior: .hardEdge,
     decoration: BoxDecoration(
       borderRadius: .circular(8),
-      border: .all(strokeAlign: 1, width: 1, color: Colors.grey.shade600),
+      border: .all(
+        strokeAlign: 1,
+        width: 1,
+        color: Colors.grey.shade600.withAlpha(120),
+      ),
     ),
     child: Stack(
       fit: .expand,
