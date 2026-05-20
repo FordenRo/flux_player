@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/audio_player/audio_player.dart';
 import '../core/config.dart';
 import 'track_list/track_list.dart';
 
@@ -12,5 +13,15 @@ class AllTracksPage extends StatefulWidget {
 
 class _AllTracksPageState extends State<AllTracksPage> {
   @override
-  Widget build(BuildContext context) => TrackList(playlist: importedPlaylist);
+  Widget build(BuildContext context) => TrackList(
+    importedPlaylist.tracks,
+    onTrackSelected: (idx) =>
+        audioPlayer.setPlaylist(importedPlaylist, index: idx, play: true),
+    trackMenuItemsBuilder: (idx) => [
+      .new(
+        text: 'Удалить песню',
+        onTap: () => importedPlaylist.tracks.removeAt(idx),
+      ),
+    ],
+  );
 }

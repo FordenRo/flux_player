@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../core/audio_player/audio_player.dart';
-import '../core/audio_player/playlist.dart';
 import '../core/constants.dart';
 import 'track_list/track_list.dart';
 
@@ -21,7 +20,15 @@ class QueueList extends StatelessWidget {
           child: Padding(
             padding: const .all(12),
             child: TrackList(
-              playlist: Playlist(title: 'Queue', tracks: audioPlayer.queue),
+              audioPlayer.queue,
+              onTrackSelected: audioPlayer.setIndex,
+              sortEnabled: false,
+              trackMenuItemsBuilder: (idx) => [
+                .new(
+                  text: 'Убрать',
+                  onTap: () => audioPlayer.queue.removeAt(idx),
+                ),
+              ],
             ),
           ),
         ),

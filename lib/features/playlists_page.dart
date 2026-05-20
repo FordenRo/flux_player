@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../app/caption_widget.dart';
+import '../core/audio_player/audio_player.dart';
 import '../core/audio_player/playlist.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
-import '../widgets/playlist_label.dart';
+import '../widgets/playlist_tile.dart';
 import 'track_list/track_list.dart';
 
 class PlaylistsPage extends StatefulWidget {
@@ -63,5 +64,15 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
             ),
           ),
         )
-      : TrackList(playlist: openedPlaylist!);
+      : TrackList(
+          openedPlaylist!.tracks,
+          onTrackSelected: (idx) =>
+              audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true),
+          trackMenuItemsBuilder: (idx) => [
+            .new(
+              text: 'Удалить из плейлиста',
+              onTap: () => openedPlaylist!.tracks.removeAt(idx),
+            ),
+          ],
+        );
 }

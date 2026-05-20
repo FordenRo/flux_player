@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../core/audio_player/audio_player.dart';
-import '../core/audio_player/playlist.dart';
 import '../core/audio_player/track.dart';
 import '../core/config.dart';
 import '../core/constants.dart';
@@ -13,18 +12,23 @@ import '../features/simple_menu.dart';
 import '../features/track_details.dart';
 import 'add_to_playlist_button.dart';
 
-class TrackLabel extends StatefulWidget {
-  const TrackLabel(this.playlist, this.index, {super.key, this.menuItems});
+class TrackItem extends StatefulWidget {
+  const TrackItem(
+    this.track, {
+    required this.onSelected,
+    super.key,
+    this.menuItems,
+  });
 
-  final Playlist playlist;
+  final Track track;
   final List<SimpleMenuItem>? menuItems;
-  final int index;
+  final void Function() onSelected;
 
   @override
-  State<TrackLabel> createState() => _TrackLabelState();
+  State<TrackItem> createState() => _TrackItemState();
 }
 
-class _TrackLabelState extends State<TrackLabel>
+class _TrackItemState extends State<TrackItem>
     with SingleTickerProviderStateMixin {
   late final List<StreamSubscription> subscriptions;
   late final AnimationController playAnim = .new(
@@ -33,9 +37,7 @@ class _TrackLabelState extends State<TrackLabel>
     value: isPlaying ? 1 : 0,
   );
 
-  int get index => widget.index;
-  Playlist get playlist => widget.playlist;
-  Track get track => playlist.tracks[index];
+  Track get track => widget.track;
   bool get isSelected => audioPlayer.currentTrack == track;
   bool get isPlaying => isSelected && audioPlayer.isPlaying;
 
@@ -68,7 +70,7 @@ class _TrackLabelState extends State<TrackLabel>
   }
 
   @override
-  void didUpdateWidget(covariant TrackLabel oldWidget) {
+  void didUpdateWidget(covariant TrackItem oldWidget) {
     playAnim.value = isPlaying ? 1 : 0;
     super.didUpdateWidget(oldWidget);
   }
@@ -81,7 +83,7 @@ class _TrackLabelState extends State<TrackLabel>
         await audioPlayer.play();
       }
     } else {
-      await audioPlayer.setPlaylist(playlist, index: index, play: true);
+      widget.onSelected();
     }
   }
 

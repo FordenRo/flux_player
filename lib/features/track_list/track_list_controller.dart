@@ -16,6 +16,7 @@ class TrackListController extends ScrollController {
       }
     });
   }
+
   var _watchCurrentTrack = true;
   List<Track> tracks = [];
   late final StreamSubscription _subscription;
@@ -41,11 +42,26 @@ class TrackListController extends ScrollController {
     });
   }
 
-  Future<void> animateToTrack(Track track) => animateTo(
-    (tracks.indexOf(track) - 1) * 50,
-    duration: Durations.long2,
-    curve: Curves.easeOutQuart,
-  );
+  Future<void> animateToTrack(Track track) =>
+      animateToIndex(tracks.indexOf(track));
+
+  Future<void> animateToIndex(int index) {
+    final delta = _offsetOf(index) - offset;
+    if (delta.abs() > 500) {
+      jumpTo(_offsetOf(index) - 500 * delta.sign);
+    }
+    return animateTo(
+      _offsetOf(index),
+      duration: Durations.long2,
+      curve: Curves.easeOutQuart,
+    );
+  }
+
+  void jumpToTrack(Track track) => jumpToIndex(tracks.indexOf(track));
+
+  void jumpToIndex(int index) => jumpTo(_offsetOf(index));
+
+  double _offsetOf(int index) => index * 50 - position.viewportDimension / 3;
 
   Future<void> animateToTop() {
     watchCurrentTrack = false;
