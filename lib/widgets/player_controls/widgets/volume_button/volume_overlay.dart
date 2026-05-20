@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/audio_player/audio_player.dart';
-import '../../core/constants.dart';
+import '../../../../core/audio_player/audio_player.dart';
+import '../../../../core/constants.dart';
 
 class VolumeOverlay extends StatefulWidget {
   const VolumeOverlay({required this.onHide, super.key});

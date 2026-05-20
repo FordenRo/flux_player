@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../core/audio_player/track.dart';
-import '../core/constants.dart';
+import '../../../core/audio_player/track.dart';
+import '../../../core/constants.dart';
 
 final TextStyle _keyStyle = .new(
   color: colorScheme.onSurface.withAlpha(200),

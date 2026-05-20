@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../core/config.dart';
 import '../core/constants.dart';
-import '../features/all_tracks_page.dart';
-import '../features/import_menu.dart';
-import '../features/loading_page.dart';
-import '../features/player_controls/player_controls.dart';
-import '../features/playlists_page.dart';
-import '../features/settings_page.dart';
+import '../pages/all_tracks_page.dart';
+import '../pages/import_menu.dart';
+import '../pages/loading_page.dart';
+import '../widgets/player_controls/player_controls.dart';
+import '../widgets/playlists_page/playlists_page.dart';
+import '../pages/settings_page.dart';
 import 'app_controller.dart';
 import 'caption_widget.dart';
 

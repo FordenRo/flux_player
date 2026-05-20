@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
-import '../../core/audio_player/audio_player.dart';
-import '../../core/constants.dart';
+import '../../../core/audio_player/audio_player.dart';
+import '../../../core/constants.dart';
 
 class PositionSlider extends StatefulWidget {
   const PositionSlider({super.key});

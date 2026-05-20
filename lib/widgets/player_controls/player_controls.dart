@@ -8,10 +8,10 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
 import '../../core/constants.dart';
-import '../../widgets/add_to_playlist_button.dart';
-import '../queue_list.dart';
-import 'position_slider.dart';
-import 'volume_button.dart';
+import '../playlists_page/add_to_playlist_button.dart';
+import 'widgets/queue_list.dart';
+import 'widgets/position_slider.dart';
+import 'widgets/volume_button/volume_button.dart';
 
 class PlayerControls extends StatefulWidget {
   const PlayerControls({super.key});

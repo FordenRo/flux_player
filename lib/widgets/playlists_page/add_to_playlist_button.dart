@@ -2,20 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../core/audio_player/track.dart';
-import '../core/config.dart';
-import '../core/constants.dart';
-import '../core/utils.dart';
-import '../features/simple_menu.dart';
+import '../../core/audio_player/track.dart';
+import '../../core/config.dart';
+import '../../core/constants.dart';
+import '../../core/utils.dart';
+import '../simple_menu.dart';
 
 class AddToPlaylistButton extends StatefulWidget {
   const AddToPlaylistButton({
+    this.padding = const .all(8),
     required this.track,
     required this.builder,
     required this.countBuilder,
     super.key,
   });
+
   final Track track;
+  final EdgeInsets padding;
   final Widget Function(BuildContext context) builder;
   final Widget Function(BuildContext context, Widget child) countBuilder;
 
@@ -97,7 +100,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
       onTap: onTap,
       onSecondaryTap: onSecondaryTap,
       child: Padding(
-        padding: const .all(8),
+        padding: widget.padding,
         child: Stack(
           alignment: .center,
           children: [

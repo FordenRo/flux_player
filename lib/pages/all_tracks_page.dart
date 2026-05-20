@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/audio_player/audio_player.dart';
 import '../core/config.dart';
-import 'track_list/track_list.dart';
+import '../widgets/track_list/track_list.dart';
 
 class AllTracksPage extends StatefulWidget {
   const AllTracksPage({super.key});

@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-import '../core/audio_player/audio_player.dart';
-import '../core/audio_player/playlist.dart';
-import '../core/config.dart';
-import '../core/constants.dart';
-import '../features/simple_menu.dart';
+import '../../core/audio_player/audio_player.dart';
+import '../../core/audio_player/playlist.dart';
+import '../../core/config.dart';
+import '../../core/constants.dart';
+import '../simple_menu.dart';
 
 class PlaylistLabel extends StatefulWidget {
   const PlaylistLabel(this.playlist, {super.key, this.onTap});
@@ -19,6 +21,7 @@ class PlaylistLabel extends StatefulWidget {
 class _PlaylistLabelState extends State<PlaylistLabel> {
   late final TextEditingController controller = .new(text: playlist.title);
   late final FocusNode focusNode = .new()..addListener(() => setState(() {}));
+  late final StreamSubscription playlistSub;
 
   Playlist get playlist => widget.playlist;
   Duration get overallDuration =>
@@ -27,15 +30,30 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
   var iconHovered = false;
 
   @override
+  void initState() {
+    super.initState();
+    playlistSub = audioPlayer.stream.currentPlaylist.listen(
+      (_) => setState(() {}),
+    );
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     focusNode.dispose();
+    playlistSub.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => Card(
     clipBehavior: .hardEdge,
+    shape: RoundedRectangleBorder(
+      borderRadius: .circular(12),
+      side: audioPlayer.currentPlaylist == playlist
+          ? .new(color: colorScheme.primary)
+          : .none,
+    ),
     child: GestureDetector(
       onTap: !focusNode.hasFocus ? widget.onTap : null,
       behavior: .opaque,
@@ -81,6 +99,11 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
             style: .new(color: colorScheme.onSurface.withAlpha(180)),
           ),
         ),
+        if (mainPlaylist == playlist)
+          Align(
+            alignment: .topRight,
+            child: Icon(Icons.star_rounded, color: colorScheme.tertiary),
+          ),
       ],
     ),
   );
@@ -107,27 +130,7 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
               .map((e) => Image.memory(e.picture!.bytes))
               .toList(),
         ),
-        StatefulBuilder(
-          builder: (context, setState) => MouseRegion(
-            onEnter: (_) => setState(() => iconHovered = true),
-            onExit: (_) => setState(() => iconHovered = false),
-            child: AnimatedOpacity(
-              opacity: iconHovered ? 1 : 0,
-              duration: Durations.short2,
-              child: ColoredBox(
-                color: colorScheme.surface.withAlpha(100),
-                child: Center(
-                  child: IconButton(
-                    onPressed: () =>
-                        audioPlayer.setPlaylist(playlist, index: 0, play: true),
-                    iconSize: 32,
-                    icon: const Icon(Icons.play_arrow_rounded),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        _PlayButton(playlist),
       ],
     ),
   );
@@ -149,4 +152,86 @@ class _PlaylistLabelState extends State<PlaylistLabel> {
           ),
         ],
       );
+}
+
+class _PlayButton extends StatefulWidget {
+  const _PlayButton(this.playlist);
+
+  final Playlist playlist;
+
+  @override
+  State<_PlayButton> createState() => _PlayButtonState();
+}
+
+class _PlayButtonState extends State<_PlayButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController playAnim = .new(
+    vsync: this,
+    duration: Durations.short2,
+    value: isVisible ? 1 : 0,
+  );
+  late final StreamSubscription isPlayingSub;
+  late final StreamSubscription playlistSub;
+  var isHovered = false;
+
+  Playlist get playlist => widget.playlist;
+  bool get isSelected => audioPlayer.currentPlaylist == playlist;
+  bool get isPlaying => isSelected && audioPlayer.isPlaying;
+  bool get isVisible => isHovered || isPlaying;
+
+  Future<void> playPressed() async {
+    if (isSelected) {
+      if (isPlaying) {
+        await audioPlayer.pause();
+      } else {
+        await audioPlayer.play();
+      }
+    } else {
+      await audioPlayer.setPlaylist(playlist, index: 0, play: true);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isPlayingSub = audioPlayer.stream.isPlaying
+        .where((_) => playlist == audioPlayer.currentPlaylist)
+        .listen((_) => update());
+    playlistSub = audioPlayer.stream.currentPlaylist.listen((_) => update());
+  }
+
+  @override
+  void dispose() {
+    isPlayingSub.cancel();
+    playlistSub.cancel();
+    super.dispose();
+  }
+
+  void update() {
+    setState(() {});
+    playAnim.animateTo(isPlaying ? 1 : 0);
+  }
+
+  @override
+  Widget build(BuildContext context) => MouseRegion(
+    onEnter: (_) => setState(() => isHovered = true),
+    onExit: (_) => setState(() => isHovered = false),
+    child: AnimatedOpacity(
+      opacity: isVisible ? 1 : 0,
+      duration: Durations.short2,
+      child: ColoredBox(
+        color: colorScheme.surface.withAlpha(100),
+        child: Center(
+          child: IconButton(
+            onPressed: playPressed,
+            iconSize: 32,
+            icon: AnimatedIcon(
+              icon: AnimatedIcons.play_pause,
+              progress: playAnim,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
