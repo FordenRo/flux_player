@@ -12,16 +12,16 @@ class CaptionWidget extends StatefulWidget {
 }
 
 class _CaptionWidgetState extends State<CaptionWidget> {
-  List<Widget Function(BuildContext)> captionButtons = [];
+  List<Widget Function(BuildContext)> captionWidgets = [];
 
   @override
   void initState() {
     super.initState();
-    captionController._onButtonAdd = (builder, controller) {
-      setState(() => captionButtons.add(builder));
+    captionController._onWidgetAdd = (builder, controller) {
+      setState(() => captionWidgets.add(builder));
       controller._onRemove = () {
         controller._onRemove = null;
-        Future.microtask(() => setState(() => captionButtons.remove(builder)));
+        Future.microtask(() => setState(() => captionWidgets.remove(builder)));
       };
     };
   }
@@ -44,7 +44,7 @@ class _CaptionWidgetState extends State<CaptionWidget> {
               duration: Durations.medium1,
               curve: Curves.easeOutCubic,
               child: Row(
-                children: captionButtons.map((e) => e(context)).toList(),
+                children: captionWidgets.map((e) => e(context)).toList(),
               ),
             ),
             Expanded(

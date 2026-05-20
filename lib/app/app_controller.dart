@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-final mainPageController = AppController._internal();
+final appController = AppController._internal();
 
 class AppController with ChangeNotifier {
   AppController._internal();

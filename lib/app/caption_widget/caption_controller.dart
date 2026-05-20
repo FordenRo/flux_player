@@ -2,8 +2,8 @@ part of 'caption_widget.dart';
 
 final captionController = CaptionController._internal();
 
-class CaptionButtonController {
-  CaptionButtonController();
+class CaptionWidgetController {
+  CaptionWidgetController();
   void Function()? _onRemove;
 
   void remove() => _onRemove!();
@@ -15,12 +15,12 @@ class CaptionController {
   CaptionController._internal();
   late void Function(
     Widget Function(BuildContext context) builder,
-    CaptionButtonController controller,
+    CaptionWidgetController controller,
   )?
-  _onButtonAdd;
+  _onWidgetAdd;
 
-  void addIconButton({
-    required IconButton Function(BuildContext context) builder,
-    required CaptionButtonController controller,
-  }) => _onButtonAdd!(builder, controller);
+  void addWidget({
+    required Widget Function(BuildContext context) builder,
+    required CaptionWidgetController controller,
+  }) => _onWidgetAdd!(builder, controller);
 }

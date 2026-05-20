@@ -26,12 +26,12 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
   var isLoaded = false;
   late final Future<void> future = loadConfiguration();
 
-  AppController get controller => mainPageController;
+  AppController get controller => appController;
 
   @override
   void initState() {
     super.initState();
-    mainPageController.addListener(() => setState(() {}));
+    appController.addListener(() => setState(() {}));
   }
 
   @override

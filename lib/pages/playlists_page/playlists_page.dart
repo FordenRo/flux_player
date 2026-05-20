@@ -16,7 +16,7 @@ class PlaylistsPage extends StatefulWidget {
 }
 
 class _PlaylistsPageState extends State<PlaylistsPage> {
-  final CaptionButtonController buttonController = .new();
+  final CaptionWidgetController buttonController = .new();
   Playlist? openedPlaylist;
 
   @override
@@ -48,13 +48,19 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
               itemBuilder: (context, idx) => PlaylistTile(
                 playlists[idx],
                 onTap: () {
-                  captionController.addIconButton(
-                    builder: (context) => IconButton(
-                      onPressed: () {
-                        buttonController.remove();
-                        setState(() => openedPlaylist = null);
-                      },
-                      icon: const Icon(Icons.arrow_back_rounded),
+                  captionController.addWidget(
+                    builder: (context) => Row(
+                      spacing: 8,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            buttonController.remove();
+                            setState(() => openedPlaylist = null);
+                          },
+                          icon: const Icon(Icons.arrow_back_rounded),
+                        ),
+                        Text(openedPlaylist!.title),
+                      ],
                     ),
                     controller: buttonController,
                   );
