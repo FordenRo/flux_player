@@ -8,9 +8,9 @@ import '../../core/audio_player/track.dart';
 import '../../core/config.dart';
 import '../../core/constants.dart';
 import '../../core/utils.dart';
+import '../../widgets/add_to_playlist_button.dart';
 import '../simple_menu.dart';
 import '../track_details.dart';
-import '../../widgets/add_to_playlist_button.dart';
 
 class TrackItem extends StatefulWidget {
   const TrackItem(

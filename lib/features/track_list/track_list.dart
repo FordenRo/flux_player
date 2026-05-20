@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../../core/audio_player/audio_player.dart';
 import '../../core/audio_player/track.dart';
-import 'track_item.dart';
 import '../simple_menu.dart';
 import 'floating_actions_overlay.dart';
 import 'search_field.dart';
 import 'sort_menu_button.dart';
+import 'track_item.dart';
 import 'track_list_controller.dart';
 
 enum Sorting { name, artist, custom }
