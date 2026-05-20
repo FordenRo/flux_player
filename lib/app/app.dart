@@ -143,7 +143,11 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
     ),
     leading: Padding(
       padding: const .only(bottom: 12),
-      child: Image.asset('assets/logo.png', width: 32),
+      child: Image.asset(
+        'assets/logo.png',
+        width: 32,
+        color: colorScheme.primary,
+      ),
     ),
     trailingAtBottom: true,
     selectedIndex: controller.pageIndex < 2 ? controller.pageIndex : null,
