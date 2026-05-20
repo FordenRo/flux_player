@@ -9,7 +9,6 @@ import 'package:window_manager/window_manager.dart';
 import 'app/app.dart';
 import 'core/audio_player/audio_player_impl.dart';
 import 'core/services/config_service.dart';
-import 'core/themes/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,34 +39,10 @@ Future<void> main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  late StreamSubscription _themeSub;
-  ThemeData get themeData => AppTheme.instance.themeData;
-
-  @override
-  void initState() {
-    super.initState();
-    _themeSub = AppTheme.instance.stream.listen((_) => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _themeSub.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'Flux',
-    color: themeData.primaryColor,
-    theme: themeData,
-    home: const App(),
-  );
+  Widget build(BuildContext context) =>
+      const MaterialApp(title: 'Flux', home: App());
 }

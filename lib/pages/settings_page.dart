@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../app/app_controller.dart';
 import '../core/services/config_service.dart';
+
+final List<Color> _themeColors = [
+  Colors.green,
+  Colors.red,
+  Colors.pink,
+  Colors.purple,
+  Colors.blue,
+  Colors.yellow,
+];
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -8,6 +18,24 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView(
     children: [
+      ListTile(
+        title: const Text('Theme color'),
+        trailing: Row(
+          spacing: 8,
+          mainAxisSize: .min,
+          children: _themeColors.map(_ColorButton.new).toList(),
+        ),
+      ),
+      ListTile(
+        title: const Text('Dark theme'),
+        trailing: StatefulBuilder(
+          builder: (context, setState) => Checkbox(
+            value: appController.darkTheme,
+            onChanged: (value) =>
+                setState(() => appController.darkTheme = value!),
+          ),
+        ),
+      ),
       ListTile(
         title: const Text('Delete all playlists'),
         trailing: IconButton(
@@ -23,5 +51,25 @@ class SettingsPage extends StatelessWidget {
         ),
       ),
     ],
+  );
+}
+
+class _ColorButton extends StatelessWidget {
+  const _ColorButton(this.color);
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: () => appController.themePrimaryColor = color,
+    child: Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        borderRadius: .circular(8),
+        color: color,
+        border: .all(color: Colors.grey.shade400, strokeAlign: 1, width: 1),
+      ),
+    ),
   );
 }

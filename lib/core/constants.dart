@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-final colorScheme = ColorScheme.fromSeed(
-  seedColor: Colors.red.shade700,
-  brightness: .dark,
-);
+import '../app/app_controller.dart';
+
+ColorScheme get colorScheme => appController.themeData.colorScheme;
