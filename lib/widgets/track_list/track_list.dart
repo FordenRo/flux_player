@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/audio_player/audio_player.dart';
-import '../../core/audio_player/track.dart';
+import '../../core/models/track.dart';
 import '../simple_menu.dart';
+import 'track_list_controller.dart';
 import 'widgets/floating_actions_overlay.dart';
 import 'widgets/search_field.dart';
 import 'widgets/sort_menu_button.dart';
 import 'widgets/track_item.dart';
-import 'track_list_controller.dart';
 
 enum Sorting { name, artist, custom }
 

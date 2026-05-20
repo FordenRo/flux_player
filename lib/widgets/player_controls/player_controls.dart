@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
 import '../../core/audio_player/audio_player.dart';
-import '../../core/audio_player/track.dart';
-import '../../core/config.dart';
 import '../../core/constants.dart';
-import '../playlists_page/add_to_playlist_button.dart';
-import 'widgets/queue_list.dart';
+import '../../core/models/track.dart';
+import '../../core/services/config_service.dart';
+import '../../pages/playlists_page/widgets/add_to_playlist_button.dart';
 import 'widgets/position_slider.dart';
+import 'widgets/queue_list.dart';
 import 'widgets/volume_button/volume_button.dart';
 
 class PlayerControls extends StatefulWidget {

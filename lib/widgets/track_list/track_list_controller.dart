@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/audio_player/audio_player.dart';
-import '../../core/audio_player/track.dart';
+import '../../core/models/track.dart';
 
 class TrackListController extends ScrollController {
   TrackListController({super.onAttach, super.onDetach}) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/config.dart';
+import '../core/services/config_service.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});

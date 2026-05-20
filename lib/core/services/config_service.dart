@@ -6,11 +6,11 @@ import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../app/app_controller.dart';
-import 'audio_player/audio_player.dart';
-import 'audio_player/playlist.dart';
-import 'audio_player/track.dart';
-import 'bitstream.dart';
+import '../../app/app_controller.dart';
+import '../audio_player/audio_player.dart';
+import '../models/playlist.dart';
+import '../models/track.dart';
+import '../utils/bitstream.dart';
 
 Playlist importedPlaylist = .new(title: 'Imported');
 Playlist? mainPlaylist;

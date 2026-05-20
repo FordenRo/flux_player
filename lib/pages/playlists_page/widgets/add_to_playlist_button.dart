@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../core/audio_player/track.dart';
-import '../../core/config.dart';
-import '../../core/constants.dart';
-import '../../core/utils.dart';
-import '../simple_menu.dart';
+import '../../../core/constants.dart';
+import '../../../core/models/track.dart';
+import '../../../core/services/config_service.dart';
+import '../../../core/utils.dart';
+import '../../../widgets/simple_menu.dart';
 
 class AddToPlaylistButton extends StatefulWidget {
   const AddToPlaylistButton({
-    this.padding = const .all(8),
     required this.track,
     required this.builder,
     required this.countBuilder,
+    this.padding = const .all(8),
     super.key,
   });
 

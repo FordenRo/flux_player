@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import '../../../core/audio_player/audio_player.dart';
-import '../../../core/audio_player/track.dart';
 import '../../../core/constants.dart';
+import '../../../core/models/track.dart';
 import '../track_list_controller.dart';
 
 class FloatingActionsOverlay extends StatefulWidget {

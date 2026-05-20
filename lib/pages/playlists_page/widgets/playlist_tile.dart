@@ -2,23 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../core/audio_player/audio_player.dart';
-import '../../core/audio_player/playlist.dart';
-import '../../core/config.dart';
-import '../../core/constants.dart';
-import '../simple_menu.dart';
+import '../../../core/audio_player/audio_player.dart';
+import '../../../core/constants.dart';
+import '../../../core/models/playlist.dart';
+import '../../../core/services/config_service.dart';
+import '../../../widgets/simple_menu.dart';
 
-class PlaylistLabel extends StatefulWidget {
-  const PlaylistLabel(this.playlist, {super.key, this.onTap});
+class PlaylistTile extends StatefulWidget {
+  const PlaylistTile(this.playlist, {super.key, this.onTap});
 
   final Playlist playlist;
   final void Function()? onTap;
 
   @override
-  State<PlaylistLabel> createState() => _PlaylistLabelState();
+  State<PlaylistTile> createState() => _PlaylistTileState();
 }
 
-class _PlaylistLabelState extends State<PlaylistLabel> {
+class _PlaylistTileState extends State<PlaylistTile> {
   late final TextEditingController controller = .new(text: playlist.title);
   late final FocusNode focusNode = .new()..addListener(() => setState(() {}));
   late final StreamSubscription playlistSub;

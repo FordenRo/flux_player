@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'playlist.dart';
-import 'track.dart';
+import '../models/playlist.dart';
+import '../models/track.dart';
 
 class AudioPlayerStream {
   AudioPlayerStream(

@@ -6,10 +6,10 @@ import 'package:audio_service/audio_service.dart'
 import 'package:audio_session/audio_session.dart' show AudioSession;
 import 'package:media_kit/media_kit.dart' as media_kit;
 
+import '../models/playlist.dart';
+import '../models/track.dart';
 import 'audio_player.dart';
 import 'audio_player_stream.dart';
-import 'playlist.dart';
-import 'track.dart';
 
 class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
   AudioHandlerImpl() {

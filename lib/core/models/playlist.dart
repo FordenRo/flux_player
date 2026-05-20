@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../config.dart';
+import '../services/config_service.dart';
 import 'track.dart';
 
 class Playlist {

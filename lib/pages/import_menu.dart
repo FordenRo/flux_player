@@ -4,9 +4,9 @@ import 'dart:isolate';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../core/audio_player/track.dart';
-import '../core/config.dart';
 import '../core/constants.dart';
+import '../core/models/track.dart';
+import '../core/services/config_service.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 

@@ -8,7 +8,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
 import 'core/audio_player/audio_player_impl.dart';
-import 'core/config.dart';
+import 'core/services/config_service.dart';
 import 'core/themes/app_theme.dart';
 
 Future<void> main() async {

@@ -5,10 +5,10 @@ import 'package:audio_metadata_reader/audio_metadata_reader.dart'
     as audio_metadata;
 import 'package:media_kit/media_kit.dart' as media_kit;
 
+import '../models/playlist.dart';
+import '../models/track.dart';
 import 'audio_player_impl.dart';
 import 'audio_player_stream.dart';
-import 'playlist.dart';
-import 'track.dart';
 
 final AudioPlayer audioPlayer = AudioPlayerImpl.instance;
 

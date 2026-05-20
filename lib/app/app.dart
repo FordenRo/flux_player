@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../core/config.dart';
 import '../core/constants.dart';
+import '../core/services/config_service.dart';
 import '../pages/all_tracks_page.dart';
 import '../pages/import_menu.dart';
 import '../pages/loading_page.dart';
-import '../widgets/player_controls/player_controls.dart';
-import '../widgets/playlists_page/playlists_page.dart';
+import '../pages/playlists_page/playlists_page.dart';
 import '../pages/settings_page.dart';
+import '../widgets/player_controls/player_controls.dart';
 import 'app_controller.dart';
-import 'caption_widget.dart';
+import 'caption_widget/caption_widget.dart';
 
 class App extends StatefulWidget {
   const App({super.key});

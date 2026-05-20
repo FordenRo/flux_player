@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:audio_metadata_reader/audio_metadata_reader.dart'
     as audio_metadata;
-import 'audio_player.dart';
+import '../audio_player/audio_player.dart';
 
 class Track {
   Track._internal({required this.path, required this.metadata});

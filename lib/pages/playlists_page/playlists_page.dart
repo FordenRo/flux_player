@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../app/caption_widget.dart';
+import '../../app/caption_widget/caption_widget.dart';
 import '../../core/audio_player/audio_player.dart';
-import '../../core/audio_player/playlist.dart';
-import '../../core/config.dart';
 import '../../core/constants.dart';
-import 'playlist_tile.dart';
-import '../track_list/track_list.dart';
+import '../../core/models/playlist.dart';
+import '../../core/services/config_service.dart';
+import '../../widgets/track_list/track_list.dart';
+import 'widgets/playlist_tile.dart';
 
 class PlaylistsPage extends StatefulWidget {
   const PlaylistsPage({super.key});
@@ -45,7 +45,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
             builder: (context, asyncSnapshot) => ListView.builder(
               itemCount: playlists.length,
               itemExtent: 110,
-              itemBuilder: (context, idx) => PlaylistLabel(
+              itemBuilder: (context, idx) => PlaylistTile(
                 playlists[idx],
                 onTap: () {
                   captionController.addIconButton(
