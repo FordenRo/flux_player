@@ -91,11 +91,10 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
         )
       : LoadingPage(future: future, onLoad: onLoad);
 
-  Widget buildPage() => switch (controller.pageIndex) {
-    0 => const AllTracksPage(),
-    1 => const PlaylistsPage(),
-    2 => const SettingsPage(),
-    _ => const AllTracksPage(),
+  Widget buildPage() => switch (controller.currentPage) {
+    .allTracks => const AllTracksPage(),
+    .playlists => const PlaylistsPage(),
+    .settings => const SettingsPage(),
   };
 
   NavigationRail buildNavigationRail() => NavigationRail(
@@ -114,8 +113,8 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
       child: NavigationRail(
         groupAlignment: 1,
         labelType: .selected,
-        selectedIndex: controller.pageIndex >= 2
-            ? controller.pageIndex - 2
+        selectedIndex: controller.currentPage.index >= 2
+            ? controller.currentPage.index - 2
             : null,
         destinations: const [
           NavigationRailDestination(
@@ -134,7 +133,7 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
           icon: const Icon(Icons.add_to_photos_rounded),
         ),
         onDestinationSelected: (value) =>
-            setState(() => controller.pageIndex = value + 2),
+            setState(() => controller.currentPage = AppPages.values[value + 2]),
       ),
     ),
     leading: Padding(
@@ -148,8 +147,10 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
       ),
     ),
     trailingAtBottom: true,
-    selectedIndex: controller.pageIndex < 2 ? controller.pageIndex : null,
+    selectedIndex: controller.currentPage.index < 2
+        ? controller.currentPage.index
+        : null,
     onDestinationSelected: (value) =>
-        setState(() => controller.pageIndex = value),
+        setState(() => controller.currentPage = AppPages.values[value]),
   );
 }

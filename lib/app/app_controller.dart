@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 final appController = AppController._internal();
 
+enum AppPages { allTracks, playlists, settings }
+
 class AppController with ChangeNotifier {
   AppController._internal() {
     _updateThemeData();
   }
 
-  var _pageIndex = 0;
+  AppPages _currentPage = .allTracks;
   late ThemeData _themeData;
   Color _themePrimaryColor = Colors.red.shade400;
   var _darkTheme = true;
@@ -28,9 +30,9 @@ class AppController with ChangeNotifier {
     notifyListeners();
   }
 
-  int get pageIndex => _pageIndex;
-  set pageIndex(int value) {
-    _pageIndex = value;
+  AppPages get currentPage => _currentPage;
+  set currentPage(AppPages value) {
+    _currentPage = value;
     notifyListeners();
   }
 

@@ -46,7 +46,7 @@ Future<void> loadConfiguration() async {
   audioPlayer
     ..setShuffled(shuffled)
     ..setLooped(looped);
-  appController.pageIndex = pageIndex;
+  appController.currentPage = AppPages.values[pageIndex];
 
   final tracksFile = File('${dir.path}/Flux Player/tracks');
   if (!tracksFile.existsSync()) {
@@ -120,7 +120,7 @@ Future<void> saveConfiguration() async {
   final wPosX = wPos.dx;
   final wPosY = wPos.dy;
   final volume = audioPlayer.volume;
-  final pageIndex = appController.pageIndex;
+  final pageIndex = appController.currentPage.index;
   final shuffled = audioPlayer.shuffled;
   final looped = audioPlayer.looped;
   final wasPlayingPlaylist = audioPlayer.currentPlaylist != null;
