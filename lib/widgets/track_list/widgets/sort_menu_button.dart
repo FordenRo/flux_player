@@ -38,6 +38,7 @@ extension on Sorting {
   String get title => switch (this) {
     .name => 'Название',
     .artist => 'Автор',
+    .creation => 'Создание',
     .custom => 'Своя',
   };
 }

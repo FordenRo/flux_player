@@ -11,7 +11,7 @@ import 'widgets/search_field.dart';
 import 'widgets/sort_menu_button.dart';
 import 'widgets/track_item.dart';
 
-enum Sorting { name, artist, custom }
+enum Sorting { name, artist, custom, creation }
 
 class TrackList extends StatefulWidget {
   const TrackList(
@@ -55,7 +55,8 @@ class _TrackListState extends State<TrackList> {
         (a, b) => switch (sort) {
           .name => a.value.title.compareTo(b.value.title),
           .artist => a.value.author.compareTo(b.value.author),
-          _ => 0,
+          .creation => -a.value.created.compareTo(b.value.created),
+          .custom => 0,
         },
       );
     }
