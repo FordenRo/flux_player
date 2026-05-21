@@ -22,6 +22,7 @@ class QueueList extends StatelessWidget {
               audioPlayer.queue,
               onTrackSelected: audioPlayer.setIndex,
               sortEnabled: false,
+              selectionEnabled: false, // TODO: Will be in the future
               trackMenuItemsBuilder: (idx) => [
                 .new(
                   text: 'Убрать',

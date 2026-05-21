@@ -41,7 +41,11 @@ abstract interface class AudioPlayer {
 
   void addToQueue(Track track);
 
+  void addAllToQueue(Iterable<Track> tracks);
+
   void addNext(Track track);
+
+  void addAllToNext(Iterable<Track> tracks);
 
   Future<void> setAudioDevice(AudioDevice device);
 

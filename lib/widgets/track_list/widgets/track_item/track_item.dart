@@ -3,25 +3,28 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
 
-import '../../../core/audio_player/audio_player.dart';
-import '../../../core/models/track.dart';
-import '../../../core/services/config_service.dart';
-import '../../../core/utils.dart';
-import '../../../pages/playlists_page/widgets/add_to_playlist_button.dart';
-import '../../simple_menu.dart';
-import 'track_details.dart';
+import '../../../../core/audio_player/audio_player.dart';
+import '../../../../core/models/track.dart';
+import '../../../../core/services/config_service.dart';
+import '../../../../core/utils.dart';
+import '../../../../pages/playlists_page/widgets/add_to_playlist_button.dart';
+import '../../../simple_menu.dart';
+import 'track_selection_controller.dart';
+import 'widgets/track_details.dart';
 
 class TrackItem extends StatefulWidget {
   const TrackItem(
     this.track, {
-    required this.onSelected,
+    required this.onPlay,
     super.key,
     this.menuItems,
+    this.selectionController,
   });
 
   final Track track;
   final List<SimpleMenuItem>? menuItems;
-  final void Function() onSelected;
+  final void Function() onPlay;
+  final TrackSelectionController? selectionController;
 
   @override
   State<TrackItem> createState() => _TrackItemState();
@@ -35,6 +38,10 @@ class _TrackItemState extends State<TrackItem>
   Track get track => widget.track;
   bool get isSelected => audioPlayer.currentTrack == track;
   bool get isPlaying => isSelected && audioPlayer.isPlaying;
+
+  TrackSelectionController? get selectionController =>
+      widget.selectionController;
+  bool get hasSelection => selectionController?.hasSelection(track) ?? false;
 
   @override
   void initState() {
@@ -72,7 +79,7 @@ class _TrackItemState extends State<TrackItem>
         await audioPlayer.play();
       }
     } else {
-      widget.onSelected();
+      widget.onPlay();
     }
   }
 
@@ -93,6 +100,13 @@ class _TrackItemState extends State<TrackItem>
         child: Row(
           spacing: 8,
           children: [
+            if (selectionController?.selectedTracks.isNotEmpty ?? false)
+              Checkbox(
+                value: hasSelection,
+                onChanged: (value) => value!
+                    ? selectionController!.add(track)
+                    : selectionController!.remove(track),
+              ),
             _buildIcon(),
             _buildText(),
             _buildButtons(),
@@ -194,44 +208,65 @@ class _TrackItemState extends State<TrackItem>
       items: [
         SimpleMenuItem(
           text: 'Добавить в очередь',
-          onTap: () => audioPlayer.addToQueue(track),
+          onTap: () => hasSelection
+              ? audioPlayer.addAllToQueue(selectionController!.selectedTracks)
+              : audioPlayer.addToQueue(track),
         ).toOverlayItem(),
         SimpleMenuItem(
           text: 'Играть следующим',
-          onTap: () => audioPlayer.addNext(track),
+          onTap: () => hasSelection
+              ? audioPlayer.addAllToNext(selectionController!.selectedTracks)
+              : audioPlayer.addNext(track),
         ).toOverlayItem(),
         if (playlists.isNotEmpty)
           OverlayMenuItem(
             child: OverlayMenuButton(
               position: .right,
               style: overlayMenuStyle,
-              items: playlists
-                  .where((e) => !e.tracks.contains(track))
-                  .map(
-                    (e) => SimpleMenuItem(
-                      text: e.title,
-                      onTap: () {
-                        e.tracks.add(track);
-                        trackPlaylistChanged.add(track);
-                        controller.close();
-                      },
-                    ).toOverlayItem(),
-                  )
-                  .followedBy(
-                    playlists
-                        .where((e) => e.tracks.contains(track))
+              items: hasSelection
+                  ? playlists
                         .map(
                           (e) => SimpleMenuItem(
-                            text: '-${e.title}',
+                            text: e.title,
                             onTap: () {
-                              e.tracks.remove(track);
+                              e.tracks.addAll(
+                                selectionController!.selectedTracks,
+                              );
+                              selectionController!.selectedTracks.forEach(
+                                trackPlaylistChanged.add,
+                              );
+                              controller.close();
+                            },
+                          ).toOverlayItem(),
+                        )
+                        .toList()
+                  : playlists
+                        .where((e) => !e.tracks.contains(track))
+                        .map(
+                          (e) => SimpleMenuItem(
+                            text: e.title,
+                            onTap: () {
+                              e.tracks.add(track);
                               trackPlaylistChanged.add(track);
                               controller.close();
                             },
                           ).toOverlayItem(),
-                        ),
-                  )
-                  .toList(),
+                        )
+                        .followedBy(
+                          playlists
+                              .where((e) => e.tracks.contains(track))
+                              .map(
+                                (e) => SimpleMenuItem(
+                                  text: '-${e.title}',
+                                  onTap: () {
+                                    e.tracks.remove(track);
+                                    trackPlaylistChanged.add(track);
+                                    controller.close();
+                                  },
+                                ).toOverlayItem(),
+                              ),
+                        )
+                        .toList(),
               child: const Padding(
                 padding: .symmetric(horizontal: 10),
                 child: Text('Добавить в плейлист'),
@@ -240,13 +275,21 @@ class _TrackItemState extends State<TrackItem>
           ),
         if (widget.menuItems != null)
           ...widget.menuItems!.map((e) => e.toOverlayItem()),
-        SimpleMenuItem(
-          text: 'Свойства',
-          onTap: () => showDialog(
-            context: context,
-            builder: (context) => TrackDetails(track),
-          ),
-        ).toOverlayItem(),
+        if (selectionController != null)
+          SimpleMenuItem(
+            text: 'Выбрать',
+            onTap: () => hasSelection
+                ? selectionController!.remove(track)
+                : selectionController!.add(track),
+          ).toOverlayItem(),
+        if (!hasSelection)
+          SimpleMenuItem(
+            text: 'Свойства',
+            onTap: () => showDialog(
+              context: context,
+              builder: (context) => TrackDetails(track),
+            ),
+          ).toOverlayItem(),
       ],
     );
     controller.close();

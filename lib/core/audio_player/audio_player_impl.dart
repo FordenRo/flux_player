@@ -207,8 +207,20 @@ class AudioPlayerImpl implements AudioPlayer {
   }
 
   @override
+  void addAllToQueue(Iterable<Track> tracks) {
+    _queue.addAll(tracks);
+    _queueController.add(queue);
+  }
+
+  @override
   void addNext(Track track) {
     _queue.insert(currentIndex! + 1, track);
+    _queueController.add(queue);
+  }
+
+  @override
+  void addAllToNext(Iterable<Track> tracks) {
+    _queue.insertAll(currentIndex! + 1, tracks);
     _queueController.add(queue);
   }
 

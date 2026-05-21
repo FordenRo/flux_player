@@ -5,6 +5,7 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/models/playlist.dart';
 import '../../core/services/config_service.dart';
 import '../../widgets/track_list/track_list.dart';
+import '../../widgets/track_list/widgets/track_item/track_selection_controller.dart';
 import 'widgets/playlist_tile.dart';
 
 class PlaylistsPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class PlaylistsPage extends StatefulWidget {
 
 class _PlaylistsPageState extends State<PlaylistsPage> {
   final CaptionWidgetController buttonController = .new();
+  final TrackSelectionController selectionController = .new();
   Playlist? openedPlaylist;
 
   @override
@@ -71,12 +73,18 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
         )
       : TrackList(
           openedPlaylist!.tracks,
+          selectionController: selectionController,
           onTrackSelected: (idx) =>
               audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true),
           trackMenuItemsBuilder: (idx) => [
             .new(
               text: 'Удалить из плейлиста',
-              onTap: () => openedPlaylist!.tracks.removeAt(idx),
+              onTap: () =>
+                  selectionController.hasSelection(openedPlaylist!.tracks[idx])
+                  ? selectionController.selectedTracks.forEach(
+                      openedPlaylist!.tracks.remove,
+                    )
+                  : openedPlaylist!.tracks.removeAt(idx),
             ),
           ],
         );

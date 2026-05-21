@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/models/track.dart';
+import '../../../../../core/models/track.dart';
 
 const TextStyle _valueStyle = .new(fontSize: 14);
 
