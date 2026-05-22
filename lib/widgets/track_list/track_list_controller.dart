@@ -65,6 +65,9 @@ class TrackListController extends ScrollController {
 
   Future<void> animateToTop() {
     watchCurrentTrack = false;
+    if (offset > 1000) {
+      jumpTo(1000);
+    }
     return animateTo(0, duration: Durations.long2, curve: Curves.easeOutQuart);
   }
 
