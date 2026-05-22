@@ -22,9 +22,9 @@ class SettingsPage extends StatelessWidget {
         title: const Text('Dark theme'),
         trailing: StatefulBuilder(
           builder: (context, setState) => Checkbox(
-            value: appController.darkTheme,
+            value: appController.isThemeDark,
             onChanged: (value) =>
-                setState(() => appController.darkTheme = value!),
+                setState(() => appController.isThemeDark = value!),
           ),
         ),
       ),

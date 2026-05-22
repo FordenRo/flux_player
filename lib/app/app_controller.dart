@@ -14,13 +14,13 @@ class AppController with ChangeNotifier {
   AppPages _currentPage = .allTracks;
   late ThemeData _themeData;
   Color _themePrimaryColor = themeColors.first;
-  var _darkTheme = true;
+  var _isThemeDark = true;
 
   ThemeData get themeData => _themeData;
 
-  bool get darkTheme => _darkTheme;
-  set darkTheme(bool value) {
-    _darkTheme = value;
+  bool get isThemeDark => _isThemeDark;
+  set isThemeDark(bool value) {
+    _isThemeDark = value;
     _updateThemeData();
     notifyListeners();
   }
@@ -42,7 +42,7 @@ class AppController with ChangeNotifier {
     _themeData = .new(
       colorScheme: .fromSeed(
         seedColor: themePrimaryColor,
-        brightness: darkTheme ? .dark : .light,
+        brightness: isThemeDark ? .dark : .light,
       ),
     );
   }
