@@ -5,11 +5,7 @@ import 'package:audio_metadata_reader/audio_metadata_reader.dart'
 import '../audio_player/audio_player.dart';
 
 class Track {
-  Track._internal({
-    required this.path,
-    required this.metadata,
-    required this.created,
-  });
+  Track._({required this.path, required this.metadata, required this.created});
   final String path;
   final AudioMetadata metadata;
   final DateTime created;
@@ -24,22 +20,14 @@ class Track {
     final file = File(path);
     final metadata = audio_metadata.readMetadata(file, getImage: true);
 
-    return ._internal(
-      path: path,
-      metadata: metadata,
-      created: file.statSync().changed,
-    );
+    return ._(path: path, metadata: metadata, created: file.statSync().changed);
   }
 
   static Track fromPath(String path) {
     final file = File(path);
     final metadata = audio_metadata.readMetadata(file, getImage: true);
 
-    return ._internal(
-      path: path,
-      metadata: metadata,
-      created: file.statSync().changed,
-    );
+    return ._(path: path, metadata: metadata, created: file.statSync().changed);
   }
 
   dynamic toJson() => {'path': path};

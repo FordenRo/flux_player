@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-final appController = AppController._internal();
+final appController = AppController._();
 
 enum AppPages { allTracks, playlists, settings }
 
 class AppController with ChangeNotifier {
-  AppController._internal() {
+  AppController._() {
     _updateThemeData();
   }
 

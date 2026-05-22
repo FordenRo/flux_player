@@ -11,7 +11,7 @@ class VolumeOverlay extends StatefulWidget {
   final void Function() onHide;
 
   static VolumeOverlayEntry createOverlay(BuildContext context) {
-    final entry = VolumeOverlayEntry._internal(context);
+    final entry = VolumeOverlayEntry._(context);
     entry.entry = .new(
       builder: (context) => VolumeOverlay(onHide: entry.remove),
     );
@@ -23,7 +23,8 @@ class VolumeOverlay extends StatefulWidget {
 }
 
 class VolumeOverlayEntry {
-  VolumeOverlayEntry._internal(this.context);
+  VolumeOverlayEntry._(this.context);
+
   late final OverlayEntry entry;
   final BuildContext context;
 

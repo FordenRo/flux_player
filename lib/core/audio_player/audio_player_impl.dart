@@ -83,7 +83,7 @@ extension MediaItemAdapter on Track {
 }
 
 class AudioPlayerImpl implements AudioPlayer {
-  AudioPlayerImpl._internal() {
+  AudioPlayerImpl._() {
     _player.stream.completed.listen((completed) {
       if (completed) {
         _onEnd();
@@ -92,7 +92,7 @@ class AudioPlayerImpl implements AudioPlayer {
   }
   final _player = media_kit.Player();
 
-  static final AudioPlayer instance = AudioPlayerImpl._internal();
+  static final AudioPlayer instance = AudioPlayerImpl._();
 
   List<Track> _queue = [];
   Playlist? _currentPlaylist;

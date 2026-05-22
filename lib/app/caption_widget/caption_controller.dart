@@ -1,6 +1,6 @@
 part of 'caption_widget.dart';
 
-final captionController = CaptionController._internal();
+final captionController = CaptionController._();
 
 class CaptionWidgetController {
   CaptionWidgetController();
@@ -12,7 +12,7 @@ class CaptionWidgetController {
 }
 
 class CaptionController {
-  CaptionController._internal();
+  CaptionController._();
   late void Function(
     Widget Function(BuildContext context) builder,
     CaptionWidgetController controller,

@@ -18,11 +18,6 @@ class _VolumeButtonState extends State<VolumeButton> {
   double? lastVolume;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     volumeOverlay.dispose();
     hoverTimer?.cancel();
@@ -46,6 +41,7 @@ class _VolumeButtonState extends State<VolumeButton> {
     },
     child: StreamBuilder(
       stream: audioPlayer.stream.volume.map(getIconDataFromVolume).distinct(),
+      initialData: getIconDataFromVolume(audioPlayer.volume),
       builder: (context, snapshot) => IconButton(
         onHover: (hovered) {
           if (hovered) {
@@ -65,7 +61,7 @@ class _VolumeButtonState extends State<VolumeButton> {
             audioPlayer.setVolume(lastVolume!);
           }
         },
-        icon: Icon(snapshot.data ?? getIconDataFromVolume(audioPlayer.volume)),
+        icon: Icon(snapshot.requireData),
       ),
     ),
   );
