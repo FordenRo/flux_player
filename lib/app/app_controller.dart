@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/constants.dart';
+
 final appController = AppController._();
 
 enum AppPages { allTracks, playlists, settings }
@@ -11,7 +13,7 @@ class AppController with ChangeNotifier {
 
   AppPages _currentPage = .allTracks;
   late ThemeData _themeData;
-  Color _themePrimaryColor = Colors.red.shade400;
+  Color _themePrimaryColor = themeColors.first;
   var _darkTheme = true;
 
   ThemeData get themeData => _themeData;

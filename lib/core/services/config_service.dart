@@ -8,6 +8,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../../app/app_controller.dart';
 import '../audio_player/audio_player.dart';
+import '../constants.dart';
 import '../models/playlist.dart';
 import '../models/track.dart';
 import '../utils/bitstream.dart';
@@ -40,6 +41,10 @@ Future<void> loadConfiguration() async {
     hasMainPlaylist = stream.readBool();
   } catch (_) {}
   final mainPlaylistIdx = hasMainPlaylist ? stream.read(8) : null;
+  var themeColorIdx = 0;
+  try {
+    themeColorIdx = stream.read(5);
+  } catch (_) {}
 
   await windowManager.setPosition(Offset(wPosX, wPosY));
   await audioPlayer.setVolume(volume);
@@ -88,6 +93,7 @@ Future<void> loadConfiguration() async {
   if (hasMainPlaylist) {
     mainPlaylist = playlists.elementAtOrNull(mainPlaylistIdx!);
   }
+  appController.themePrimaryColor = themeColors[themeColorIdx];
 
   await Future.microtask(() async {
     await audioPlayer.setAudioDevice(
@@ -163,6 +169,7 @@ Future<void> saveConfiguration() async {
   if (hasMainPlaylist) {
     stream.write(playlists.indexOf(mainPlaylist!), 8);
   }
+  stream.write(themeColors.indexOf(appController.themePrimaryColor), 5);
   await file.writeAsBytes(stream.toBytes());
 
   final tracksFile = File('${dir.path}/Flux Player/tracks');

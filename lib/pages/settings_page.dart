@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../app/app_controller.dart';
+import '../core/constants.dart';
 import '../core/services/config_service.dart';
-
-final List<Color> _themeColors = [
-  Colors.green,
-  Colors.red,
-  Colors.pink,
-  Colors.purple,
-  Colors.blue,
-  Colors.yellow,
-];
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -23,7 +15,7 @@ class SettingsPage extends StatelessWidget {
         trailing: Row(
           spacing: 8,
           mainAxisSize: .min,
-          children: _themeColors.map(_ColorButton.new).toList(),
+          children: themeColors.map(_ColorButton.new).toList(),
         ),
       ),
       ListTile(
