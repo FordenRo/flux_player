@@ -133,7 +133,17 @@ class _PlaylistTileState extends State<PlaylistTile> {
           children: playlist.tracks
               .where((e) => e.picture != null)
               .take(4)
-              .map((e) => Image.memory(e.picture!.bytes))
+              .map(
+                (e) => Image(
+                  image: MemoryImage(e.picture!.bytes),
+                  frameBuilder:
+                      (context, child, frame, wasSynchronouslyLoaded) =>
+                          FadeTransition(
+                            opacity: const AlwaysStoppedAnimation<double>(1),
+                            child: child,
+                          ),
+                ),
+              )
               .toList(),
         ),
         _PlayButton(playlist),
