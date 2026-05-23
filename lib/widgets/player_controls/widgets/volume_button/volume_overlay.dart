@@ -6,14 +6,20 @@ import 'package:flutter/material.dart';
 import '../../../../core/audio_player/audio_player.dart';
 
 class VolumeOverlay extends StatefulWidget {
-  const VolumeOverlay({required this.onHide, super.key});
+  const VolumeOverlay._({
+    required this.onHide,
+    required _VolumeOverlayController controller,
+  }) : _controller = controller;
 
   final void Function() onHide;
+  final _VolumeOverlayController _controller;
 
   static VolumeOverlayEntry createOverlay(BuildContext context) {
-    final entry = VolumeOverlayEntry._(context);
+    final controller = _VolumeOverlayController();
+    final entry = VolumeOverlayEntry._(context, controller: controller);
     entry.entry = .new(
-      builder: (context) => VolumeOverlay(onHide: entry.remove),
+      builder: (context) =>
+          VolumeOverlay._(onHide: entry.remove, controller: controller),
     );
     return entry;
   }
@@ -22,11 +28,31 @@ class VolumeOverlay extends StatefulWidget {
   State<VolumeOverlay> createState() => _VolumeOverlayState();
 }
 
+class _VolumeOverlayController with ChangeNotifier {
+  var _isButtonHovered = false;
+
+  bool get isButtonHovered => _isButtonHovered;
+  set isButtonHovered(bool hovered) {
+    _isButtonHovered = hovered;
+    notifyListeners();
+  }
+}
+
 class VolumeOverlayEntry {
-  VolumeOverlayEntry._(this.context);
+  VolumeOverlayEntry._(
+    this.context, {
+    required _VolumeOverlayController controller,
+  }) : _controller = controller;
 
   late final OverlayEntry entry;
+  final _VolumeOverlayController _controller;
   final BuildContext context;
+
+  bool get isButtonHovered => _controller.isButtonHovered;
+  set isButtonHovered(bool hovered) {
+    _controller.isButtonHovered = hovered;
+    show();
+  }
 
   void show() {
     if (!entry.mounted) {
@@ -54,35 +80,58 @@ class _VolumeOverlayState extends State<VolumeOverlay>
   );
   var hovered = false;
   var sliding = false;
-  late Timer timer;
+  Timer? timer;
   late final StreamSubscription subscription;
+
+  _VolumeOverlayController get controller => widget._controller;
+  bool get isButtonHovered => controller.isButtonHovered;
 
   @override
   void initState() {
     super.initState();
-    timer = Timer(const Duration(seconds: 5), hide);
     subscription = audioPlayer.stream.volume.listen((_) => setState(() {}));
+    controller.addListener(onControllerUpdate);
     show();
   }
 
-  @override
-  Future<void> dispose() async {
-    fadeAnimation.dispose();
-    timer.cancel();
-    super.dispose();
-    await subscription.cancel();
+  void onControllerUpdate() {
+    if (isButtonHovered) {
+      show();
+    } else {
+      hideDelayed();
+    }
   }
 
-  Future<void> show() async {
-    await fadeAnimation.animateTo(1, curve: Curves.easeInOut);
+  @override
+  void dispose() {
+    controller.removeListener(onControllerUpdate);
+    fadeAnimation.dispose();
+    timer?.cancel();
+    subscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> show() {
+    timer?.cancel();
+    fadeAnimation.stop();
+    return fadeAnimation.animateTo(1, curve: Curves.easeInOut);
   }
 
   Future<void> hide() async {
-    if (sliding) {
+    if (sliding || hovered || isButtonHovered) {
       return;
     }
-    await fadeAnimation.animateTo(0, curve: Curves.easeInOut);
-    widget.onHide();
+    await fadeAnimation
+        .animateTo(0, curve: Curves.easeInOut)
+        .then((_) => widget.onHide());
+  }
+
+  void hideDelayed() {
+    if (sliding || hovered || isButtonHovered) {
+      return;
+    }
+    timer?.cancel();
+    timer = Timer(const Duration(milliseconds: 400), hide);
   }
 
   @override
@@ -104,11 +153,11 @@ class _VolumeOverlayState extends State<VolumeOverlay>
           child: MouseRegion(
             onEnter: (event) {
               hovered = true;
-              timer.cancel();
+              show();
             },
             onExit: (event) {
               hovered = false;
-              hide();
+              hideDelayed();
             },
             child: Center(
               child: SizedBox(
@@ -148,9 +197,7 @@ class _VolumeOverlayState extends State<VolumeOverlay>
           onChangeStart: (_) => sliding = true,
           onChangeEnd: (_) {
             sliding = false;
-            if (!hovered) {
-              hide();
-            }
+            hideDelayed();
           },
           onChanged: audioPlayer.setVolume,
         ),
