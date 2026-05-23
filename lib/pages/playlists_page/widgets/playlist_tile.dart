@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/audio_player/audio_player.dart';
 import '../../../core/models/playlist.dart';
 import '../../../core/services/config_service.dart';
+import '../../../widgets/fade_in_widget.dart';
 import '../../../widgets/simple_menu.dart';
 
 class PlaylistTile extends StatefulWidget {
@@ -134,12 +135,12 @@ class _PlaylistTileState extends State<PlaylistTile> {
               .where((e) => e.picture != null)
               .take(4)
               .map(
-                (e) => Image(
-                  image: MemoryImage(e.picture!.bytes),
+                (e) => Image.memory(
+                  e.picture!.bytes,
                   frameBuilder:
                       (context, child, frame, wasSynchronouslyLoaded) =>
-                          FadeTransition(
-                            opacity: const AlwaysStoppedAnimation<double>(1),
+                          FadeInWidget(
+                            duration: Durations.medium1,
                             child: child,
                           ),
                 ),

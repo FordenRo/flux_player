@@ -8,6 +8,7 @@ import '../../../../core/models/track.dart';
 import '../../../../core/services/config_service.dart';
 import '../../../../core/utils.dart';
 import '../../../../pages/playlists_page/widgets/add_to_playlist_button.dart';
+import '../../../fade_in_widget.dart';
 import '../../../simple_menu.dart';
 import 'track_selection_controller.dart';
 import 'widgets/track_details.dart';
@@ -145,7 +146,11 @@ class _TrackItemState extends State<TrackItem>
       alignment: .center,
       children: [
         if (track.picture != null)
-          Image.memory(track.picture!.bytes)
+          Image.memory(
+            track.picture!.bytes,
+            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) =>
+                FadeInWidget(duration: Durations.medium1, child: child),
+          )
         else
           Icon(Icons.music_note_rounded, color: Colors.grey.shade400, size: 20),
         _PlayButton(isPlaying: isPlaying, onPressed: playPressed),
