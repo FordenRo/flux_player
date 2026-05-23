@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../core/audio_player/audio_player.dart';
 import '../../core/models/track.dart';
 import '../simple_menu.dart';
 import 'track_list_controller.dart';
@@ -20,9 +19,9 @@ class TrackList extends StatefulWidget {
     required this.onTrackSelected,
     this.sortEnabled = true,
     this.selectionEnabled = true,
-    super.key,
     this.trackMenuItemsBuilder,
     this.selectionController,
+    super.key,
   });
 
   final List<Track> tracks;
@@ -37,7 +36,7 @@ class TrackList extends StatefulWidget {
 }
 
 class _TrackListState extends State<TrackList> {
-  late final TrackListController controller = .new();
+  final TrackListController controller = .new();
   late final TrackSelectionController? selectionController =
       widget.selectionEnabled ? (widget.selectionController ?? .new()) : null;
   late final StreamSubscription subscription;
@@ -83,11 +82,11 @@ class _TrackListState extends State<TrackList> {
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     selectionController?.removeListener(_onSelectionUpdate);
+    controller.dispose();
+    subscription.cancel();
     super.dispose();
-    await controller.dispose();
-    await subscription.cancel();
   }
 
   void _onSelectionUpdate() => setState(() {});
@@ -101,7 +100,7 @@ class _TrackListState extends State<TrackList> {
   @override
   Widget build(BuildContext context) => Scaffold(
     floatingActionButton: FloatingActionsOverlay(
-      scrollController: controller,
+      listController: controller,
       tracks: tracks.map((e) => e.value).toList(),
     ),
     body: Column(
@@ -123,9 +122,7 @@ class _TrackListState extends State<TrackList> {
                 onChanged: (value) {
                   query = value;
                   update();
-                  if (audioPlayer.currentTrack != null) {
-                    controller.animateToTrack(audioPlayer.currentTrack!);
-                  }
+                  controller.animateToCurrentTrack();
                 },
                 hint: 'Поиск треков',
               ),
@@ -136,9 +133,7 @@ class _TrackListState extends State<TrackList> {
                 onSelected: (e) {
                   sort = e;
                   update();
-                  if (audioPlayer.currentTrack != null) {
-                    controller.animateToTrack(audioPlayer.currentTrack!);
-                  }
+                  controller.animateToCurrentTrack();
                 },
               ),
           ],
@@ -155,14 +150,6 @@ class _TrackListState extends State<TrackList> {
               menuItems: selectedTracks.isEmpty
                   ? widget.trackMenuItemsBuilder?.call(tracks[idx].key)
                   : [],
-              // menuItems: [
-              //   SimpleMenuItem(
-              //     text: widget.playlist != importedPlaylist
-              //         ? 'Удалить из плейлиста'
-              //         : 'Удалить песню',
-              //     onTap: () => widget.playlist.tracks.remove(tracks[idx]),
-              //   ),
-              // ],
             ),
           ),
         ),

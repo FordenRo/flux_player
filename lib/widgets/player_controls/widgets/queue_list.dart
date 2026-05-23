@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/audio_player/audio_player.dart';
-import '../../track_list/track_list.dart';
+import '../../../core/models/track.dart';
+import '../../track_list/track_list_controller.dart';
+import '../../track_list/widgets/floating_actions_overlay.dart';
+import '../../track_list/widgets/track_item/track_item.dart';
 
-class QueueList extends StatelessWidget {
+class QueueList extends StatefulWidget {
   const QueueList({super.key});
+
+  @override
+  State<QueueList> createState() => _QueueListState();
+}
+
+class _QueueListState extends State<QueueList> {
+  final TrackListController controller = .new(useIndex: true);
+
+  List<Track> get queue => audioPlayer.queue;
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => Align(
@@ -14,21 +32,25 @@ class QueueList extends StatelessWidget {
       child: SizedBox(
         width: 500,
         height: 400,
-        child: Card(
-          color: Theme.of(context).colorScheme.surface,
-          child: Padding(
-            padding: const .all(12),
-            child: TrackList(
-              audioPlayer.queue,
-              onTrackSelected: audioPlayer.setIndex,
-              sortEnabled: false,
-              selectionEnabled: false, // TODO: Will be in the future
-              trackMenuItemsBuilder: (idx) => [
-                .new(
-                  text: 'Убрать',
-                  onTap: () => audioPlayer.queue.removeAt(idx),
+        child: Scaffold(
+          floatingActionButton: FloatingActionsOverlay(
+            listController: controller,
+            tracks: queue,
+          ),
+          body: Card(
+            color: Theme.of(context).colorScheme.surface,
+            child: Padding(
+              padding: const .all(12),
+              child: ListView.builder(
+                itemCount: queue.length,
+                itemExtent: 50,
+                controller: controller,
+                itemBuilder: (context, idx) => TrackItem(
+                  queue[idx],
+                  onPlay: () => audioPlayer.setIndex(idx),
+                  isSelectedCallback: () => audioPlayer.currentIndex! == idx,
                 ),
-              ],
+              ),
             ),
           ),
         ),

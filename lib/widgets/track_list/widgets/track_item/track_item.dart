@@ -19,9 +19,11 @@ class TrackItem extends StatefulWidget {
     super.key,
     this.menuItems,
     this.selectionController,
+    this.isSelectedCallback,
   });
 
   final Track track;
+  final bool Function()? isSelectedCallback;
   final List<SimpleMenuItem>? menuItems;
   final void Function() onPlay;
   final TrackSelectionController? selectionController;
@@ -36,7 +38,8 @@ class _TrackItemState extends State<TrackItem>
   late final StreamSubscription trackSub;
 
   Track get track => widget.track;
-  bool get isSelected => audioPlayer.currentTrack == track;
+  bool get isSelected =>
+      widget.isSelectedCallback?.call() ?? audioPlayer.currentTrack == track;
   bool get isPlaying => isSelected && audioPlayer.isPlaying;
 
   TrackSelectionController? get selectionController =>

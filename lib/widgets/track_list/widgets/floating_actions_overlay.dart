@@ -8,11 +8,11 @@ import '../track_list_controller.dart';
 
 class FloatingActionsOverlay extends StatefulWidget {
   const FloatingActionsOverlay({
-    required this.scrollController,
+    required this.listController,
     required this.tracks,
     super.key,
   });
-  final TrackListController scrollController;
+  final TrackListController listController;
   final List<Track> tracks;
 
   @override
@@ -20,18 +20,15 @@ class FloatingActionsOverlay extends StatefulWidget {
 }
 
 class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
-  TrackListController get controller => widget.scrollController;
-  int? get currentTrackPos => audioPlayer.currentTrack != null
-      ? (widget.tracks.indexOf(audioPlayer.currentTrack!) - 1) * 50
-      : null;
+  TrackListController get controller => widget.listController;
 
   late bool showWatchTrack = canShowWatchTrack();
   late bool showGoTop = canShowGoTop();
   late bool watchCurrentTrack = controller.watchCurrentTrack;
   late final StreamSubscription subscription;
 
-  bool canShowWatchTrack() => currentTrackPos != null;
-  bool canShowGoTop() => controller.offset > 1000;
+  bool canShowWatchTrack() => audioPlayer.currentTrack != null;
+  bool canShowGoTop() => controller.offset > 500;
 
   @override
   void initState() {

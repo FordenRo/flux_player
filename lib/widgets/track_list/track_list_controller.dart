@@ -4,7 +4,7 @@ import '../../core/audio_player/audio_player.dart';
 import '../../core/models/track.dart';
 
 class TrackListController extends ScrollController {
-  TrackListController({super.onAttach, super.onDetach}) {
+  TrackListController({super.onAttach, super.onDetach, this.useIndex = false}) {
     addListener(() {
       if (watchCurrentTrack && position.userScrollDirection != .idle) {
         watchCurrentTrack = false;
@@ -12,11 +12,12 @@ class TrackListController extends ScrollController {
     });
     _subscription = audioPlayer.stream.currentIndex.listen((_) {
       if (watchCurrentTrack) {
-        animateToTrack(audioPlayer.currentTrack!);
+        animateToCurrentTrack();
       }
     });
   }
 
+  final bool useIndex;
   var _watchCurrentTrack = true;
   List<Track> tracks = [];
   late final StreamSubscription _subscription;
@@ -26,7 +27,7 @@ class TrackListController extends ScrollController {
     if (value != _watchCurrentTrack) {
       _watchCurrentTrack = value;
       if (value) {
-        animateToTrack(audioPlayer.currentTrack!);
+        animateToCurrentTrack();
       }
     }
   }
@@ -37,10 +38,16 @@ class TrackListController extends ScrollController {
 
     Future.microtask(() {
       if (watchCurrentTrack && audioPlayer.currentTrack != null) {
-        animateToTrack(audioPlayer.currentTrack!);
+        animateToCurrentTrack();
       }
     });
   }
+
+  Future<void> animateToCurrentTrack() async => audioPlayer.currentTrack != null
+      ? (useIndex
+            ? await animateToIndex(audioPlayer.currentIndex!)
+            : await animateToTrack(audioPlayer.currentTrack!))
+      : null;
 
   Future<void> animateToTrack(Track track) =>
       animateToIndex(tracks.indexOf(track));
@@ -72,8 +79,8 @@ class TrackListController extends ScrollController {
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
+    _subscription.cancel();
     super.dispose();
-    await _subscription.cancel();
   }
 }
