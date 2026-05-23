@@ -41,11 +41,11 @@ class _PlayerControlsState extends State<PlayerControls>
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     playAnim.dispose();
+    subscription.cancel();
+    audioPlayer.dispose();
     super.dispose();
-    await subscription.cancel();
-    await audioPlayer.dispose();
   }
 
   @override

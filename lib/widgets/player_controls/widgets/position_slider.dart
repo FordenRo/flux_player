@@ -33,9 +33,9 @@ class _PositionSliderState extends State<PositionSlider> {
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
+    stream.close();
     super.dispose();
-    await stream.close();
   }
 
   @override

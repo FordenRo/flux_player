@@ -53,9 +53,9 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
+    subscription.cancel();
     super.dispose();
-    await subscription.cancel();
   }
 
   @override
