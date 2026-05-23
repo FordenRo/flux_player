@@ -6,6 +6,7 @@ import '../pages/import_menu.dart';
 import '../pages/loading_page.dart';
 import '../pages/playlists_page/playlists_page.dart';
 import '../pages/settings_page.dart';
+import '../widgets/fade_in_widget.dart';
 import '../widgets/player_controls/player_controls.dart';
 import 'app_controller.dart';
 import 'caption_widget/caption_widget.dart';
@@ -17,11 +18,7 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> with SingleTickerProviderStateMixin {
-  late final animation = AnimationController(
-    duration: const Duration(seconds: 1),
-    vsync: this,
-  );
+class _AppState extends State<App> {
   var isLoaded = false;
   late final Future<void> future = loadConfiguration();
 
@@ -30,25 +27,16 @@ class _AppState extends State<App> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    appController.addListener(() => setState(() {}));
+    controller.addListener(() => setState(() {}));
   }
 
-  @override
-  void dispose() {
-    animation.dispose();
-    super.dispose();
-  }
-
-  void onLoad() => setState(() {
-    animation.animateTo(1, curve: Curves.easeInOut);
-    isLoaded = true;
-  });
+  void onLoad() => setState(() => isLoaded = true);
 
   @override
   Widget build(BuildContext context) => isLoaded
       ? Scaffold(
-          body: FadeTransition(
-            opacity: animation,
+          body: FadeInWidget(
+            duration: Durations.extralong4,
             child: Column(
               children: [
                 Expanded(

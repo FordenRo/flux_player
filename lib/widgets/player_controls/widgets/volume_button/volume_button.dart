@@ -13,7 +13,6 @@ class VolumeButton extends StatefulWidget {
 
 class _VolumeButtonState extends State<VolumeButton> {
   late final volumeOverlay = VolumeOverlay.createOverlay(context);
-  late final StreamSubscription subscription;
   Timer? hoverTimer;
   double? lastVolume;
 
@@ -21,7 +20,6 @@ class _VolumeButtonState extends State<VolumeButton> {
   void dispose() {
     volumeOverlay.dispose();
     hoverTimer?.cancel();
-    subscription.cancel();
     super.dispose();
   }
 
