@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/audio_player/audio_player.dart';
 import '../../../core/models/playlist.dart';
 import '../../../core/services/config_service.dart';
+import '../../../core/theme/theme.dart';
 import '../../../widgets/fade_in_widget.dart';
 import '../../../widgets/simple_menu.dart';
 
@@ -49,7 +50,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
   Widget build(BuildContext context) => Card(
     clipBehavior: .hardEdge,
     shape: RoundedRectangleBorder(
-      borderRadius: .circular(12),
+      borderRadius: Radiuses.r12,
       side: audioPlayer.currentPlaylist == playlist
           ? .new(color: Theme.of(context).colorScheme.primary)
           : .none,
@@ -120,7 +121,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
     height: 80,
     clipBehavior: .hardEdge,
     decoration: BoxDecoration(
-      borderRadius: .circular(8),
+      borderRadius: Radiuses.r8,
       border: .all(strokeAlign: 1, width: 1, color: Colors.grey.shade600),
     ),
     child: Stack(

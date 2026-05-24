@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../../core/theme/theme.dart';
+
 part 'caption_controller.dart';
 
 class CaptionWidget extends StatefulWidget {
@@ -31,7 +33,7 @@ class _CaptionWidgetState extends State<CaptionWidget> {
     data: .new(
       style: .new(
         padding: .all(.zero),
-        shape: .all(RoundedRectangleBorder(borderRadius: .circular(6))),
+        shape: .all(const RoundedRectangleBorder(borderRadius: Radiuses.r6)),
       ),
     ),
     child: SizedBox(

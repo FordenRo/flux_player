@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/audio_player/audio_player.dart';
+import '../../../../core/theme/theme.dart';
 
 class VolumeOverlay extends StatefulWidget {
   const VolumeOverlay._({
@@ -51,7 +52,9 @@ class VolumeOverlayEntry {
   bool get isButtonHovered => _controller.isButtonHovered;
   set isButtonHovered(bool hovered) {
     _controller.isButtonHovered = hovered;
-    show();
+    if (hovered) {
+      show();
+    }
   }
 
   void show() {
@@ -181,7 +184,7 @@ class _VolumeOverlayState extends State<VolumeOverlay>
         side: BorderSide(
           color: Theme.of(context).colorScheme.secondary.withAlpha(100),
         ),
-        borderRadius: .circular(16),
+        borderRadius: Radiuses.r12,
       ),
       elevation: 8,
       child: SliderTheme(

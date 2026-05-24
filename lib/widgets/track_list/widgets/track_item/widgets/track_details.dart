@@ -38,7 +38,7 @@ class TrackDetails extends StatelessWidget {
 
   RichText _buildDetailsText(BuildContext context) {
     final keyStyle = TextStyle(
-      color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
       fontSize: 12,
     );
 

@@ -7,6 +7,7 @@ import 'package:flutter_show_menu/flutter_show_menu.dart';
 import '../../core/audio_player/audio_player.dart';
 import '../../core/models/track.dart';
 import '../../core/services/config_service.dart';
+import '../../core/theme/theme.dart';
 import '../../pages/playlists_page/widgets/add_to_playlist_button.dart';
 import 'widgets/position_slider.dart';
 import 'widgets/queue_list.dart';
@@ -53,7 +54,7 @@ class _PlayerControlsState extends State<PlayerControls>
       ? Card(
           clipBehavior: .hardEdge,
           shape: RoundedRectangleBorder(
-            borderRadius: .circular(12),
+            borderRadius: Radiuses.r12,
             side: BorderSide(
               color: audioPlayer.isPlaying
                   ? Theme.of(context).colorScheme.primary.withAlpha(200)
@@ -103,7 +104,7 @@ class _PlayerControlsState extends State<PlayerControls>
       children: [
         Container(
           decoration: BoxDecoration(
-            borderRadius: .circular(6),
+            borderRadius: Radiuses.r6,
             border: .all(color: Colors.grey.shade600, width: 1, strokeAlign: 1),
           ),
           height: 40,
@@ -117,14 +118,15 @@ class _PlayerControlsState extends State<PlayerControls>
           child: Column(
             crossAxisAlignment: .start,
             children: [
-              Text(track.title, overflow: .ellipsis),
+              Text(
+                track.title,
+                overflow: .ellipsis,
+                style: TextStyles.trackTitle,
+              ),
               Text(
                 track.author,
                 overflow: .ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(170),
-                ),
+                style: TextStyles.trackArtist,
               ),
             ],
           ),
@@ -139,7 +141,7 @@ class _PlayerControlsState extends State<PlayerControls>
                           .isNotEmpty
                   ? Icons.playlist_add_check_rounded
                   : Icons.playlist_add_rounded,
-              color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             countBuilder: (context, child) =>
                 Transform.translate(offset: const .new(-14, 10), child: child),

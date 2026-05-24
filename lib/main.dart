@@ -7,9 +7,9 @@ import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
-import 'app/app_controller.dart';
 import 'core/audio_player/audio_player_impl.dart';
 import 'core/services/config_service.dart';
+import 'core/theme/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,13 +51,10 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    appController.addListener(() => setState(() {}));
+    appTheme.addListener(() => setState(() {}));
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'Flux',
-    theme: appController.themeData,
-    home: const App(),
-  );
+  Widget build(BuildContext context) =>
+      MaterialApp(title: 'Flux', theme: appTheme.themeData, home: const App());
 }

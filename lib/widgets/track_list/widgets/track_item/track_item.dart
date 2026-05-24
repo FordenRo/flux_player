@@ -6,6 +6,7 @@ import 'package:flutter_show_menu/flutter_show_menu.dart';
 import '../../../../core/audio_player/audio_player.dart';
 import '../../../../core/models/track.dart';
 import '../../../../core/services/config_service.dart';
+import '../../../../core/theme/theme.dart';
 import '../../../../core/utils.dart';
 import '../../../../pages/playlists_page/widgets/add_to_playlist_button.dart';
 import '../../../fade_in_widget.dart';
@@ -94,7 +95,7 @@ class _TrackItemState extends State<TrackItem>
     child: Card(
       clipBehavior: .hardEdge,
       shape: RoundedRectangleBorder(
-        borderRadius: .circular(12),
+        borderRadius: Radiuses.r12,
         side: isSelected
             ? BorderSide(color: Theme.of(context).colorScheme.primary)
             : .none,
@@ -120,7 +121,7 @@ class _TrackItemState extends State<TrackItem>
               '${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: TextStyle(
                 fontSize: 13,
-                color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -134,7 +135,7 @@ class _TrackItemState extends State<TrackItem>
     height: 30,
     clipBehavior: .hardEdge,
     decoration: BoxDecoration(
-      borderRadius: .circular(8),
+      borderRadius: Radiuses.r8,
       border: .all(
         strokeAlign: 1,
         width: 1,
@@ -162,15 +163,8 @@ class _TrackItemState extends State<TrackItem>
     child: RichText(
       text: TextSpan(
         text: '${track.title}  ',
-        children: [
-          TextSpan(
-            text: track.author,
-            style: .new(
-              fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withAlpha(170),
-            ),
-          ),
-        ],
+        style: TextStyles.trackTitle,
+        children: [TextSpan(text: track.author, style: TextStyles.trackArtist)],
       ),
       overflow: .ellipsis,
     ),
@@ -188,7 +182,7 @@ class _TrackItemState extends State<TrackItem>
                 ? Icons.playlist_add_check_rounded
                 : Icons.playlist_add_rounded,
             size: 20,
-            color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           countBuilder: (context, child) =>
               Transform.translate(offset: const .new(-12, 8), child: child),
@@ -196,7 +190,7 @@ class _TrackItemState extends State<TrackItem>
       IconButton(
         onPressed: () => audioPlayer.addNext(track),
         icon: const Icon(Icons.navigate_next_rounded),
-        color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
         style: ButtonStyle(
           minimumSize: .all(Size.zero),
           iconSize: .all(24),

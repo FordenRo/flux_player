@@ -112,9 +112,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
                     playlistCount.toString(),
                     style: .new(
                       fontSize: 9,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withAlpha(200),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),

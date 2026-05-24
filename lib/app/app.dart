@@ -100,7 +100,6 @@ class _AppState extends State<App> {
     trailing: Expanded(
       child: NavigationRail(
         groupAlignment: 1,
-        labelType: .selected,
         selectedIndex: controller.currentPage.index >= 2
             ? controller.currentPage.index - 2
             : null,
