@@ -61,7 +61,7 @@ abstract interface class AudioPlayer {
 
   Future<void> seek(Duration position);
 
-  Future<void> setIndex(int index, {bool play = true});
+  Future<void> setIndex(int index, {bool play = true, bool load = true});
 
   Future<void> jump(int index, {bool play = true});
 

@@ -17,6 +17,7 @@ class TrackList extends StatefulWidget {
   const TrackList(
     this.tracks, {
     required this.onTrackSelected,
+    this.onTrackMoved,
     this.sortEnabled = true,
     this.selectionEnabled = true,
     this.trackMenuItemsBuilder,
@@ -26,6 +27,7 @@ class TrackList extends StatefulWidget {
 
   final List<Track> tracks;
   final void Function(int index) onTrackSelected;
+  final void Function(int oldIndex, int newIndex)? onTrackMoved;
   final List<SimpleMenuItem> Function(int index)? trackMenuItemsBuilder;
   final bool sortEnabled;
   final bool selectionEnabled;
@@ -45,6 +47,8 @@ class _TrackListState extends State<TrackList> {
   var query = '';
   Set<int> selectedTracks = {};
   Sorting sort = .custom;
+
+  bool get isReorderable => widget.onTrackMoved != null && sort == .custom;
 
   List<MapEntry<int, Track>> getTracks() {
     final filtered = widget.tracks
@@ -87,6 +91,12 @@ class _TrackListState extends State<TrackList> {
     controller.dispose();
     subscription.cancel();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant TrackList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    tracks = getTracks();
   }
 
   void _onSelectionUpdate() => setState(() {});
@@ -138,22 +148,37 @@ class _TrackListState extends State<TrackList> {
               ),
           ],
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: tracks.length,
-            itemExtent: 50,
-            controller: controller,
-            itemBuilder: (context, idx) => TrackItem(
-              tracks[idx].value,
-              selectionController: selectionController,
-              onPlay: () => widget.onTrackSelected(tracks[idx].key),
-              menuItems: selectedTracks.isEmpty
-                  ? widget.trackMenuItemsBuilder?.call(tracks[idx].key)
-                  : [],
-            ),
-          ),
-        ),
+        Expanded(child: isReorderable ? _buildReorderableList() : _buildList()),
       ],
+    ),
+  );
+
+  ListView _buildList() => ListView.builder(
+    itemCount: tracks.length,
+    itemExtent: 50,
+    controller: controller,
+    itemBuilder: (context, idx) => _buildItem(idx),
+  );
+
+  TrackItem _buildItem(int idx) => TrackItem(
+    tracks[idx].value,
+    selectionController: selectionController,
+    onPlay: () => widget.onTrackSelected(tracks[idx].key),
+    menuItems: selectedTracks.isEmpty
+        ? widget.trackMenuItemsBuilder?.call(tracks[idx].key)
+        : [],
+  );
+
+  ReorderableListView _buildReorderableList() => ReorderableListView.builder(
+    itemCount: tracks.length,
+    itemExtent: 50,
+    buildDefaultDragHandles: false,
+    scrollController: controller,
+    onReorder: widget.onTrackMoved!,
+    itemBuilder: (context, idx) => ReorderableDragStartListener(
+      key: Key(idx.toString()),
+      index: idx,
+      child: _buildItem(idx),
     ),
   );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/audio_player/audio_player.dart';
 import '../../../core/models/track.dart';
+import '../../../core/utils.dart';
 import '../../simple_menu.dart';
 import '../../track_list/track_list_controller.dart';
 import '../../track_list/widgets/floating_actions_overlay.dart';
@@ -25,6 +26,25 @@ class _QueueListState extends State<QueueList> {
     super.dispose();
   }
 
+  Future<void> updatePlaybackIndex(int index) =>
+      audioPlayer.setIndex(index, play: audioPlayer.isPlaying, load: false);
+
+  void onMove(int oldIndex, int newIndex) => setState(() {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    queue.move(oldIndex, newIndex);
+    if (oldIndex == audioPlayer.currentIndex) {
+      updatePlaybackIndex(newIndex);
+    } else if (oldIndex < audioPlayer.currentIndex! &&
+        newIndex >= audioPlayer.currentIndex!) {
+      updatePlaybackIndex(audioPlayer.currentIndex! - 1);
+    } else if (oldIndex > audioPlayer.currentIndex! &&
+        newIndex <= audioPlayer.currentIndex!) {
+      updatePlaybackIndex(audioPlayer.currentIndex! + 1);
+    }
+  });
+
   @override
   Widget build(BuildContext context) => Align(
     alignment: .bottomRight,
@@ -42,20 +62,26 @@ class _QueueListState extends State<QueueList> {
             color: Theme.of(context).colorScheme.surface,
             child: Padding(
               padding: const .all(12),
-              child: ListView.builder(
+              child: ReorderableListView.builder(
                 itemCount: queue.length,
                 itemExtent: 50,
-                controller: controller,
-                itemBuilder: (context, idx) => TrackItem(
-                  queue[idx],
-                  onPlay: () => audioPlayer.setIndex(idx),
-                  menuItems: [
-                    SimpleMenuItem(
-                      text: 'Убрать',
-                      onTap: () => setState(() => queue.removeAt(idx)),
-                    ),
-                  ],
-                  isSelectedCallback: () => audioPlayer.currentIndex! == idx,
+                buildDefaultDragHandles: false,
+                scrollController: controller,
+                onReorder: onMove,
+                itemBuilder: (context, idx) => ReorderableDragStartListener(
+                  key: Key(idx.toString()),
+                  index: idx,
+                  child: TrackItem(
+                    queue[idx],
+                    onPlay: () => audioPlayer.setIndex(idx),
+                    menuItems: [
+                      SimpleMenuItem(
+                        text: 'Убрать',
+                        onTap: () => setState(() => queue.removeAt(idx)),
+                      ),
+                    ],
+                    isSelectedCallback: () => audioPlayer.currentIndex! == idx,
+                  ),
                 ),
               ),
             ),

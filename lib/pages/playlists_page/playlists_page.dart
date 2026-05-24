@@ -4,6 +4,7 @@ import '../../app/caption_widget/caption_widget.dart';
 import '../../core/audio_player/audio_player.dart';
 import '../../core/models/playlist.dart';
 import '../../core/services/config_service.dart';
+import '../../core/utils.dart';
 import '../../widgets/track_list/track_list.dart';
 import '../../widgets/track_list/widgets/track_item/track_selection_controller.dart';
 import 'widgets/playlist_tile.dart';
@@ -76,6 +77,12 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
           selectionController: selectionController,
           onTrackSelected: (idx) =>
               audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true),
+          onTrackMoved: (oldIndex, newIndex) => setState(() {
+            if (newIndex > oldIndex) {
+              newIndex -= 1;
+            }
+            openedPlaylist!.tracks.move(oldIndex, newIndex);
+          }),
           trackMenuItemsBuilder: (idx) => [
             .new(
               text: 'Удалить из плейлиста',

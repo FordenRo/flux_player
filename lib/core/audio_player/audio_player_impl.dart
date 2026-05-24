@@ -255,13 +255,15 @@ class AudioPlayerImpl implements AudioPlayer {
   );
 
   @override
-  Future<void> setIndex(int index, {bool play = true}) {
+  Future<void> setIndex(int index, {bool play = true, bool load = true}) async {
     if (index < 0 || index >= queue.length) {
       index = index % queue.length;
     }
     _currentIndex = index;
     _currentIndexController.add(index);
-    return _player.open(media_kit.Media(queue[index].path), play: play);
+    if (load) {
+      await _player.open(media_kit.Media(queue[index].path), play: play);
+    }
   }
 
   Future<void> _onEnd() => looped ? play() : next();
