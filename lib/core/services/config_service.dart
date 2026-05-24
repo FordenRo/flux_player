@@ -8,7 +8,6 @@ import 'package:window_manager/window_manager.dart';
 
 import '../../app/app_controller.dart';
 import '../audio_player/audio_player.dart';
-import '../constants.dart';
 import '../models/playlist.dart';
 import '../models/track.dart';
 import '../theme/theme.dart';

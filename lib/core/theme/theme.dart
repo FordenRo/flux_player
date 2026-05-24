@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-export 'src/radiuses.dart';
 export 'src/styles.dart';
+export 'src/values.dart';
 
 final appTheme = AppTheme._();
 
