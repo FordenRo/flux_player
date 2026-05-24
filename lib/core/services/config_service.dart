@@ -46,7 +46,10 @@ Future<void> loadConfiguration() async {
     themeColorIdx = stream.read(5);
   } catch (_) {}
 
-  await windowManager.setPosition(Offset(wPosX, wPosY));
+  Future.delayed(
+    const Duration(milliseconds: 10),
+    () => windowManager.setPosition(Offset(wPosX, wPosY)),
+  );
   await audioPlayer.setVolume(volume);
   audioPlayer
     ..setShuffled(shuffled)
