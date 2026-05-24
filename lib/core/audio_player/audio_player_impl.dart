@@ -257,7 +257,7 @@ class AudioPlayerImpl implements AudioPlayer {
   @override
   Future<void> setIndex(int index, {bool play = true}) {
     if (index < 0 || index >= queue.length) {
-      index = 0;
+      index = index % queue.length;
     }
     _currentIndex = index;
     _currentIndexController.add(index);
