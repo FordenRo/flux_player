@@ -93,34 +93,34 @@ class _VolumeOverlayState extends State<VolumeOverlay>
   void initState() {
     super.initState();
     subscription = audioPlayer.stream.volume.listen((_) => setState(() {}));
-    controller.addListener(onControllerUpdate);
-    show();
-  }
-
-  void onControllerUpdate() {
-    if (isButtonHovered) {
-      show();
-    } else {
-      hideDelayed();
-    }
+    controller.addListener(_onControllerUpdate);
+    _show();
   }
 
   @override
   void dispose() {
-    controller.removeListener(onControllerUpdate);
+    controller.removeListener(_onControllerUpdate);
     fadeAnimation.dispose();
     timer?.cancel();
     subscription.cancel();
     super.dispose();
   }
 
-  Future<void> show() {
+  void _onControllerUpdate() {
+    if (isButtonHovered) {
+      _show();
+    } else {
+      _hideDelayed();
+    }
+  }
+
+  Future<void> _show() {
     timer?.cancel();
     fadeAnimation.stop();
     return fadeAnimation.animateTo(1, curve: Curves.easeInOut);
   }
 
-  Future<void> hide() async {
+  Future<void> _hide() async {
     if (sliding || hovered || isButtonHovered) {
       return;
     }
@@ -129,56 +129,15 @@ class _VolumeOverlayState extends State<VolumeOverlay>
         .then((_) => widget.onHide());
   }
 
-  void hideDelayed() {
+  void _hideDelayed() {
     if (sliding || hovered || isButtonHovered) {
       return;
     }
     timer?.cancel();
-    timer = Timer(const Duration(milliseconds: 400), hide);
+    timer = Timer(const Duration(milliseconds: 400), _hide);
   }
 
-  @override
-  Widget build(BuildContext context) => Align(
-    alignment: .bottomRight,
-    child: Transform.translate(
-      offset: const Offset(15, -55),
-      child: SizedBox(
-        width: 250,
-        height: 100,
-        child: Listener(
-          onPointerSignal: (e) async {
-            if (e is PointerScrollEvent) {
-              await audioPlayer.setVolume(
-                audioPlayer.volume - e.scrollDelta.dy / 5000,
-              );
-            }
-          },
-          child: MouseRegion(
-            onEnter: (event) {
-              hovered = true;
-              show();
-            },
-            onExit: (event) {
-              hovered = false;
-              hideDelayed();
-            },
-            child: Center(
-              child: SizedBox(
-                width: 200,
-                height: 50,
-                child: FadeTransition(
-                  opacity: fadeAnimation,
-                  child: buildCard(),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
-  Builder buildCard() => Builder(
+  Builder _buildCard() => Builder(
     builder: (context) => Card(
       shape: RoundedRectangleBorder(
         side: BorderSide(
@@ -200,9 +159,50 @@ class _VolumeOverlayState extends State<VolumeOverlay>
           onChangeStart: (_) => sliding = true,
           onChangeEnd: (_) {
             sliding = false;
-            hideDelayed();
+            _hideDelayed();
           },
           onChanged: audioPlayer.setVolume,
+        ),
+      ),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: .bottomRight,
+    child: Transform.translate(
+      offset: const Offset(15, -55),
+      child: SizedBox(
+        width: 250,
+        height: 100,
+        child: Listener(
+          onPointerSignal: (e) async {
+            if (e is PointerScrollEvent) {
+              await audioPlayer.setVolume(
+                audioPlayer.volume - e.scrollDelta.dy / 5000,
+              );
+            }
+          },
+          child: MouseRegion(
+            onEnter: (event) {
+              hovered = true;
+              _show();
+            },
+            onExit: (event) {
+              hovered = false;
+              _hideDelayed();
+            },
+            child: Center(
+              child: SizedBox(
+                width: 200,
+                height: 50,
+                child: FadeTransition(
+                  opacity: fadeAnimation,
+                  child: _buildCard(),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     ),

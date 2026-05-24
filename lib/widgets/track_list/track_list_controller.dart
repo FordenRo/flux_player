@@ -43,6 +43,12 @@ class TrackListController extends ScrollController {
     });
   }
 
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
   Future<void> animateToCurrentTrack() async => audioPlayer.currentTrack != null
       ? (useIndex
             ? await animateToIndex(audioPlayer.currentIndex!)
@@ -76,11 +82,5 @@ class TrackListController extends ScrollController {
       jumpTo(1000);
     }
     return animateTo(0, duration: Durations.long2, curve: Curves.easeOutQuart);
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
   }
 }

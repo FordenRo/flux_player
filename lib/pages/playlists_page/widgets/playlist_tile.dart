@@ -46,27 +46,25 @@ class _PlaylistTileState extends State<PlaylistTile> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) => Card(
-    clipBehavior: .hardEdge,
-    shape: RoundedRectangleBorder(
-      borderRadius: Radiuses.r12,
-      side: audioPlayer.currentPlaylist == playlist
-          ? .new(color: Theme.of(context).colorScheme.primary)
-          : .none,
-    ),
-    child: GestureDetector(
-      onTap: !focusNode.hasFocus ? widget.onTap : null,
-      behavior: .opaque,
-      onSecondaryTapDown: (e) => showMenu(context, e),
-      child: Padding(
-        padding: const .all(10),
-        child: Row(spacing: 20, children: [buildIcon(), buildInfo()]),
-      ),
-    ),
-  );
+  Future<void> _showMenu(BuildContext context, TapDownDetails e) =>
+      showSimpleMenu(
+        context: context,
+        offset: e.localPosition.translate(0, -context.size!.height),
+        items: [
+          SimpleMenuItem(text: 'Переименовать', onTap: focusNode.requestFocus),
+          if (mainPlaylist != playlist)
+            SimpleMenuItem(
+              text: 'Сделать главным',
+              onTap: () => mainPlaylist = playlist,
+            ),
+          SimpleMenuItem(
+            text: 'Удалить',
+            onTap: () => playlists.remove(playlist),
+          ),
+        ],
+      );
 
-  Expanded buildInfo() => Expanded(
+  Expanded _buildInfo() => Expanded(
     child: Stack(
       children: [
         Center(
@@ -116,7 +114,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
     ),
   );
 
-  Container buildIcon() => Container(
+  Container _buildIcon() => Container(
     width: 80,
     height: 80,
     clipBehavior: .hardEdge,
@@ -153,23 +151,25 @@ class _PlaylistTileState extends State<PlaylistTile> {
     ),
   );
 
-  Future<void> showMenu(BuildContext context, TapDownDetails e) =>
-      showSimpleMenu(
-        context: context,
-        offset: e.localPosition.translate(0, -context.size!.height),
-        items: [
-          SimpleMenuItem(text: 'Переименовать', onTap: focusNode.requestFocus),
-          if (mainPlaylist != playlist)
-            SimpleMenuItem(
-              text: 'Сделать главным',
-              onTap: () => mainPlaylist = playlist,
-            ),
-          SimpleMenuItem(
-            text: 'Удалить',
-            onTap: () => playlists.remove(playlist),
-          ),
-        ],
-      );
+  @override
+  Widget build(BuildContext context) => Card(
+    clipBehavior: .hardEdge,
+    shape: RoundedRectangleBorder(
+      borderRadius: Radiuses.r12,
+      side: audioPlayer.currentPlaylist == playlist
+          ? .new(color: Theme.of(context).colorScheme.primary)
+          : .none,
+    ),
+    child: GestureDetector(
+      onTap: !focusNode.hasFocus ? widget.onTap : null,
+      behavior: .opaque,
+      onSecondaryTapDown: (e) => _showMenu(context, e),
+      child: Padding(
+        padding: const .all(10),
+        child: Row(spacing: 20, children: [_buildIcon(), _buildInfo()]),
+      ),
+    ),
+  );
 }
 
 class _PlayButton extends StatefulWidget {
@@ -197,25 +197,13 @@ class _PlayButtonState extends State<_PlayButton>
   bool get isPlaying => isSelected && audioPlayer.isPlaying;
   bool get isVisible => isHovered || isPlaying;
 
-  Future<void> playPressed() async {
-    if (isSelected) {
-      if (isPlaying) {
-        await audioPlayer.pause();
-      } else {
-        await audioPlayer.play();
-      }
-    } else {
-      await audioPlayer.setPlaylist(playlist, index: 0, play: true);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     isPlayingSub = audioPlayer.stream.isPlaying
         .where((_) => playlist == audioPlayer.currentPlaylist)
-        .listen((_) => update());
-    playlistSub = audioPlayer.stream.currentPlaylist.listen((_) => update());
+        .listen((_) => _update());
+    playlistSub = audioPlayer.stream.currentPlaylist.listen((_) => _update());
   }
 
   @override
@@ -225,9 +213,21 @@ class _PlayButtonState extends State<_PlayButton>
     super.dispose();
   }
 
-  void update() {
+  void _update() {
     setState(() {});
     playAnim.animateTo(isPlaying ? 1 : 0);
+  }
+
+  Future<void> _playPressed() async {
+    if (isSelected) {
+      if (isPlaying) {
+        await audioPlayer.pause();
+      } else {
+        await audioPlayer.play();
+      }
+    } else {
+      await audioPlayer.setPlaylist(playlist, index: 0, play: true);
+    }
   }
 
   @override
@@ -241,7 +241,7 @@ class _PlayButtonState extends State<_PlayButton>
         color: Theme.of(context).colorScheme.surface.withAlpha(100),
         child: Center(
           child: IconButton(
-            onPressed: playPressed,
+            onPressed: _playPressed,
             iconSize: 32,
             icon: AnimatedIcon(
               icon: AnimatedIcons.play_pause,

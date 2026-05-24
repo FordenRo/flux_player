@@ -4,7 +4,8 @@ import '../../app/caption_widget/caption_widget.dart';
 import '../../core/audio_player/audio_player.dart';
 import '../../core/models/playlist.dart';
 import '../../core/services/config_service.dart';
-import '../../core/utils.dart';
+import '../../core/utils/move_element.dart';
+import '../../widgets/simple_menu.dart';
 import '../../widgets/track_list/track_list.dart';
 import '../../widgets/track_list/widgets/track_item/track_selection_controller.dart';
 import 'widgets/playlist_tile.dart';
@@ -27,6 +28,47 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
     super.dispose();
   }
 
+  void _onTrackMoved(int oldIndex, int newIndex) => setState(() {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    openedPlaylist!.tracks.move(oldIndex, newIndex);
+  });
+
+  List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
+    .new(
+      text: 'Удалить из плейлиста',
+      onTap: () => selectionController.hasSelection(openedPlaylist!.tracks[idx])
+          ? selectionController.selectedTracks.forEach(
+              openedPlaylist!.tracks.remove,
+            )
+          : openedPlaylist!.tracks.removeAt(idx),
+    ),
+  ];
+
+  Widget? _playlistBuilder(int idx) => PlaylistTile(
+    playlists[idx],
+    onTap: () {
+      captionController.addWidget(
+        builder: (context) => Row(
+          spacing: 8,
+          children: [
+            IconButton(
+              onPressed: () {
+                buttonController.remove();
+                setState(() => openedPlaylist = null);
+              },
+              icon: const Icon(Icons.arrow_back_rounded),
+            ),
+            Text(openedPlaylist!.title),
+          ],
+        ),
+        controller: buttonController,
+      );
+      setState(() => openedPlaylist = playlists[idx]);
+    },
+  );
+
   @override
   Widget build(BuildContext context) => openedPlaylist == null
       ? Scaffold(
@@ -47,28 +89,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
             builder: (context, asyncSnapshot) => ListView.builder(
               itemCount: playlists.length,
               itemExtent: 110,
-              itemBuilder: (context, idx) => PlaylistTile(
-                playlists[idx],
-                onTap: () {
-                  captionController.addWidget(
-                    builder: (context) => Row(
-                      spacing: 8,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            buttonController.remove();
-                            setState(() => openedPlaylist = null);
-                          },
-                          icon: const Icon(Icons.arrow_back_rounded),
-                        ),
-                        Text(openedPlaylist!.title),
-                      ],
-                    ),
-                    controller: buttonController,
-                  );
-                  setState(() => openedPlaylist = playlists[idx]);
-                },
-              ),
+              itemBuilder: (context, idx) => _playlistBuilder(idx),
             ),
           ),
         )
@@ -77,22 +98,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
           selectionController: selectionController,
           onTrackSelected: (idx) =>
               audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true),
-          onTrackMoved: (oldIndex, newIndex) => setState(() {
-            if (newIndex > oldIndex) {
-              newIndex -= 1;
-            }
-            openedPlaylist!.tracks.move(oldIndex, newIndex);
-          }),
-          trackMenuItemsBuilder: (idx) => [
-            .new(
-              text: 'Удалить из плейлиста',
-              onTap: () =>
-                  selectionController.hasSelection(openedPlaylist!.tracks[idx])
-                  ? selectionController.selectedTracks.forEach(
-                      openedPlaylist!.tracks.remove,
-                    )
-                  : openedPlaylist!.tracks.removeAt(idx),
-            ),
-          ],
+          onTrackMoved: _onTrackMoved,
+          trackMenuItemsBuilder: _menuItemsBuilder,
         );
 }

@@ -22,6 +22,23 @@ class _AppState extends State<App> {
   var isLoaded = false;
   late final Future<void> future = loadConfiguration();
 
+  final topDestinations = const [
+    NavigationRailDestination(
+      icon: Icon(Icons.music_note_rounded),
+      label: Text('Все треки'),
+    ),
+    NavigationRailDestination(
+      icon: Icon(Icons.library_music_rounded),
+      label: Text('Плейлисты'),
+    ),
+  ];
+  final bottomDestinations = const [
+    NavigationRailDestination(
+      icon: Icon(Icons.settings_rounded),
+      label: Text('Настройки'),
+    ),
+  ];
+
   AppController get controller => appController;
 
   @override
@@ -32,6 +49,79 @@ class _AppState extends State<App> {
 
   void onLoad() => setState(() => isLoaded = true);
 
+  void onPageSelected(int page) =>
+      setState(() => controller.currentPage = AppPages.values[page]);
+
+  Widget buildPage() => switch (controller.currentPage) {
+    .allTracks => const AllTracksPage(),
+    .playlists => const PlaylistsPage(),
+    .settings => const SettingsPage(),
+  };
+
+  IconButton buildImportButton() => IconButton(
+    hoverColor: Theme.of(context).colorScheme.primary.withAlpha(10),
+    splashColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+    visualDensity: .compact,
+    padding: const .symmetric(horizontal: 16),
+    onPressed: () =>
+        showDialog(context: context, builder: (_) => const ImportMenu()),
+    icon: const Icon(Icons.add_to_photos_rounded),
+  );
+
+  Widget buildLogo() => Builder(
+    builder: (context) => Image.asset(
+      'assets/logo.png',
+      width: 32,
+      color: Theme.of(context).colorScheme.primary,
+    ),
+  );
+
+  NavigationRail buildNavigationRail() => NavigationRail(
+    labelType: .selected,
+    destinations: topDestinations,
+    trailing: Expanded(
+      child: NavigationRail(
+        groupAlignment: 1,
+        selectedIndex: controller.currentPage.index >= 2
+            ? controller.currentPage.index - 2
+            : null,
+        destinations: bottomDestinations,
+        leadingAtTop: false,
+        leading: buildImportButton(),
+        onDestinationSelected: (page) => onPageSelected(page + 2),
+      ),
+    ),
+    leading: Padding(padding: const .only(bottom: 12), child: buildLogo()),
+    trailingAtBottom: true,
+    selectedIndex: controller.currentPage.index < 2
+        ? controller.currentPage.index
+        : null,
+    onDestinationSelected: onPageSelected,
+  );
+
+  Row buildBody() => Row(
+    children: [
+      Padding(
+        padding: const .symmetric(vertical: 12),
+        child: buildNavigationRail(),
+      ),
+      const VerticalDivider(width: 1),
+      Expanded(
+        child: Padding(
+          padding: const .only(right: 8, left: 8, top: 8),
+          child: Column(
+            children: [
+              const CaptionWidget(title: 'Flux Music Player'),
+              Expanded(
+                child: Padding(padding: const .all(4), child: buildPage()),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) => isLoaded
       ? Scaffold(
@@ -39,36 +129,7 @@ class _AppState extends State<App> {
             duration: Durations.extralong4,
             child: Column(
               children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const .symmetric(vertical: 12),
-                        child: buildNavigationRail(),
-                      ),
-
-                      const VerticalDivider(width: 1),
-
-                      Expanded(
-                        child: Padding(
-                          padding: const .only(right: 8, left: 8, top: 8),
-                          child: Column(
-                            children: [
-                              const CaptionWidget(title: 'Flux Music Player'),
-
-                              Expanded(
-                                child: Padding(
-                                  padding: const .all(4),
-                                  child: buildPage(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                Expanded(child: buildBody()),
                 const Padding(
                   padding: .only(right: 4, left: 4, bottom: 4),
                   child: PlayerControls(),
@@ -78,66 +139,4 @@ class _AppState extends State<App> {
           ),
         )
       : LoadingPage(future: future, onLoad: onLoad);
-
-  Widget buildPage() => switch (controller.currentPage) {
-    .allTracks => const AllTracksPage(),
-    .playlists => const PlaylistsPage(),
-    .settings => const SettingsPage(),
-  };
-
-  NavigationRail buildNavigationRail() => NavigationRail(
-    labelType: .selected,
-    destinations: const [
-      NavigationRailDestination(
-        icon: Icon(Icons.music_note_rounded),
-        label: Text('Все треки'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.library_music_rounded),
-        label: Text('Плейлисты'),
-      ),
-    ],
-    trailing: Expanded(
-      child: NavigationRail(
-        groupAlignment: 1,
-        selectedIndex: controller.currentPage.index >= 2
-            ? controller.currentPage.index - 2
-            : null,
-        destinations: const [
-          NavigationRailDestination(
-            icon: Icon(Icons.settings_rounded),
-            label: Text('Настройки'),
-          ),
-        ],
-        leadingAtTop: false,
-        leading: IconButton(
-          hoverColor: Theme.of(context).colorScheme.primary.withAlpha(10),
-          splashColor: Theme.of(context).colorScheme.primary.withAlpha(100),
-          visualDensity: .compact,
-          padding: const .symmetric(horizontal: 16),
-          onPressed: () =>
-              showDialog(context: context, builder: (_) => const ImportMenu()),
-          icon: const Icon(Icons.add_to_photos_rounded),
-        ),
-        onDestinationSelected: (value) =>
-            setState(() => controller.currentPage = AppPages.values[value + 2]),
-      ),
-    ),
-    leading: Padding(
-      padding: const .only(bottom: 12),
-      child: Builder(
-        builder: (context) => Image.asset(
-          'assets/logo.png',
-          width: 32,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-    ),
-    trailingAtBottom: true,
-    selectedIndex: controller.currentPage.index < 2
-        ? controller.currentPage.index
-        : null,
-    onDestinationSelected: (value) =>
-        setState(() => controller.currentPage = AppPages.values[value]),
-  );
 }

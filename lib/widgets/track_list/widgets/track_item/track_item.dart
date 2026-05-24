@@ -76,7 +76,7 @@ class _TrackItemState extends State<TrackItem>
     super.dispose();
   }
 
-  Future<void> playPressed() async {
+  Future<void> _playPressed() async {
     if (isSelected) {
       if (isPlaying) {
         await audioPlayer.pause();
@@ -87,48 +87,6 @@ class _TrackItemState extends State<TrackItem>
       widget.onPlay();
     }
   }
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    behavior: .opaque,
-    onSecondaryTapDown: (e) => showMenu(context, e),
-    child: Card(
-      clipBehavior: .hardEdge,
-      shape: RoundedRectangleBorder(
-        borderRadius: Radiuses.r12,
-        side: isSelected
-            ? BorderSide(color: Theme.of(context).colorScheme.primary)
-            : .none,
-      ),
-      child: Padding(
-        padding: const .only(left: 6, right: 10),
-        child: Row(
-          spacing: 8,
-          children: [
-            if (selectionController?.selectedTracks.isNotEmpty ?? false)
-              Checkbox(
-                value: hasSelection,
-                onChanged: (value) => value!
-                    ? selectionController!.add(track)
-                    : selectionController!.remove(track),
-              ),
-            _buildIcon(),
-            _buildText(),
-            _buildButtons(),
-            Text(
-              '${track.duration.inMinutes.toString().padLeft(2, '0')}'
-              ':'
-              '${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
-              style: TextStyle(
-                fontSize: 13,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 
   Container _buildIcon() => Container(
     width: 30,
@@ -154,7 +112,7 @@ class _TrackItemState extends State<TrackItem>
           )
         else
           Icon(Icons.music_note_rounded, color: Colors.grey.shade400, size: 20),
-        _PlayButton(isPlaying: isPlaying, onPressed: playPressed),
+        _PlayButton(isPlaying: isPlaying, onPressed: _playPressed),
       ],
     ),
   );
@@ -200,7 +158,7 @@ class _TrackItemState extends State<TrackItem>
     ],
   );
 
-  Future<void> showMenu(BuildContext context, TapDownDetails e) async {
+  Future<void> _showMenu(BuildContext context, TapDownDetails e) async {
     final controller = OverlayMenuController();
     await showOverlayMenu(
       context: context,
@@ -296,6 +254,48 @@ class _TrackItemState extends State<TrackItem>
     );
     controller.close();
   }
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+    behavior: .opaque,
+    onSecondaryTapDown: (e) => _showMenu(context, e),
+    child: Card(
+      clipBehavior: .hardEdge,
+      shape: RoundedRectangleBorder(
+        borderRadius: Radiuses.r12,
+        side: isSelected
+            ? BorderSide(color: Theme.of(context).colorScheme.primary)
+            : .none,
+      ),
+      child: Padding(
+        padding: const .only(left: 6, right: 10),
+        child: Row(
+          spacing: 8,
+          children: [
+            if (selectionController?.selectedTracks.isNotEmpty ?? false)
+              Checkbox(
+                value: hasSelection,
+                onChanged: (value) => value!
+                    ? selectionController!.add(track)
+                    : selectionController!.remove(track),
+              ),
+            _buildIcon(),
+            _buildText(),
+            _buildButtons(),
+            Text(
+              '${track.duration.inMinutes.toString().padLeft(2, '0')}'
+              ':'
+              '${(track.duration.inSeconds % 60).toString().padLeft(2, '0')}',
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class _PlayButton extends StatefulWidget {

@@ -41,67 +41,7 @@ class ImportMenu extends StatefulWidget {
 class _ImportMenuState extends State<ImportMenu> {
   var selected = false;
 
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Card(
-      child: AnimatedSize(
-        duration: Durations.medium1,
-        curve: Curves.easeInOut,
-        child: Padding(
-          padding: const .all(40),
-          child: !selected
-              ? Row(
-                  mainAxisSize: .min,
-                  spacing: 20,
-                  children: [
-                    buildButton(
-                      context,
-                      icon: Icons.file_copy_rounded,
-                      text: 'Добавить файлы',
-                      onTap: () async {
-                        final result = await FilePicker.pickFiles(
-                          type: .custom,
-                          dialogTitle: 'Flux Import Files',
-                          allowedExtensions: audioExtensions,
-                          allowMultiple: true,
-                        );
-                        if (result != null) {
-                          setState(() => selected = true);
-                          await _onFilesSelected(
-                            result.files.map((e) => e.path).nonNulls.toList(),
-                          );
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                          }
-                        }
-                      },
-                    ),
-                    buildButton(
-                      context,
-                      icon: Icons.folder_copy_rounded,
-                      text: 'Добавить папки',
-                      onTap: () async {
-                        final result = await FilePicker.getDirectoryPath(
-                          dialogTitle: 'Flux Import Folder',
-                        );
-                        if (result != null) {
-                          setState(() => selected = true);
-                          await _onFolderSelected(result);
-                          if (context.mounted) {
-                            Navigator.pop(context);
-                          }
-                        }
-                      },
-                    ),
-                  ],
-                )
-              : const CircularProgressIndicator(),
-        ),
-      ),
-    ),
-  );
-
-  Card buildButton(
+  Card _buildButton(
     BuildContext context, {
     required IconData icon,
     required String text,
@@ -125,6 +65,68 @@ class _ImportMenuState extends State<ImportMenu> {
               Text(text, textAlign: .center),
             ],
           ),
+        ),
+      ),
+    ),
+  );
+
+  Row _buildButtonsRow(BuildContext context) => Row(
+    mainAxisSize: .min,
+    spacing: 20,
+    children: [
+      _buildButton(
+        context,
+        icon: Icons.file_copy_rounded,
+        text: 'Добавить файлы',
+        onTap: () async {
+          final result = await FilePicker.pickFiles(
+            type: .custom,
+            dialogTitle: 'Flux Import Files',
+            allowedExtensions: audioExtensions,
+            allowMultiple: true,
+          );
+          if (result != null) {
+            setState(() => selected = true);
+            await _onFilesSelected(
+              result.files.map((e) => e.path).nonNulls.toList(),
+            );
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
+          }
+        },
+      ),
+      _buildButton(
+        context,
+        icon: Icons.folder_copy_rounded,
+        text: 'Добавить папки',
+        onTap: () async {
+          final result = await FilePicker.getDirectoryPath(
+            dialogTitle: 'Flux Import Folder',
+          );
+          if (result != null) {
+            setState(() => selected = true);
+            await _onFolderSelected(result);
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
+          }
+        },
+      ),
+    ],
+  );
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Card(
+      child: AnimatedSize(
+        duration: Durations.medium1,
+        curve: Curves.easeInOut,
+        child: Padding(
+          padding: const .all(40),
+          child: !selected
+              ? _buildButtonsRow(context)
+              : const CircularProgressIndicator(),
         ),
       ),
     ),

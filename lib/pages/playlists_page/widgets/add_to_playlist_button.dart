@@ -45,7 +45,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
     super.dispose();
   }
 
-  Future<void> onTap() async {
+  Future<void> _onTap() async {
     final isSelected = await showSimpleMenu(
       context: context,
       items: playlists
@@ -76,7 +76,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
     }
   }
 
-  void onSecondaryTap() {
+  void _onSecondaryTap() {
     if (mainPlaylist == null) {
       return;
     }
@@ -88,6 +88,19 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
     trackPlaylistChanged.add(track);
   }
 
+  Builder _buildCount(int playlistCount) => Builder(
+    builder: (context) => widget.countBuilder(
+      context,
+      Text(
+        playlistCount.toString(),
+        style: .new(
+          fontSize: 9,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     final playlistCount = playlists
@@ -96,27 +109,15 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
 
     return InkWell(
       customBorder: const CircleBorder(),
-      onTap: onTap,
-      onSecondaryTap: onSecondaryTap,
+      onTap: _onTap,
+      onSecondaryTap: _onSecondaryTap,
       child: Padding(
         padding: widget.padding,
         child: Stack(
           alignment: .center,
           children: [
             Builder(builder: widget.builder),
-            if (playlistCount > 0)
-              Builder(
-                builder: (context) => widget.countBuilder(
-                  context,
-                  Text(
-                    playlistCount.toString(),
-                    style: .new(
-                      fontSize: 9,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
+            if (playlistCount > 0) _buildCount(playlistCount),
           ],
         ),
       ),

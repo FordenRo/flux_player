@@ -23,7 +23,7 @@ class _VolumeButtonState extends State<VolumeButton> {
     super.dispose();
   }
 
-  IconData getIconDataFromVolume(double volume) => switch (volume) {
+  IconData _getIconDataFromVolume(double volume) => switch (volume) {
     > .7 => Icons.volume_up_rounded,
     > .3 => Icons.volume_down_rounded,
     > 0 => Icons.volume_mute_rounded,
@@ -38,8 +38,8 @@ class _VolumeButtonState extends State<VolumeButton> {
       }
     },
     child: StreamBuilder(
-      stream: audioPlayer.stream.volume.map(getIconDataFromVolume).distinct(),
-      initialData: getIconDataFromVolume(audioPlayer.volume),
+      stream: audioPlayer.stream.volume.map(_getIconDataFromVolume).distinct(),
+      initialData: _getIconDataFromVolume(audioPlayer.volume),
       builder: (context, snapshot) => IconButton(
         onHover: (hovered) => volumeOverlay.isButtonHovered = hovered,
         onPressed: () {

@@ -42,7 +42,7 @@ class _TrackListState extends State<TrackList> {
   late final TrackSelectionController? selectionController =
       widget.selectionEnabled ? (widget.selectionController ?? .new()) : null;
   late final StreamSubscription subscription;
-  late List<MapEntry<int, Track>> tracks = getTracks();
+  late List<MapEntry<int, Track>> tracks = _getTracks();
 
   var query = '';
   Set<int> selectedTracks = {};
@@ -50,7 +50,7 @@ class _TrackListState extends State<TrackList> {
 
   bool get isReorderable => widget.onTrackMoved != null && sort == .custom;
 
-  List<MapEntry<int, Track>> getTracks() {
+  List<MapEntry<int, Track>> _getTracks() {
     final filtered = widget.tracks
         .asMap()
         .entries
@@ -96,62 +96,17 @@ class _TrackListState extends State<TrackList> {
   @override
   void didUpdateWidget(covariant TrackList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    tracks = getTracks();
+    tracks = _getTracks();
+    controller.tracks = tracks.map((e) => e.value).toList();
   }
 
   void _onSelectionUpdate() => setState(() {});
 
-  void update() {
-    tracks = getTracks();
+  void _update() {
+    tracks = _getTracks();
     controller.tracks = tracks.map((e) => e.value).toList();
     setState(() {});
   }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    floatingActionButton: FloatingActionsOverlay(
-      listController: controller,
-      tracks: tracks.map((e) => e.value).toList(),
-    ),
-    body: Column(
-      children: [
-        Row(
-          children: [
-            if (selectionController?.selectedTracks.isNotEmpty ?? false)
-              Checkbox(
-                value:
-                    selectionController!.selectedTracks.length == tracks.length,
-                onChanged: (value) => !value!
-                    ? selectionController!.clear()
-                    : selectionController!.addAll(
-                        tracks.map((e) => e.value).toList(),
-                      ),
-              ),
-            Expanded(
-              child: SearchField(
-                onChanged: (value) {
-                  query = value;
-                  update();
-                  controller.animateToCurrentTrack();
-                },
-                hint: 'Поиск треков',
-              ),
-            ),
-            if (widget.sortEnabled)
-              SortMenuButton(
-                value: sort,
-                onSelected: (e) {
-                  sort = e;
-                  update();
-                  controller.animateToCurrentTrack();
-                },
-              ),
-          ],
-        ),
-        Expanded(child: isReorderable ? _buildReorderableList() : _buildList()),
-      ],
-    ),
-  );
 
   ListView _buildList() => ListView.builder(
     itemCount: tracks.length,
@@ -179,6 +134,52 @@ class _TrackListState extends State<TrackList> {
       key: Key(idx.toString()),
       index: idx,
       child: _buildItem(idx),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    floatingActionButton: FloatingActionsOverlay(
+      listController: controller,
+      tracks: tracks.map((e) => e.value).toList(),
+    ),
+    body: Column(
+      children: [
+        Row(
+          children: [
+            if (selectionController?.selectedTracks.isNotEmpty ?? false)
+              Checkbox(
+                value:
+                    selectionController!.selectedTracks.length == tracks.length,
+                onChanged: (value) => !value!
+                    ? selectionController!.clear()
+                    : selectionController!.addAll(
+                        tracks.map((e) => e.value).toList(),
+                      ),
+              ),
+            Expanded(
+              child: SearchField(
+                onChanged: (value) {
+                  query = value;
+                  _update();
+                  controller.animateToCurrentTrack();
+                },
+                hint: 'Поиск треков',
+              ),
+            ),
+            if (widget.sortEnabled)
+              SortMenuButton(
+                value: sort,
+                onSelected: (e) {
+                  sort = e;
+                  _update();
+                  controller.animateToCurrentTrack();
+                },
+              ),
+          ],
+        ),
+        Expanded(child: isReorderable ? _buildReorderableList() : _buildList()),
+      ],
     ),
   );
 }

@@ -34,11 +34,17 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
   void initState() {
     super.initState();
 
-    controller.addListener(update);
-    subscription = audioPlayer.stream.currentIndex.listen((_) => update());
+    controller.addListener(_update);
+    subscription = audioPlayer.stream.currentIndex.listen((_) => _update());
   }
 
-  void update() {
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
+
+  void _update() {
     final canShowWatch = canShowWatchTrack();
     final canShowTop = canShowGoTop();
     if (canShowWatch != showWatchTrack ||
@@ -50,12 +56,6 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
         watchCurrentTrack = controller.watchCurrentTrack;
       });
     }
-  }
-
-  @override
-  void dispose() {
-    subscription.cancel();
-    super.dispose();
   }
 
   @override
@@ -96,7 +96,7 @@ class _FloatingActionsOverlayState extends State<FloatingActionsOverlay> {
           onPressed: showWatchTrack
               ? () {
                   controller.watchCurrentTrack = !controller.watchCurrentTrack;
-                  update();
+                  _update();
                 }
               : null,
           iconSize: 22,

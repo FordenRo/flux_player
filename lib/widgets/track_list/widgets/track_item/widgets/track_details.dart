@@ -10,32 +10,6 @@ class TrackDetails extends StatelessWidget {
   const TrackDetails(this.track, {super.key});
   final Track track;
 
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const .all(100),
-      child: Card(
-        child: Padding(
-          padding: const .all(8),
-          child: SingleChildScrollView(
-            padding: const .all(10),
-            child: Column(
-              children: [
-                const Text('Свойства\n'),
-                _buildDetailsText(context),
-                TextButton(
-                  onPressed: () =>
-                      Process.run('explorer', ['/select,', track.path]),
-                  child: const Text('Открыть папку с файлом'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-
   RichText _buildDetailsText(BuildContext context) {
     final keyStyle = TextStyle(
       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -70,4 +44,30 @@ class TrackDetails extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Padding(
+      padding: const .all(100),
+      child: Card(
+        child: Padding(
+          padding: const .all(8),
+          child: SingleChildScrollView(
+            padding: const .all(10),
+            child: Column(
+              children: [
+                const Text('Свойства\n'),
+                _buildDetailsText(context),
+                TextButton(
+                  onPressed: () =>
+                      Process.run('explorer', ['/select,', track.path]),
+                  child: const Text('Открыть папку с файлом'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }

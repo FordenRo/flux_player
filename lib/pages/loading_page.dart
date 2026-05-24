@@ -15,10 +15,10 @@ class _LoadingPageState extends State<LoadingPage>
     duration: const Duration(milliseconds: 500),
     vsync: this,
   );
-  late final fadeAnimation = Tween<double>(
-    begin: 0,
-    end: 1,
-  ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+  late final fadeAnimation = CurvedAnimation(
+    parent: controller,
+    curve: Curves.easeInOut,
+  );
   late final scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
     CurvedAnimation(parent: controller, curve: Curves.fastEaseInToSlowEaseOut),
   );
@@ -26,7 +26,7 @@ class _LoadingPageState extends State<LoadingPage>
   @override
   void initState() {
     super.initState();
-    start();
+    _start();
   }
 
   @override
@@ -35,7 +35,7 @@ class _LoadingPageState extends State<LoadingPage>
     super.dispose();
   }
 
-  Future<void> start() async {
+  Future<void> _start() async {
     await controller.forward();
     await widget.future;
     await controller.animateBack(0);

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../core/audio_player/audio_player.dart';
 import '../core/services/config_service.dart';
-import '../core/utils.dart';
+import '../core/utils/move_element.dart';
+import '../widgets/simple_menu.dart';
 import '../widgets/track_list/track_list.dart';
 import '../widgets/track_list/widgets/track_item/track_selection_controller.dart';
 
@@ -16,30 +17,36 @@ class AllTracksPage extends StatefulWidget {
 class _AllTracksPageState extends State<AllTracksPage> {
   final TrackSelectionController selectionController = .new();
 
+  void _onTrackSelected(int idx) =>
+      audioPlayer.setPlaylist(importedPlaylist, index: idx, play: true);
+
+  void _onTrackMoved(int oldIndex, int newIndex) => setState(() {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    importedPlaylist.tracks.move(oldIndex, newIndex);
+  });
+
+  List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
+    .new(
+      text: selectionController.hasSelection(importedPlaylist.tracks[idx])
+          ? 'Удалить песни'
+          : 'Удалить песню',
+      onTap: () =>
+          selectionController.hasSelection(importedPlaylist.tracks[idx])
+          ? selectionController.selectedTracks.forEach(
+              importedPlaylist.tracks.remove,
+            )
+          : importedPlaylist.tracks.removeAt(idx),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) => TrackList(
     importedPlaylist.tracks,
     selectionController: selectionController,
-    onTrackSelected: (idx) =>
-        audioPlayer.setPlaylist(importedPlaylist, index: idx, play: true),
-    onTrackMoved: (oldIndex, newIndex) => setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
-      importedPlaylist.tracks.move(oldIndex, newIndex);
-    }),
-    trackMenuItemsBuilder: (idx) => [
-      .new(
-        text: selectionController.hasSelection(importedPlaylist.tracks[idx])
-            ? 'Удалить песни'
-            : 'Удалить песню',
-        onTap: () =>
-            selectionController.hasSelection(importedPlaylist.tracks[idx])
-            ? selectionController.selectedTracks.forEach(
-                importedPlaylist.tracks.remove,
-              )
-            : importedPlaylist.tracks.removeAt(idx),
-      ),
-    ],
+    onTrackSelected: _onTrackSelected,
+    onTrackMoved: _onTrackMoved,
+    trackMenuItemsBuilder: _menuItemsBuilder,
   );
 }

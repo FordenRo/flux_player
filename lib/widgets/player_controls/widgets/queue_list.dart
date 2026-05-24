@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/audio_player/audio_player.dart';
 import '../../../core/models/track.dart';
-import '../../../core/utils.dart';
+import '../../../core/utils/move_element.dart';
 import '../../simple_menu.dart';
 import '../../track_list/track_list_controller.dart';
 import '../../track_list/widgets/floating_actions_overlay.dart';
@@ -26,22 +26,22 @@ class _QueueListState extends State<QueueList> {
     super.dispose();
   }
 
-  Future<void> updatePlaybackIndex(int index) =>
+  Future<void> _updatePlaybackIndex(int index) =>
       audioPlayer.setIndex(index, play: audioPlayer.isPlaying, load: false);
 
-  void onMove(int oldIndex, int newIndex) => setState(() {
+  void _onMove(int oldIndex, int newIndex) => setState(() {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
     queue.move(oldIndex, newIndex);
     if (oldIndex == audioPlayer.currentIndex) {
-      updatePlaybackIndex(newIndex);
+      _updatePlaybackIndex(newIndex);
     } else if (oldIndex < audioPlayer.currentIndex! &&
         newIndex >= audioPlayer.currentIndex!) {
-      updatePlaybackIndex(audioPlayer.currentIndex! - 1);
+      _updatePlaybackIndex(audioPlayer.currentIndex! - 1);
     } else if (oldIndex > audioPlayer.currentIndex! &&
         newIndex <= audioPlayer.currentIndex!) {
-      updatePlaybackIndex(audioPlayer.currentIndex! + 1);
+      _updatePlaybackIndex(audioPlayer.currentIndex! + 1);
     }
   });
 
@@ -67,7 +67,7 @@ class _QueueListState extends State<QueueList> {
                 itemExtent: 50,
                 buildDefaultDragHandles: false,
                 scrollController: controller,
-                onReorder: onMove,
+                onReorder: _onMove,
                 itemBuilder: (context, idx) => ReorderableDragStartListener(
                   key: Key(idx.toString()),
                   index: idx,

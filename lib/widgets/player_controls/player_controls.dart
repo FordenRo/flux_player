@@ -49,54 +49,7 @@ class _PlayerControlsState extends State<PlayerControls>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) => audioPlayer.currentIndex != null
-      ? Card(
-          clipBehavior: .hardEdge,
-          shape: RoundedRectangleBorder(
-            borderRadius: Radiuses.r12,
-            side: BorderSide(
-              color: audioPlayer.isPlaying
-                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
-                  : Theme.of(context).colorScheme.secondary.withAlpha(100),
-            ),
-          ),
-          elevation: 2,
-          child: Column(
-            children: [
-              Padding(
-                padding: const .only(top: 8, right: 8, left: 8, bottom: 4),
-                child: Row(
-                  mainAxisAlignment: .center,
-                  children: [
-                    Expanded(child: trackInfo(context)),
-                    controlButtons(),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: .end,
-                        children: [
-                          IconButton(
-                            onPressed: () => showDialog(
-                              context: context,
-                              builder: (context) => const QueueList(),
-                            ),
-                            icon: const Icon(Icons.queue_music_rounded),
-                          ),
-                          inputDeviceButton(),
-                          const VolumeButton(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PositionSlider(),
-            ],
-          ),
-        )
-      : const SizedBox();
-
-  Widget trackInfo(BuildContext context) => StreamBuilder(
+  Widget _trackInfo(BuildContext context) => StreamBuilder(
     stream: audioPlayer.stream.currentTrack,
     builder: (context, asyncSnapshot) => Row(
       mainAxisSize: .min,
@@ -150,7 +103,7 @@ class _PlayerControlsState extends State<PlayerControls>
     ),
   );
 
-  Widget controlButtons() => Row(
+  Widget _controlButtons() => Row(
     mainAxisAlignment: .center,
     children: [
       /// Shuffle
@@ -242,7 +195,7 @@ class _PlayerControlsState extends State<PlayerControls>
     ],
   );
 
-  Widget inputDeviceButton() => Builder(
+  Widget _inputDeviceButton() => Builder(
     builder: (context) => IconButton(
       onPressed: () async {
         final device = await showOverlayMenu(
@@ -269,4 +222,51 @@ class _PlayerControlsState extends State<PlayerControls>
       icon: const Icon(Icons.input_rounded),
     ),
   );
+
+  @override
+  Widget build(BuildContext context) => audioPlayer.currentIndex != null
+      ? Card(
+          clipBehavior: .hardEdge,
+          shape: RoundedRectangleBorder(
+            borderRadius: Radiuses.r12,
+            side: BorderSide(
+              color: audioPlayer.isPlaying
+                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                  : Theme.of(context).colorScheme.secondary.withAlpha(100),
+            ),
+          ),
+          elevation: 2,
+          child: Column(
+            children: [
+              Padding(
+                padding: const .only(top: 8, right: 8, left: 8, bottom: 4),
+                child: Row(
+                  mainAxisAlignment: .center,
+                  children: [
+                    Expanded(child: _trackInfo(context)),
+                    _controlButtons(),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: .end,
+                        children: [
+                          IconButton(
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => const QueueList(),
+                            ),
+                            icon: const Icon(Icons.queue_music_rounded),
+                          ),
+                          _inputDeviceButton(),
+                          const VolumeButton(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PositionSlider(),
+            ],
+          ),
+        )
+      : const SizedBox();
 }
