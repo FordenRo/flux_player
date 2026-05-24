@@ -93,10 +93,7 @@ Future<void> loadConfiguration() async {
   if (hasMainPlaylist) {
     mainPlaylist = playlists.elementAtOrNull(mainPlaylistIdx!);
   }
-  appTheme.themeData = getThemeData(
-    color: themeColors[themeColorIdx],
-    brightness: .dark,
-  );
+  appTheme.seedColor = seedColors[themeColorIdx % 5];
 
   await Future.microtask(() async {
     await audioPlayer.setAudioDevice(
@@ -172,7 +169,7 @@ Future<void> saveConfiguration() async {
   if (hasMainPlaylist) {
     stream.write(playlists.indexOf(mainPlaylist!), 8);
   }
-  stream.write(themeColors.indexOf(appTheme.themeData.colorScheme.primary), 5);
+  stream.write(seedColors.indexOf(appTheme.seedColor), 5);
   await file.writeAsBytes(stream.toBytes());
 
   final tracksFile = File('${dir.path}/Flux Player/tracks');

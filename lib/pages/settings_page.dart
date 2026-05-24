@@ -14,20 +14,16 @@ class SettingsPage extends StatelessWidget {
         trailing: Row(
           spacing: 8,
           mainAxisSize: .min,
-          children: themeColors.map(_ColorButton.new).toList(),
+          children: seedColors.map(_ColorButton.new).toList(),
         ),
       ),
       ListTile(
         title: const Text('Dark theme'),
         trailing: StatefulBuilder(
           builder: (context, setState) => Checkbox(
-            value: appTheme.themeData.brightness == .dark,
-            onChanged: (value) => setState(
-              () => appTheme.themeData = getThemeData(
-                color: appTheme.themeData.colorScheme.primary,
-                brightness: value! ? .dark : .light,
-              ),
-            ),
+            value: appTheme.brightness == .dark,
+            onChanged: (value) =>
+                setState(() => appTheme.brightness = value! ? .dark : .light),
           ),
         ),
       ),
@@ -56,10 +52,7 @@ class _ColorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: () => appTheme.themeData = getThemeData(
-      color: color,
-      brightness: appTheme.themeData.brightness,
-    ),
+    onTap: () => appTheme.seedColor = color,
     child: Container(
       width: 24,
       height: 24,

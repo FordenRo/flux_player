@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'src/values.dart';
+
 export 'src/styles.dart';
 export 'src/values.dart';
 
@@ -8,18 +10,36 @@ final appTheme = AppTheme._();
 class AppTheme with ChangeNotifier {
   AppTheme._();
 
-  ThemeData _themeData = getThemeData(color: Colors.red, brightness: .dark);
+  late ThemeData _themeData = _getThemeData(
+    seedColor: seedColor,
+    brightness: .dark,
+  );
+  Color _seedColor = seedColors.first;
+  Brightness _brightness = .dark;
 
   ThemeData get themeData => _themeData;
-  set themeData(ThemeData value) {
-    _themeData = value;
+  Color get seedColor => _seedColor;
+  Brightness get brightness => _brightness;
+
+  set seedColor(Color value) {
+    _seedColor = value;
+    _themeData = _getThemeData(seedColor: seedColor, brightness: brightness);
+    notifyListeners();
+  }
+
+  set brightness(Brightness value) {
+    _brightness = value;
+    _themeData = _getThemeData(seedColor: seedColor, brightness: brightness);
     notifyListeners();
   }
 }
 
-ThemeData getThemeData({required Color color, required Brightness brightness}) {
+ThemeData _getThemeData({
+  required Color seedColor,
+  required Brightness brightness,
+}) {
   final colorScheme = ColorScheme.fromSeed(
-    seedColor: color,
+    seedColor: seedColor,
     brightness: brightness,
   );
   return .new(

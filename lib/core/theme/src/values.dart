@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const List<Color> themeColors = [
+const List<Color> seedColors = [
   Colors.red,
   Colors.green,
   Colors.pink,
