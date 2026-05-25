@@ -20,12 +20,8 @@ class _AllTracksPageState extends State<AllTracksPage> {
   void _onTrackSelected(int idx) =>
       audioPlayer.setPlaylist(importedPlaylist, index: idx, play: true);
 
-  void _onTrackMoved(int oldIndex, int newIndex) => setState(() {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
-    importedPlaylist.tracks.move(oldIndex, newIndex);
-  });
+  void _onTrackMoved(int oldIndex, int newIndex) =>
+      setState(() => importedPlaylist.tracks.move(oldIndex, newIndex));
 
   List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
     .new(

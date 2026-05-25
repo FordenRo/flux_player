@@ -28,12 +28,11 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
     super.dispose();
   }
 
-  void _onTrackMoved(int oldIndex, int newIndex) => setState(() {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
-    openedPlaylist!.tracks.move(oldIndex, newIndex);
-  });
+  void _onTrackSelected(int idx) =>
+      audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true);
+
+  void _onTrackMoved(int oldIndex, int newIndex) =>
+      setState(() => openedPlaylist!.tracks.move(oldIndex, newIndex));
 
   List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
     .new(
@@ -96,8 +95,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
       : TrackList(
           openedPlaylist!.tracks,
           selectionController: selectionController,
-          onTrackSelected: (idx) =>
-              audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true),
+          onTrackSelected: _onTrackSelected,
           onTrackMoved: _onTrackMoved,
           trackMenuItemsBuilder: _menuItemsBuilder,
         );

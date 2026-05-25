@@ -129,7 +129,12 @@ class _TrackListState extends State<TrackList> {
     itemExtent: 50,
     buildDefaultDragHandles: false,
     scrollController: controller,
-    onReorder: widget.onTrackMoved!,
+    onReorder: (oldIndex, newIndex) {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      widget.onTrackMoved!(oldIndex, newIndex);
+    },
     itemBuilder: (context, idx) => ReorderableDragStartListener(
       key: Key(idx.toString()),
       index: idx,
