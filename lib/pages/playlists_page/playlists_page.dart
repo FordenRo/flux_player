@@ -34,6 +34,9 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
   void _onTrackMoved(int oldIndex, int newIndex) =>
       setState(() => openedPlaylist!.tracks.move(oldIndex, newIndex));
 
+  void _onPlaylistMoved(int oldIndex, int newIndex) =>
+      setState(() => playlists.move(oldIndex, newIndex));
+
   List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
     .new(
       text: 'Удалить из плейлиста',
@@ -45,7 +48,24 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
     ),
   ];
 
-  Widget? _playlistBuilder(int idx) => PlaylistTile(
+  ReorderableListView _buildPlaylistList() => ReorderableListView.builder(
+    itemCount: playlists.length,
+    itemExtent: 110,
+    buildDefaultDragHandles: false,
+    onReorder: (oldIndex, newIndex) {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      _onPlaylistMoved(oldIndex, newIndex);
+    },
+    itemBuilder: (context, idx) => ReorderableDragStartListener(
+      key: Key(idx.toString()),
+      index: idx,
+      child: _playlistBuilder(idx),
+    ),
+  );
+
+  Widget _playlistBuilder(int idx) => PlaylistTile(
     playlists[idx],
     onTap: () {
       captionController.addWidget(
@@ -85,11 +105,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
               const Duration(seconds: 1),
               (_) => playlists.length,
             ).distinct(),
-            builder: (context, asyncSnapshot) => ListView.builder(
-              itemCount: playlists.length,
-              itemExtent: 110,
-              itemBuilder: (context, idx) => _playlistBuilder(idx),
-            ),
+            builder: (context, asyncSnapshot) => _buildPlaylistList(),
           ),
         )
       : TrackList(

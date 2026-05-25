@@ -46,6 +46,12 @@ class _PlaylistTileState extends State<PlaylistTile> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant PlaylistTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    controller.text = playlist.title;
+  }
+
   Future<void> _showMenu(BuildContext context, TapDownDetails e) =>
       showSimpleMenu(
         context: context,
