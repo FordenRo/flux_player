@@ -45,6 +45,15 @@ class _QueueListState extends State<QueueList> {
     }
   });
 
+  void _onRemove(int index) => setState(() {
+    queue.removeAt(index);
+    if (index == audioPlayer.currentIndex) {
+      audioPlayer.setIndex(index, play: audioPlayer.isPlaying);
+    } else if (index > audioPlayer.currentIndex!) {
+      _updatePlaybackIndex(audioPlayer.currentIndex! - 1);
+    }
+  });
+
   @override
   Widget build(BuildContext context) => Align(
     alignment: .bottomRight,
@@ -75,11 +84,11 @@ class _QueueListState extends State<QueueList> {
                     queue[idx],
                     onPlay: () => audioPlayer.setIndex(idx),
                     showPlayNext: false,
-                    removeCallback: () => setState(() => queue.removeAt(idx)),
+                    removeCallback: () => _onRemove(idx),
                     menuItems: [
                       SimpleMenuItem(
                         text: 'Убрать',
-                        onTap: () => setState(() => queue.removeAt(idx)),
+                        onTap: () => _onRemove(idx),
                       ),
                     ],
                     isSelectedCallback: () => audioPlayer.currentIndex! == idx,
