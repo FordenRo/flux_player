@@ -33,11 +33,18 @@ abstract interface class AudioPlayer {
 
   Future<void> setVolume(double volume);
 
-  void setShuffled(bool shuffled);
+  void setShuffled(bool shuffled, {bool shuffleQueue = true});
 
   void setLooped(bool looped);
 
   Future<void> setPlaylist(Playlist playlist, {int? index, bool play = false});
+
+  Future<void> setQueue(
+    List<Track> queue, {
+    int? index,
+    bool play = false,
+    bool load = true,
+  });
 
   void addToQueue(Track track);
 

@@ -154,15 +154,15 @@ class AudioPlayerImpl implements AudioPlayer {
       _player.setVolume(max(min(volume, 1), 0) * 100);
 
   @override
-  void setShuffled(bool shuffled) {
-    if (shuffled) {
+  void setShuffled(bool shuffled, {bool shuffleQueue = true}) {
+    if (shuffled && shuffleQueue) {
       final track = currentTrack;
       _queue.shuffle();
       if (track != null) {
         _currentIndex = _queue.indexOf(track);
         _currentIndexController.add(_currentIndex);
       }
-    } else {
+    } else if (!shuffled) {
       final track = currentTrack;
       _queue = List.of(currentPlaylist?.tracks ?? []);
       if (track != null) {
@@ -198,6 +198,18 @@ class AudioPlayerImpl implements AudioPlayer {
       _currentIndexController.add(null);
     }
     setShuffled(shuffled);
+  }
+
+  @override
+  Future<void> setQueue(
+    List<Track> queue, {
+    int? index,
+    bool play = false,
+    bool load = true,
+  }) async {
+    _queue = queue;
+    _queueController.add(_queue);
+    if (index != null) await setIndex(index, play: play, load: load);
   }
 
   @override
