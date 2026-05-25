@@ -87,7 +87,7 @@ class _PlayerControlsState extends State<PlayerControls>
         if (playlists.isNotEmpty)
           AddToPlaylistButton(
             track: track,
-            builder: (context) => Icon(
+            iconBuilder: (context) => Icon(
               mainPlaylist?.tracks.contains(track) ??
                       playlists
                           .where((e) => e.tracks.contains(track))

@@ -74,6 +74,8 @@ class _QueueListState extends State<QueueList> {
                   child: TrackItem(
                     queue[idx],
                     onPlay: () => audioPlayer.setIndex(idx),
+                    showPlayNext: false,
+                    removeCallback: () => setState(() => queue.removeAt(idx)),
                     menuItems: [
                       SimpleMenuItem(
                         text: 'Убрать',

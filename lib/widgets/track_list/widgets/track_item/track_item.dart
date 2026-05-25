@@ -20,11 +20,17 @@ class TrackItem extends StatefulWidget {
     required this.onPlay,
     super.key,
     this.menuItems,
+    this.showPlayNext = true,
+    this.showAddToPlaylist = true,
+    this.removeCallback,
     this.selectionController,
     this.isSelectedCallback,
   });
 
   final Track track;
+  final bool showPlayNext;
+  final bool showAddToPlaylist;
+  final void Function()? removeCallback;
   final bool Function()? isSelectedCallback;
   final List<SimpleMenuItem>? menuItems;
   final void Function() onPlay;
@@ -130,11 +136,11 @@ class _TrackItemState extends State<TrackItem>
 
   Row _buildButtons() => Row(
     children: [
-      if (playlists.isNotEmpty)
+      if (widget.showAddToPlaylist && playlists.isNotEmpty)
         AddToPlaylistButton(
           track: track,
           padding: const .all(6),
-          builder: (context) => Icon(
+          iconBuilder: (context) => Icon(
             mainPlaylist?.tracks.contains(track) ??
                     playlists.where((e) => e.tracks.contains(track)).isNotEmpty
                 ? Icons.playlist_add_check_rounded
@@ -145,16 +151,28 @@ class _TrackItemState extends State<TrackItem>
           countBuilder: (context, child) =>
               Transform.translate(offset: const .new(-12, 8), child: child),
         ),
-      IconButton(
-        onPressed: () => audioPlayer.addNext(track),
-        icon: const Icon(Icons.navigate_next_rounded),
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        style: ButtonStyle(
-          minimumSize: .all(Size.zero),
-          iconSize: .all(24),
-          padding: .all(const .all(4)),
+      if (widget.showPlayNext)
+        IconButton(
+          onPressed: () => audioPlayer.addNext(track),
+          icon: const Icon(Icons.navigate_next_rounded),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          style: .new(
+            minimumSize: .all(.zero),
+            iconSize: .all(24),
+            padding: .all(const .all(4)),
+          ),
         ),
-      ),
+      if (widget.removeCallback != null)
+        IconButton(
+          onPressed: widget.removeCallback,
+          icon: const Icon(Icons.close_rounded),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          style: .new(
+            minimumSize: .all(.zero),
+            iconSize: .all(20),
+            padding: .all(const .all(6)),
+          ),
+        ),
     ],
   );
 

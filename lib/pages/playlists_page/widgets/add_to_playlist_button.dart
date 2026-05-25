@@ -10,7 +10,7 @@ import '../../../widgets/simple_menu.dart';
 class AddToPlaylistButton extends StatefulWidget {
   const AddToPlaylistButton({
     required this.track,
-    required this.builder,
+    required this.iconBuilder,
     required this.countBuilder,
     this.padding = const .all(8),
     super.key,
@@ -18,7 +18,7 @@ class AddToPlaylistButton extends StatefulWidget {
 
   final Track track;
   final EdgeInsets padding;
-  final Widget Function(BuildContext context) builder;
+  final Widget Function(BuildContext context) iconBuilder;
   final Widget Function(BuildContext context, Widget child) countBuilder;
 
   @override
@@ -116,7 +116,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
         child: Stack(
           alignment: .center,
           children: [
-            Builder(builder: widget.builder),
+            Builder(builder: widget.iconBuilder),
             if (playlistCount > 0) _buildCount(playlistCount),
           ],
         ),
