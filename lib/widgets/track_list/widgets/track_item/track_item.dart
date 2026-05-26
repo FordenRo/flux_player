@@ -84,11 +84,7 @@ class _TrackItemState extends State<TrackItem>
 
   Future<void> _playPressed() async {
     if (isSelected) {
-      if (isPlaying) {
-        await audioPlayer.pause();
-      } else {
-        await audioPlayer.play();
-      }
+      isPlaying ? await audioPlayer.pause() : await audioPlayer.play();
     } else {
       widget.onPlay();
     }

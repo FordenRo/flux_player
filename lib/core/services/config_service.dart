@@ -220,9 +220,7 @@ Future<void> saveConfiguration() async {
     ..writeString(deviceName, 6)
     ..write((position * 255).toInt(), 10)
     ..writeBool(hasMainPlaylist);
-  if (hasMainPlaylist) {
-    stream.write(playlists.indexOf(mainPlaylist!), 8);
-  }
+  if (hasMainPlaylist) stream.write(playlists.indexOf(mainPlaylist!), 8);
   stream.write(seedColors.indexOf(appTheme.seedColor), 5);
   await file.writeAsBytes(stream.toBytes());
 

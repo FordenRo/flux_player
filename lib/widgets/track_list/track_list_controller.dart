@@ -11,9 +11,7 @@ class TrackListController extends ScrollController {
       }
     });
     _subscription = audioPlayer.stream.currentIndex.listen((_) {
-      if (watchCurrentTrack) {
-        animateToCurrentTrack();
-      }
+      if (watchCurrentTrack) animateToCurrentTrack();
     });
   }
 
@@ -26,9 +24,7 @@ class TrackListController extends ScrollController {
   set watchCurrentTrack(bool value) {
     if (value != _watchCurrentTrack) {
       _watchCurrentTrack = value;
-      if (value) {
-        animateToCurrentTrack();
-      }
+      if (value) animateToCurrentTrack();
     }
   }
 
@@ -49,20 +45,21 @@ class TrackListController extends ScrollController {
     super.dispose();
   }
 
-  Future<void> animateToCurrentTrack() async => audioPlayer.currentTrack != null
-      ? (useIndex
-            ? await animateToIndex(audioPlayer.currentIndex!)
-            : await animateToTrack(audioPlayer.currentTrack!))
-      : null;
+  Future<void> animateToCurrentTrack() async {
+    if (audioPlayer.currentTrack == null) return;
+
+    useIndex
+        ? await animateToIndex(audioPlayer.currentIndex!)
+        : await animateToTrack(audioPlayer.currentTrack!);
+  }
 
   Future<void> animateToTrack(Track track) =>
       animateToIndex(tracks.indexOf(track));
 
   Future<void> animateToIndex(int index) {
     final delta = _offsetOf(index) - offset;
-    if (delta.abs() > 500) {
-      jumpTo(_offsetOf(index) - 500 * delta.sign);
-    }
+    if (delta.abs() > 500) jumpTo(_offsetOf(index) - 500 * delta.sign);
+
     return animateTo(
       _offsetOf(index),
       duration: Durations.long2,
@@ -78,9 +75,8 @@ class TrackListController extends ScrollController {
 
   Future<void> animateToTop() {
     watchCurrentTrack = false;
-    if (offset > 1000) {
-      jumpTo(1000);
-    }
+    if (offset > 1000) jumpTo(1000);
+
     return animateTo(0, duration: Durations.long2, curve: Curves.easeOutQuart);
   }
 }

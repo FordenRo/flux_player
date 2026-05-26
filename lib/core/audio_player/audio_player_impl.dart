@@ -85,9 +85,7 @@ extension MediaItemAdapter on Track {
 class AudioPlayerImpl implements AudioPlayer {
   AudioPlayerImpl._() {
     _player.stream.completed.listen((completed) {
-      if (completed) {
-        _onEnd();
-      }
+      if (completed) _onEnd();
     });
   }
   final _player = media_kit.Player();
@@ -268,9 +266,8 @@ class AudioPlayerImpl implements AudioPlayer {
 
   @override
   Future<void> setIndex(int index, {bool play = true, bool load = true}) async {
-    if (index < 0 || index >= queue.length) {
-      index = index % queue.length;
-    }
+    if (index < 0 || index >= queue.length) index = index % queue.length;
+
     _currentIndex = index;
     _currentIndexController.add(index);
     if (load) {

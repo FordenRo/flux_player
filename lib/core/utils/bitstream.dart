@@ -30,9 +30,8 @@ class BitStream {
     var thisBit = _bitLength % 8;
     while (len > 0) {
       final thisLen = min(len, 8 - thisBit);
-      if (thisByte + 1 > _stream.length) {
-        _stream.add(0);
-      }
+      if (thisByte + 1 > _stream.length) _stream.add(0);
+
       final shiftAmt = 8 - (thisBit + len);
       _stream[thisByte] =
           _stream[thisByte] |
@@ -145,9 +144,8 @@ class BitStream {
     final totBytes = len ~/ 8;
     final remBits = len % 8;
     final op = <int>[];
-    if (remBits > 0) {
-      op.add(read(remBits));
-    }
+    if (remBits > 0) op.add(read(remBits));
+
     for (var i = 0; i < totBytes; i++) {
       op.add(read(8));
     }

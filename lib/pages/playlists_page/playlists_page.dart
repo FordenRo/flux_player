@@ -53,9 +53,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
     itemExtent: 110,
     buildDefaultDragHandles: false,
     onReorder: (oldIndex, newIndex) {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
+      if (newIndex > oldIndex) newIndex -= 1;
       _onPlaylistMoved(oldIndex, newIndex);
     },
     itemBuilder: (context, idx) => ReorderableDragStartListener(

@@ -124,9 +124,7 @@ class _PlayerControlsState extends State<PlayerControls>
           offset: Offset(-prevBtnOffset / 10, 0),
           duration: Durations.short2,
           onEnd: () {
-            if (prevBtnOffset != 0) {
-              setState(() => prevBtnOffset = 0);
-            }
+            if (prevBtnOffset != 0) setState(() => prevBtnOffset = 0);
           },
           child: IconButton(
             color: prevBtnOffset != 0
@@ -160,9 +158,7 @@ class _PlayerControlsState extends State<PlayerControls>
           offset: Offset(nextBtnOffset / 10, 0),
           duration: Durations.short2,
           onEnd: () {
-            if (nextBtnOffset != 0) {
-              setState(() => nextBtnOffset = 0);
-            }
+            if (nextBtnOffset != 0) setState(() => nextBtnOffset = 0);
           },
           child: IconButton(
             color: nextBtnOffset != 0
@@ -215,9 +211,7 @@ class _PlayerControlsState extends State<PlayerControls>
               )
               .toList(),
         );
-        if (device != null) {
-          await audioPlayer.setAudioDevice(device);
-        }
+        if (device != null) await audioPlayer.setAudioDevice(device);
       },
       icon: const Icon(Icons.input_rounded),
     ),

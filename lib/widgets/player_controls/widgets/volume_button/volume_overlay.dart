@@ -52,21 +52,15 @@ class VolumeOverlayEntry {
   bool get isButtonHovered => _controller.isButtonHovered;
   set isButtonHovered(bool hovered) {
     _controller.isButtonHovered = hovered;
-    if (hovered) {
-      show();
-    }
+    if (hovered) show();
   }
 
   void show() {
-    if (!entry.mounted) {
-      Overlay.of(context).insert(entry);
-    }
+    if (!entry.mounted) Overlay.of(context).insert(entry);
   }
 
   void remove() {
-    if (entry.mounted) {
-      entry.remove();
-    }
+    if (entry.mounted) entry.remove();
   }
 
   void dispose() {
@@ -121,18 +115,16 @@ class _VolumeOverlayState extends State<VolumeOverlay>
   }
 
   Future<void> _hide() async {
-    if (sliding || hovered || isButtonHovered) {
-      return;
-    }
+    if (sliding || hovered || isButtonHovered) return;
+
     await fadeAnimation
         .animateTo(0, curve: Curves.easeInOut)
         .then((_) => widget.onHide());
   }
 
   void _hideDelayed() {
-    if (sliding || hovered || isButtonHovered) {
-      return;
-    }
+    if (sliding || hovered || isButtonHovered) return;
+
     timer?.cancel();
     timer = Timer(const Duration(milliseconds: 400), _hide);
   }

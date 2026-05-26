@@ -33,9 +33,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
   void initState() {
     super.initState();
     subscription = trackPlaylistChanged.stream.listen((e) {
-      if (track == e) {
-        setState(() {});
-      }
+      if (track == e) setState(() {});
     });
   }
 
@@ -77,9 +75,8 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
   }
 
   void _onSecondaryTap() {
-    if (mainPlaylist == null) {
-      return;
-    }
+    if (mainPlaylist == null) return;
+
     if (mainPlaylist!.tracks.contains(track)) {
       setState(() => mainPlaylist!.tracks.remove(track));
     } else {

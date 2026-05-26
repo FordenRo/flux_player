@@ -17,9 +17,8 @@ Future<void> _onFilesSelected(List<String> paths) async {
 
 Future<void> _onFolderSelected(String path) async {
   final folder = Directory(path);
-  if (!folder.existsSync()) {
-    return;
-  }
+  if (!folder.existsSync()) return;
+
   importedPlaylist.tracks.addAll(
     await Isolate.run(
       () => folder
@@ -90,9 +89,7 @@ class _ImportMenuState extends State<ImportMenu> {
             await _onFilesSelected(
               result.files.map((e) => e.path).nonNulls.toList(),
             );
-            if (context.mounted) {
-              Navigator.pop(context);
-            }
+            if (context.mounted) Navigator.pop(context);
           }
         },
       ),
@@ -104,13 +101,11 @@ class _ImportMenuState extends State<ImportMenu> {
           final result = await FilePicker.getDirectoryPath(
             dialogTitle: 'Flux Import Folder',
           );
-          if (result != null) {
-            setState(() => selected = true);
-            await _onFolderSelected(result);
-            if (context.mounted) {
-              Navigator.pop(context);
-            }
-          }
+          if (result == null) return;
+
+          setState(() => selected = true);
+          await _onFolderSelected(result);
+          if (context.mounted) Navigator.pop(context);
         },
       ),
     ],
