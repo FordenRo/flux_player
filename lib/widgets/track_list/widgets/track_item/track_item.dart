@@ -137,8 +137,8 @@ class _TrackItemState extends State<TrackItem>
           track: track,
           padding: const .all(6),
           iconBuilder: (context) => Icon(
-            mainPlaylist?.tracks.contains(track) ??
-                    playlists.where((e) => e.tracks.contains(track)).isNotEmpty
+            mainPlaylist?.contains(track) ??
+                    playlists.where((e) => e.contains(track)).isNotEmpty
                 ? Icons.playlist_add_check_rounded
                 : Icons.playlist_add_rounded,
             size: 20,
@@ -203,9 +203,7 @@ class _TrackItemState extends State<TrackItem>
                           (e) => SimpleMenuItem(
                             text: e.title,
                             onTap: () {
-                              e.tracks.addAll(
-                                selectionController!.selectedTracks,
-                              );
+                              e.addAll(selectionController!.selectedTracks);
                               selectionController!.selectedTracks.forEach(
                                 trackPlaylistChanged.add,
                               );
@@ -215,12 +213,12 @@ class _TrackItemState extends State<TrackItem>
                         )
                         .toList()
                   : playlists
-                        .where((e) => !e.tracks.contains(track))
+                        .where((e) => !e.contains(track))
                         .map(
                           (e) => SimpleMenuItem(
                             text: e.title,
                             onTap: () {
-                              e.tracks.add(track);
+                              e.add(track);
                               trackPlaylistChanged.add(track);
                               controller.close();
                             },
@@ -228,12 +226,12 @@ class _TrackItemState extends State<TrackItem>
                         )
                         .followedBy(
                           playlists
-                              .where((e) => e.tracks.contains(track))
+                              .where((e) => e.contains(track))
                               .map(
                                 (e) => SimpleMenuItem(
                                   text: '-${e.title}',
                                   onTap: () {
-                                    e.tracks.remove(track);
+                                    e.remove(track);
                                     trackPlaylistChanged.add(track);
                                     controller.close();
                                   },

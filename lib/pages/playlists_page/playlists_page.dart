@@ -32,7 +32,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
       audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true);
 
   void _onTrackMoved(int oldIndex, int newIndex) =>
-      setState(() => openedPlaylist!.tracks.move(oldIndex, newIndex));
+      setState(() => openedPlaylist!.move(oldIndex, newIndex));
 
   void _onPlaylistMoved(int oldIndex, int newIndex) =>
       setState(() => playlists.move(oldIndex, newIndex));
@@ -40,11 +40,9 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
   List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
     .new(
       text: 'Удалить из плейлиста',
-      onTap: () => selectionController.hasSelection(openedPlaylist!.tracks[idx])
-          ? selectionController.selectedTracks.forEach(
-              openedPlaylist!.tracks.remove,
-            )
-          : openedPlaylist!.tracks.removeAt(idx),
+      onTap: () => selectionController.hasSelection(openedPlaylist![idx])
+          ? selectionController.selectedTracks.forEach(openedPlaylist!.remove)
+          : openedPlaylist!.removeAt(idx),
     ),
   ];
 
@@ -107,7 +105,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
           ),
         )
       : TrackList(
-          openedPlaylist!.tracks,
+          openedPlaylist!.toList(),
           selectionController: selectionController,
           onTrackSelected: _onTrackSelected,
           onTrackMoved: _onTrackMoved,

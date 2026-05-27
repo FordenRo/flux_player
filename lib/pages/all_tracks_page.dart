@@ -21,25 +21,22 @@ class _AllTracksPageState extends State<AllTracksPage> {
       audioPlayer.setPlaylist(importedPlaylist, index: idx, play: true);
 
   void _onTrackMoved(int oldIndex, int newIndex) =>
-      setState(() => importedPlaylist.tracks.move(oldIndex, newIndex));
+      setState(() => importedPlaylist.move(oldIndex, newIndex));
 
   List<SimpleMenuItem<dynamic>> _menuItemsBuilder(int idx) => [
     .new(
-      text: selectionController.hasSelection(importedPlaylist.tracks[idx])
+      text: selectionController.hasSelection(importedPlaylist[idx])
           ? 'Удалить песни'
           : 'Удалить песню',
-      onTap: () =>
-          selectionController.hasSelection(importedPlaylist.tracks[idx])
-          ? selectionController.selectedTracks.forEach(
-              importedPlaylist.tracks.remove,
-            )
-          : importedPlaylist.tracks.removeAt(idx),
+      onTap: () => selectionController.hasSelection(importedPlaylist[idx])
+          ? selectionController.selectedTracks.forEach(importedPlaylist.remove)
+          : importedPlaylist.removeAt(idx),
     ),
   ];
 
   @override
   Widget build(BuildContext context) => TrackList(
-    importedPlaylist.tracks,
+    importedPlaylist.toList(),
     customSortEnabled: false,
     selectionController: selectionController,
     onTrackSelected: _onTrackSelected,

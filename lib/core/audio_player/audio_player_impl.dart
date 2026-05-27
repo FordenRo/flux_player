@@ -162,7 +162,7 @@ class AudioPlayerImpl implements AudioPlayer {
       }
     } else if (!shuffled) {
       final track = currentTrack;
-      _queue = List.of(currentPlaylist?.tracks ?? []);
+      _queue = List.of(currentPlaylist ?? []);
       if (track != null) {
         _currentIndex = _queue.indexOf(track);
         _currentIndexController.add(_currentIndex);
@@ -187,7 +187,7 @@ class AudioPlayerImpl implements AudioPlayer {
   }) async {
     _currentPlaylist = playlist;
     _currentPlaylistController.add(_currentPlaylist);
-    _queue = List.of(playlist.tracks);
+    _queue = List.of(playlist);
     _queueController.add(_queue);
     if (index != null) {
       await jump(index, play: play);
@@ -264,7 +264,7 @@ class AudioPlayerImpl implements AudioPlayer {
 
   @override
   Future<void> jump(int index, {bool play = true}) => setIndex(
-    shuffled ? queue.indexOf(currentPlaylist!.tracks[index]) : index,
+    shuffled ? queue.indexOf(currentPlaylist![index]) : index,
     play: play,
   );
 

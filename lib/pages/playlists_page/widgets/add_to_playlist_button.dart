@@ -47,22 +47,22 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
     final isSelected = await showSimpleMenu(
       context: context,
       items: playlists
-          .where((e) => !e.tracks.contains(track))
+          .where((e) => !e.contains(track))
           .map(
             (e) => SimpleMenuItem(
               text: e.title,
               value: true,
-              onTap: () => e.tracks.add(track),
+              onTap: () => e.add(track),
             ),
           )
           .followedBy(
             playlists
-                .where((e) => e.tracks.contains(track))
+                .where((e) => e.contains(track))
                 .map(
                   (e) => SimpleMenuItem(
                     text: '-${e.title}',
                     value: true,
-                    onTap: () => e.tracks.remove(track),
+                    onTap: () => e.remove(track),
                   ),
                 ),
           )
@@ -77,10 +77,10 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
   void _onSecondaryTap() {
     if (mainPlaylist == null) return;
 
-    if (mainPlaylist!.tracks.contains(track)) {
-      setState(() => mainPlaylist!.tracks.remove(track));
+    if (mainPlaylist!.contains(track)) {
+      setState(() => mainPlaylist!.remove(track));
     } else {
-      setState(() => mainPlaylist!.tracks.add(track));
+      setState(() => mainPlaylist!.add(track));
     }
     trackPlaylistChanged.add(track);
   }
@@ -100,9 +100,7 @@ class _AddToPlaylistButtonState extends State<AddToPlaylistButton> {
 
   @override
   Widget build(BuildContext context) {
-    final playlistCount = playlists
-        .where((e) => e.tracks.contains(track))
-        .length;
+    final playlistCount = playlists.where((e) => e.contains(track)).length;
 
     return InkWell(
       customBorder: const CircleBorder(),

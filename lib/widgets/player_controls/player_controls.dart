@@ -86,10 +86,8 @@ class _PlayerControlsState extends State<PlayerControls>
           AddToPlaylistButton(
             track: track,
             iconBuilder: (context) => Icon(
-              mainPlaylist?.tracks.contains(track) ??
-                      playlists
-                          .where((e) => e.tracks.contains(track))
-                          .isNotEmpty
+              mainPlaylist?.contains(track) ??
+                      playlists.where((e) => e.contains(track)).isNotEmpty
                   ? Icons.playlist_add_check_rounded
                   : Icons.playlist_add_rounded,
               color: Theme.of(context).colorScheme.onSurfaceVariant,

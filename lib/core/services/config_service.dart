@@ -32,14 +32,12 @@ class ConfigService {
 
   Future<void> removeFile(String path) async {
     _addedFiles.remove(path);
-    importedPlaylist.tracks.removeWhere((e) => e.path == path);
+    importedPlaylist.removeWhere((e) => e.path == path);
   }
 
   Future<void> removeFolder(String path) async {
     _addedFolders.remove(path);
-    importedPlaylist.tracks.removeWhere(
-      (e) => File(e.path).parent.path == path,
-    );
+    importedPlaylist.removeWhere((e) => File(e.path).parent.path == path);
   }
 
   Future<void> addFile(String path) async {
@@ -52,7 +50,7 @@ class ConfigService {
     if (_isAlreadyImported(track)) return;
 
     _addedFiles.add(path);
-    importedPlaylist.tracks.add(track);
+    importedPlaylist.add(track);
   }
 
   Future<void> addFolder(String path) async {
@@ -69,7 +67,7 @@ class ConfigService {
       final track = Track.fromFile(file);
       if (_isAlreadyImported(track)) continue;
 
-      importedPlaylist.tracks.add(track);
+      importedPlaylist.add(track);
     }
     _addedFolders.add(path);
     _watchingFolders.add(dir.watch().listen(_onFolderEvent));
@@ -81,16 +79,16 @@ class ConfigService {
         final track = Track.fromFile(File(path));
         if (_isAlreadyImported(track)) return;
 
-        importedPlaylist.tracks.add(track);
+        importedPlaylist.add(track);
       case FileSystemDeleteEvent(path: final path):
-        importedPlaylist.tracks.removeWhere((e) => e.path == path);
+        importedPlaylist.removeWhere((e) => e.path == path);
       default:
         return;
     }
   }
 
   bool _isAlreadyImported(Track track) =>
-      importedPlaylist.tracks.where((e) => e.id == track.id).isNotEmpty;
+      importedPlaylist.where((e) => e.id == track.id).isNotEmpty;
 
   Future<void> loadConfiguration() async {
     final path =
@@ -169,7 +167,7 @@ class ConfigService {
 
     playlists = await (await dir.list().map((file) {
       if (file is! File) return null;
-      return _loadPlaylist(file, importedTracks: importedPlaylist.tracks);
+      return _loadPlaylist(file, importedTracks: importedPlaylist.toList());
     }).toList()).nonNulls.wait;
 
     if (playingPlaylistIdx != null) {
@@ -204,9 +202,7 @@ class ConfigService {
     await audioPlayer.setQueue(
       (await file.readAsLines())
           .map(
-            (e) => importedPlaylist.tracks
-                .where((track) => track.id == e)
-                .firstOrNull,
+            (e) => importedPlaylist.where((track) => track.id == e).firstOrNull,
           )
           .nonNulls
           .toList(),
@@ -303,7 +299,7 @@ class ConfigService {
   Future<void> _savePlaylist(String path, Playlist playlist) async {
     final file = File('$path/${playlist.title}.txt');
     await file.create(recursive: true);
-    await file.writeAsString(playlist.tracks.map((e) => e.id).join('\n'));
+    await file.writeAsString(playlist.map((e) => e.id).join('\n'));
   }
 
   Future<void> _saveQueue(String path) async {

@@ -26,7 +26,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
 
   Playlist get playlist => widget.playlist;
   Duration get overallDuration =>
-      playlist.tracks.fold(Duration.zero, (prev, e) => prev + e.duration);
+      playlist.fold(Duration.zero, (prev, e) => prev + e.duration);
 
   var iconHovered = false;
 
@@ -91,7 +91,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
         Align(
           alignment: .bottomLeft,
           child: Text(
-            '${playlist.tracks.length} треков',
+            '${playlist.length} треков',
             style: .new(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
             ),
@@ -136,7 +136,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
           scrollDirection: .horizontal,
           crossAxisCount: 2,
           clipBehavior: .none,
-          children: playlist.tracks
+          children: playlist
               .where((e) => e.picture != null)
               .take(4)
               .map(
