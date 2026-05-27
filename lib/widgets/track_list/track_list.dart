@@ -19,6 +19,7 @@ class TrackList extends StatefulWidget {
     required this.onTrackSelected,
     this.onTrackMoved,
     this.sortEnabled = true,
+    this.customSortEnabled = true,
     this.selectionEnabled = true,
     this.trackMenuItemsBuilder,
     this.selectionController,
@@ -46,7 +47,7 @@ class _TrackListState extends State<TrackList> {
 
   var query = '';
   Set<int> selectedTracks = {};
-  Sorting sort = .custom;
+  late Sorting sort = widget.customSortEnabled ? .custom : .name;
 
   bool get isReorderable => widget.onTrackMoved != null && sort == .custom;
 
@@ -173,6 +174,7 @@ class _TrackListState extends State<TrackList> {
             if (widget.sortEnabled)
               SortMenuButton(
                 value: sort,
+                customSortEnabled: widget.customSortEnabled,
                 onSelected: (e) {
                   sort = e;
                   _update();

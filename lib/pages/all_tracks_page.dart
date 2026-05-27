@@ -40,6 +40,7 @@ class _AllTracksPageState extends State<AllTracksPage> {
   @override
   Widget build(BuildContext context) => TrackList(
     importedPlaylist.tracks,
+    customSortEnabled: false,
     selectionController: selectionController,
     onTrackSelected: _onTrackSelected,
     onTrackMoved: _onTrackMoved,

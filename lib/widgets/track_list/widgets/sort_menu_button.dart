@@ -7,19 +7,24 @@ class SortMenuButton extends StatelessWidget {
   const SortMenuButton({
     required this.onSelected,
     required this.value,
+    this.customSortEnabled = true,
     super.key,
   });
   final void Function(Sorting sort) onSelected;
   final Sorting value;
+  final bool customSortEnabled;
 
   @override
   Widget build(BuildContext context) => OverlayMenuButton(
     alignment: .center,
     style: overlayMenuStyle,
     onSelected: onSelected,
-    items: Sorting.values
-        .map((e) => SimpleMenuItem(text: e.title, value: e).toOverlayItem())
-        .toList(),
+    items:
+        (customSortEnabled
+                ? Sorting.values
+                : Sorting.values.where((e) => e != .custom))
+            .map((e) => SimpleMenuItem(text: e.title, value: e).toOverlayItem())
+            .toList(),
     child: Padding(
       padding: const .symmetric(horizontal: 10, vertical: 5),
       child: Row(
