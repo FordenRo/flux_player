@@ -110,13 +110,6 @@ class _TrackListState extends State<TrackList> {
     setState(() {});
   }
 
-  ListView _buildList() => ListView.builder(
-    itemCount: tracks.length,
-    itemExtent: 50,
-    controller: controller,
-    itemBuilder: (context, idx) => _buildItem(idx),
-  );
-
   TrackItem _buildItem(int idx) => TrackItem(
     tracks[idx].value,
     selectionController: selectionController,
@@ -124,22 +117,6 @@ class _TrackListState extends State<TrackList> {
     menuItems: selectedTracks.isEmpty
         ? widget.trackMenuItemsBuilder?.call(tracks[idx].key)
         : [],
-  );
-
-  ReorderableListView _buildReorderableList() => ReorderableListView.builder(
-    itemCount: tracks.length,
-    itemExtent: 50,
-    buildDefaultDragHandles: false,
-    scrollController: controller,
-    onReorder: (oldIndex, newIndex) {
-      if (newIndex > oldIndex) newIndex -= 1;
-      widget.onTrackMoved!(oldIndex, newIndex);
-    },
-    itemBuilder: (context, idx) => ReorderableDragStartListener(
-      key: Key(idx.toString()),
-      index: idx,
-      child: _buildItem(idx),
-    ),
   );
 
   @override
@@ -184,8 +161,54 @@ class _TrackListState extends State<TrackList> {
               ),
           ],
         ),
-        Expanded(child: isReorderable ? _buildReorderableList() : _buildList()),
+        Expanded(
+          child: TrackListView(
+            controller: controller,
+            onItemMoved: widget.onTrackMoved,
+            itemCount: tracks.length,
+            itemBuilder: (context, idx) => _buildItem(idx),
+          ),
+        ),
       ],
     ),
   );
+}
+
+class TrackListView extends StatelessWidget {
+  const TrackListView({
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.controller,
+    super.key,
+    this.onItemMoved,
+  });
+
+  final int itemCount;
+  final TrackListController controller;
+  final TrackItem Function(BuildContext context, int index) itemBuilder;
+  final void Function(int oldIndex, int newIndex)? onItemMoved;
+
+  ListView _buildList() => ListView.builder(
+    itemCount: itemCount,
+    itemExtent: 50,
+    controller: controller,
+    itemBuilder: itemBuilder,
+  );
+
+  ReorderableListView _buildReorderableList() => ReorderableListView.builder(
+    itemCount: itemCount,
+    itemExtent: 50,
+    buildDefaultDragHandles: false,
+    scrollController: controller,
+    onReorderItem: onItemMoved,
+    itemBuilder: (context, idx) => ReorderableDragStartListener(
+      key: Key(idx.toString()),
+      index: idx,
+      child: itemBuilder(context, idx),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) =>
+      onItemMoved == null ? _buildList() : _buildReorderableList();
 }
