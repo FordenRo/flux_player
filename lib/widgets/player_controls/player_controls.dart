@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_show_menu/flutter_show_menu.dart';
@@ -10,7 +9,7 @@ import '../../core/services/config_service.dart';
 import '../../core/theme/theme.dart';
 import '../../pages/playlists_page/widgets/add_to_playlist_button.dart';
 import 'widgets/position_slider.dart';
-import 'widgets/queue_list.dart';
+import 'widgets/queue_overlay.dart';
 import 'widgets/volume_button/volume_button.dart';
 
 class PlayerControls extends StatefulWidget {
@@ -35,10 +34,9 @@ class _PlayerControlsState extends State<PlayerControls>
   @override
   void initState() {
     super.initState();
-    subscription = audioPlayer.stream.isPlaying.listen((_) {
-      setState(() {});
-      playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0);
-    });
+    subscription = audioPlayer.stream.isPlaying.listen(
+      (_) => playAnim.animateTo(audioPlayer.isPlaying ? 1 : 0),
+    );
   }
 
   @override
@@ -218,13 +216,22 @@ class _PlayerControlsState extends State<PlayerControls>
   );
 
   @override
-  Widget build(BuildContext context) => audioPlayer.currentIndex != null
-      ? Card(
+  Widget build(BuildContext context) => StreamBuilder(
+    stream: audioPlayer.stream.currentIndex.map((e) => e != null).distinct(),
+    initialData: audioPlayer.currentIndex != null,
+    builder: (context, hasPlayback) {
+      if (!hasPlayback.requireData) {
+        return const SizedBox();
+      }
+      return StreamBuilder(
+        stream: audioPlayer.stream.isPlaying,
+        initialData: audioPlayer.isPlaying,
+        builder: (context, isPlaying) => Card(
           clipBehavior: .hardEdge,
           shape: RoundedRectangleBorder(
             borderRadius: Radiuses.r12,
             side: BorderSide(
-              color: audioPlayer.isPlaying
+              color: isPlaying.requireData
                   ? Theme.of(context).colorScheme.primary.withAlpha(200)
                   : Theme.of(context).colorScheme.secondary.withAlpha(100),
             ),
@@ -246,7 +253,7 @@ class _PlayerControlsState extends State<PlayerControls>
                           IconButton(
                             onPressed: () => showDialog(
                               context: context,
-                              builder: (context) => const QueueList(),
+                              builder: (context) => const QueueOverlay(),
                             ),
                             icon: const Icon(Icons.queue_music_rounded),
                           ),
@@ -261,6 +268,8 @@ class _PlayerControlsState extends State<PlayerControls>
               const PositionSlider(),
             ],
           ),
-        )
-      : const SizedBox();
+        ),
+      );
+    },
+  );
 }

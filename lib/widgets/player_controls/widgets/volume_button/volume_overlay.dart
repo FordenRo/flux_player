@@ -7,10 +7,7 @@ import '../../../../core/audio_player/audio_player.dart';
 import '../../../../core/theme/theme.dart';
 
 class VolumeOverlay extends StatefulWidget {
-  const VolumeOverlay._({
-    required this.onHide,
-    required _VolumeOverlayController controller,
-  }) : _controller = controller;
+  const VolumeOverlay._({required this.onHide, required this._controller});
 
   final void Function() onHide;
   final _VolumeOverlayController _controller;
@@ -40,10 +37,7 @@ class _VolumeOverlayController with ChangeNotifier {
 }
 
 class VolumeOverlayEntry {
-  VolumeOverlayEntry._(
-    this.context, {
-    required _VolumeOverlayController controller,
-  }) : _controller = controller;
+  VolumeOverlayEntry._(this.context, {required this._controller});
 
   late final OverlayEntry entry;
   final _VolumeOverlayController _controller;

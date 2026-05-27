@@ -149,7 +149,7 @@ class ConfigService {
     int? mainPlaylistIdx,
     int? playingPlaylistIdx,
   }) async {
-    final dir = Directory('$path/playlistsd');
+    final dir = Directory('$path/playlists');
     if (!dir.existsSync()) return;
 
     playlists = await (await dir.list().map((file) {
@@ -283,10 +283,10 @@ class ConfigService {
   }
 
   Future<void> _savePlaylists(String path) =>
-      Future.wait(playlists.map((e) => _savePlaylist(path, e)));
+      Future.wait(playlists.map((e) => _savePlaylist('$path/playlists', e)));
 
   Future<void> _savePlaylist(String path, Playlist playlist) async {
-    final file = File('$path/playlistsd/${playlist.title}.txt');
+    final file = File('$path/${playlist.title}.txt');
     await file.create(recursive: true);
     await file.writeAsString(playlist.tracks.map((e) => e.id).join('\n'));
   }

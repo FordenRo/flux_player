@@ -52,7 +52,7 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
     itemCount: playlists.length,
     itemExtent: 110,
     buildDefaultDragHandles: false,
-    onReorder: (oldIndex, newIndex) {
+    onReorderItem: (oldIndex, newIndex) {
       if (newIndex > oldIndex) newIndex -= 1;
       _onPlaylistMoved(oldIndex, newIndex);
     },

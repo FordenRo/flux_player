@@ -13,29 +13,12 @@ class PositionSlider extends StatefulWidget {
 }
 
 class _PositionSliderState extends State<PositionSlider> {
-  late final StreamController stream;
-
   var hovered = false;
   var sliding = false;
 
   bool get expanded => hovered || sliding;
   double get position => audioPlayer.position.inMilliseconds / 1000;
   double get duration => audioPlayer.duration.inMilliseconds / 1000;
-
-  @override
-  void initState() {
-    super.initState();
-    stream = .broadcast()
-      ..addStream(
-        audioPlayer.stream.position,
-      ).then((_) => stream.addStream(audioPlayer.stream.duration));
-  }
-
-  @override
-  void dispose() {
-    stream.close();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) => MouseRegion(
@@ -70,13 +53,16 @@ class _PositionSliderState extends State<PositionSlider> {
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
           ),
           child: StreamBuilder(
-            stream: stream.stream,
-            builder: (context, asyncSnapshot) => Slider(
-              value: duration > 0 ? max(min(position / duration, 1), 0) : 0,
-              onChangeStart: (_) => setState(() => sliding = true),
-              onChangeEnd: (_) => setState(() => sliding = false),
-              onChanged: (e) => audioPlayer.seek(
-                Duration(milliseconds: (e * duration * 1000).toInt()),
+            stream: audioPlayer.stream.duration,
+            builder: (context, _) => StreamBuilder(
+              stream: audioPlayer.stream.position,
+              builder: (context, _) => Slider(
+                value: duration > 0 ? max(min(position / duration, 1), 0) : 0,
+                onChangeStart: (_) => setState(() => sliding = true),
+                onChangeEnd: (_) => setState(() => sliding = false),
+                onChanged: (e) => audioPlayer.seek(
+                  Duration(milliseconds: (e * duration * 1000).toInt()),
+                ),
               ),
             ),
           ),
