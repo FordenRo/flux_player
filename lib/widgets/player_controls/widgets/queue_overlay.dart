@@ -30,7 +30,6 @@ class _QueueOverlayState extends State<QueueOverlay> {
       audioPlayer.setIndex(index, play: audioPlayer.isPlaying, load: false);
 
   void _onMove(int oldIndex, int newIndex) => setState(() {
-    if (newIndex > oldIndex) newIndex -= 1;
     queue.move(oldIndex, newIndex);
     if (oldIndex == audioPlayer.currentIndex) {
       _updatePlaybackIndex(newIndex);
@@ -47,7 +46,7 @@ class _QueueOverlayState extends State<QueueOverlay> {
     queue.removeAt(index);
     if (index == audioPlayer.currentIndex) {
       audioPlayer.setIndex(index, play: audioPlayer.isPlaying);
-    } else if (index > audioPlayer.currentIndex!) {
+    } else if (index < audioPlayer.currentIndex!) {
       _updatePlaybackIndex(audioPlayer.currentIndex! - 1);
     }
   });
