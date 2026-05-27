@@ -8,14 +8,14 @@ import '../../track_list/track_list_controller.dart';
 import '../../track_list/widgets/floating_actions_overlay.dart';
 import '../../track_list/widgets/track_item/track_item.dart';
 
-class QueueList extends StatefulWidget {
-  const QueueList({super.key});
+class QueueOverlay extends StatefulWidget {
+  const QueueOverlay({super.key});
 
   @override
-  State<QueueList> createState() => _QueueListState();
+  State<QueueOverlay> createState() => _QueueOverlayState();
 }
 
-class _QueueListState extends State<QueueList> {
+class _QueueOverlayState extends State<QueueOverlay> {
   final TrackListController controller = .new(useIndex: true);
 
   List<Track> get queue => audioPlayer.queue;
@@ -30,9 +30,7 @@ class _QueueListState extends State<QueueList> {
       audioPlayer.setIndex(index, play: audioPlayer.isPlaying, load: false);
 
   void _onMove(int oldIndex, int newIndex) => setState(() {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
+    if (newIndex > oldIndex) newIndex -= 1;
     queue.move(oldIndex, newIndex);
     if (oldIndex == audioPlayer.currentIndex) {
       _updatePlaybackIndex(newIndex);
@@ -53,6 +51,11 @@ class _QueueListState extends State<QueueList> {
       _updatePlaybackIndex(audioPlayer.currentIndex! - 1);
     }
   });
+
+  void _clearQueue() {
+    Navigator.pop(context);
+    audioPlayer.stop().then((_) => audioPlayer.setQueue([]));
+  }
 
   @override
   Widget build(BuildContext context) => Align(
@@ -76,7 +79,7 @@ class _QueueListState extends State<QueueList> {
                 itemExtent: 50,
                 buildDefaultDragHandles: false,
                 scrollController: controller,
-                onReorder: _onMove,
+                onReorderItem: _onMove,
                 itemBuilder: (context, idx) => ReorderableDragStartListener(
                   key: Key(idx.toString()),
                   index: idx,
@@ -90,8 +93,12 @@ class _QueueListState extends State<QueueList> {
                         text: 'Убрать',
                         onTap: () => _onRemove(idx),
                       ),
+                      SimpleMenuItem(
+                        text: 'Очистить список',
+                        onTap: _clearQueue,
+                      ),
                     ],
-                    isSelectedCallback: () => audioPlayer.currentIndex! == idx,
+                    isSelectedCallback: () => audioPlayer.currentIndex == idx,
                   ),
                 ),
               ),
