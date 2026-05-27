@@ -1,34 +1,14 @@
-import 'dart:io';
-import 'dart:isolate';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../core/models/track.dart';
 import '../core/services/config_service.dart';
 
 const audioExtensions = ['mp3', 'ogg', 'aac', 'flac', 'midi', 'wav', 'v4a'];
 
-Future<void> _onFilesSelected(List<String> paths) async {
-  importedPlaylist.tracks.addAll(
-    await Isolate.run(() => paths.map(Track.fromPath)),
-  );
-}
+Future<void> _onFilesSelected(List<String> paths) =>
+    paths.map(configService.addFile).wait;
 
-Future<void> _onFolderSelected(String path) async {
-  final folder = Directory(path);
-  if (!folder.existsSync()) return;
-
-  importedPlaylist.tracks.addAll(
-    await Isolate.run(
-      () => folder
-          .list()
-          .where((e) => audioExtensions.contains(e.path.split('.').last))
-          .asyncMap((e) => Track.fromPath(e.path))
-          .toList(),
-    ),
-  );
-}
+Future<void> _onFolderSelected(String path) => configService.addFolder(path);
 
 class ImportMenu extends StatefulWidget {
   const ImportMenu({super.key});

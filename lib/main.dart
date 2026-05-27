@@ -24,7 +24,7 @@ Future<void> main() async {
   await windowManager.waitUntilReadyToShow(windowOptions, windowManager.show);
 
   await FlutterWindowClose.setWindowShouldCloseHandler(() async {
-    await saveConfiguration();
+    await configService.saveConfiguration();
     return true;
   });
 

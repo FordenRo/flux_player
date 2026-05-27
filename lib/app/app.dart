@@ -20,7 +20,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   var isLoaded = false;
-  late final Future<void> future = loadConfiguration();
+  late final Future<void> future = configService.loadConfiguration();
 
   final topDestinations = const [
     NavigationRailDestination(
