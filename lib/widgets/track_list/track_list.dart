@@ -32,6 +32,7 @@ class TrackList extends StatefulWidget {
   final List<SimpleMenuItem> Function(int index)? trackMenuItemsBuilder;
   final bool sortEnabled;
   final bool selectionEnabled;
+  final bool customSortEnabled;
   final TrackSelectionController? selectionController;
 
   @override
