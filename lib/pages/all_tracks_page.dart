@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../core/audio_player/audio_player.dart';
 import '../core/services/config_service.dart';
-import '../core/utils/move_element.dart';
 import '../widgets/simple_menu.dart';
 import '../widgets/track_list/track_list.dart';
 import '../widgets/track_list/widgets/track_item/track_selection_controller.dart';
@@ -35,12 +34,15 @@ class _AllTracksPageState extends State<AllTracksPage> {
   ];
 
   @override
-  Widget build(BuildContext context) => TrackList(
-    importedPlaylist.toList(),
-    customSortEnabled: false,
-    selectionController: selectionController,
-    onTrackSelected: _onTrackSelected,
-    onTrackMoved: _onTrackMoved,
-    trackMenuItemsBuilder: _menuItemsBuilder,
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: importedPlaylist,
+    builder: (context, child) => TrackList(
+      importedPlaylist.toList(),
+      customSortEnabled: false,
+      selectionController: selectionController,
+      onTrackSelected: _onTrackSelected,
+      onTrackMoved: _onTrackMoved,
+      trackMenuItemsBuilder: _menuItemsBuilder,
+    ),
   );
 }

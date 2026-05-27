@@ -31,9 +31,6 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
   void _onTrackSelected(int idx) =>
       audioPlayer.setPlaylist(openedPlaylist!, index: idx, play: true);
 
-  void _onTrackMoved(int oldIndex, int newIndex) =>
-      setState(() => openedPlaylist!.move(oldIndex, newIndex));
-
   void _onPlaylistMoved(int oldIndex, int newIndex) =>
       setState(() => playlists.move(oldIndex, newIndex));
 
@@ -104,11 +101,14 @@ class _PlaylistsPageState extends State<PlaylistsPage> {
             builder: (context, asyncSnapshot) => _buildPlaylistList(),
           ),
         )
-      : TrackList(
-          openedPlaylist!.toList(),
-          selectionController: selectionController,
-          onTrackSelected: _onTrackSelected,
-          onTrackMoved: _onTrackMoved,
-          trackMenuItemsBuilder: _menuItemsBuilder,
+      : ListenableBuilder(
+          listenable: openedPlaylist!,
+          builder: (context, child) => TrackList(
+            openedPlaylist!.toList(),
+            selectionController: selectionController,
+            onTrackSelected: _onTrackSelected,
+            onTrackMoved: openedPlaylist!.move,
+            trackMenuItemsBuilder: _menuItemsBuilder,
+          ),
         );
 }

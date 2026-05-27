@@ -37,7 +37,7 @@ class SettingsPage extends StatelessWidget {
       ListTile(
         title: const Text('Delete all imports'),
         trailing: IconButton(
-          onPressed: importedPlaylist.tracks.clear,
+          onPressed: importedPlaylist.clear,
           icon: const Icon(Icons.delete_outlined),
         ),
       ),
