@@ -69,7 +69,7 @@ class _ImportMenuState extends State<ImportMenu> {
             await _onFilesSelected(
               result.files.map((e) => e.path).nonNulls.toList(),
             );
-            if (context.mounted) Navigator.pop(context);
+            if (context.mounted) Navigator.pop(context, true);
           }
         },
       ),
@@ -85,25 +85,87 @@ class _ImportMenuState extends State<ImportMenu> {
 
           setState(() => selected = true);
           await _onFolderSelected(result);
-          if (context.mounted) Navigator.pop(context);
+          if (context.mounted) Navigator.pop(context, true);
         },
       ),
     ],
   );
 
+  Widget _buildAdditionsList() => ListView.builder(
+    itemCount:
+        configService.addedFiles.length + configService.addedFolders.length,
+    shrinkWrap: true,
+    itemBuilder: (context, index) => _AdditionItem(
+      (configService.addedFiles + configService.addedFolders)[index],
+      onRemove: () async {
+        if (index < configService.addedFiles.length) {
+          await configService.removeFile(configService.addedFiles[index]);
+        } else {
+          await configService.removeFolder(
+            configService.addedFolders[index - configService.addedFiles.length],
+          );
+        }
+        setState(() {});
+      },
+    ),
+  );
+
   @override
-  Widget build(BuildContext context) => Center(
-    child: Card(
-      child: AnimatedSize(
-        duration: Durations.medium1,
-        curve: Curves.easeInOut,
-        child: Padding(
-          padding: const .all(40),
-          child: !selected
-              ? _buildButtonsRow(context)
-              : const CircularProgressIndicator(),
+  Widget build(BuildContext context) => PopScope(
+    canPop: !selected,
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) return;
+      if (result != true) return;
+      Navigator.pop(context);
+    },
+    child: Center(
+      child: Card(
+        child: AnimatedSize(
+          duration: Durations.medium1,
+          curve: Curves.easeInOut,
+          child: Padding(
+            padding: const .all(40),
+            child: !selected
+                ? Column(
+                    mainAxisSize: .min,
+                    spacing: 20,
+                    children: [
+                      _buildButtonsRow(context),
+                      if (configService.addedFiles.isNotEmpty ||
+                          configService.addedFolders.isNotEmpty)
+                        Flexible(
+                          child: SizedBox(
+                            width: 270,
+                            child: _buildAdditionsList(),
+                          ),
+                        ),
+                    ],
+                  )
+                : const CircularProgressIndicator(),
+          ),
         ),
       ),
     ),
+  );
+}
+
+class _AdditionItem extends StatelessWidget {
+  const _AdditionItem(this.title, {required this.onRemove});
+
+  final String title;
+  final void Function() onRemove;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(child: Text(title)),
+      IconButton(
+        onPressed: onRemove,
+        iconSize: 20,
+        padding: .zero,
+        visualDensity: .compact,
+        icon: const Icon(Icons.close_rounded),
+      ),
+    ],
   );
 }

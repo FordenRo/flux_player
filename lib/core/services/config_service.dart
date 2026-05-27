@@ -27,6 +27,21 @@ class ConfigService {
   final List<String> _addedFolders = [];
   final List<StreamSubscription<FileSystemEvent>> _watchingFolders = [];
 
+  List<String> get addedFiles => _addedFiles;
+  List<String> get addedFolders => _addedFolders;
+
+  Future<void> removeFile(String path) async {
+    _addedFiles.remove(path);
+    importedPlaylist.tracks.removeWhere((e) => e.path == path);
+  }
+
+  Future<void> removeFolder(String path) async {
+    _addedFolders.remove(path);
+    importedPlaylist.tracks.removeWhere(
+      (e) => File(e.path).parent.path == path,
+    );
+  }
+
   Future<void> addFile(String path) async {
     if (_addedFiles.contains(path)) return;
 
