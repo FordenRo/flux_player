@@ -50,8 +50,6 @@ class _TrackListState extends State<TrackList> {
   Set<int> selectedTracks = {};
   late Sorting sort = widget.customSortEnabled ? .custom : .name;
 
-  bool get isReorderable => widget.onTrackMoved != null && sort == .custom;
-
   List<MapEntry<int, Track>> _getTracks() {
     final filtered = widget.tracks
         .asMap()
@@ -164,7 +162,7 @@ class _TrackListState extends State<TrackList> {
         Expanded(
           child: TrackListView(
             controller: controller,
-            onItemMoved: widget.onTrackMoved,
+            onItemMoved: sort == .custom ? widget.onTrackMoved : null,
             itemCount: tracks.length,
             itemBuilder: (context, idx) => _buildItem(idx),
           ),
