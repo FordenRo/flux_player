@@ -7,7 +7,7 @@ import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
-import 'core/audio_player/audio_player_impl.dart';
+import 'core/audio_player/src/audio_player_impl.dart';
 import 'core/services/config_service.dart';
 import 'core/theme/theme.dart';
 

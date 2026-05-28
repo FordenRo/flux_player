@@ -104,12 +104,12 @@ class _PlayerControlsState extends State<PlayerControls>
     children: [
       /// Shuffle
       StreamBuilder(
-        stream: audioPlayer.stream.shuffled,
+        stream: audioPlayer.stream.isShuffled,
         builder: (context, asyncSnapshot) => IconButton(
-          color: audioPlayer.shuffled
+          color: audioPlayer.isShuffled
               ? Theme.of(context).colorScheme.primary
               : null,
-          onPressed: () => audioPlayer.setShuffled(!audioPlayer.shuffled),
+          onPressed: () => audioPlayer.setShuffled(!audioPlayer.isShuffled),
           icon: const Icon(Icons.shuffle_rounded),
         ),
       ),
@@ -171,15 +171,15 @@ class _PlayerControlsState extends State<PlayerControls>
 
       /// Loop
       StreamBuilder(
-        stream: audioPlayer.stream.looped,
+        stream: audioPlayer.stream.isLooped,
         builder: (context, asyncSnapshot) => AnimatedRotation(
           duration: Durations.short3,
-          turns: audioPlayer.looped ? -0.5 : 0,
+          turns: audioPlayer.isLooped ? -0.5 : 0,
           child: IconButton(
-            color: audioPlayer.looped
+            color: audioPlayer.isLooped
                 ? Theme.of(context).colorScheme.primary
                 : null,
-            onPressed: () => audioPlayer.setLooped(!audioPlayer.looped),
+            onPressed: () => audioPlayer.setLooped(!audioPlayer.isLooped),
             icon: const Icon(Icons.loop_rounded),
           ),
         ),

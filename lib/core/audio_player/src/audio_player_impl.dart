@@ -2,19 +2,21 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart'
-    show BaseAudioHandler, MediaItem, SeekHandler;
+    show BaseAudioHandler, SeekHandler;
 import 'package:audio_session/audio_session.dart' show AudioSession;
 import 'package:media_kit/media_kit.dart' as media_kit;
 
-import '../models/playlist.dart';
-import '../models/track.dart';
-import 'audio_player.dart';
+import '../../models/playlist.dart';
+import '../../models/track.dart';
+import '../../utils/media_item_adapter.dart';
+import '../audio_player.dart';
 import 'audio_player_stream.dart';
 
 class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
   AudioHandlerImpl() {
     _init();
   }
+
   final _player = AudioPlayerImpl.instance;
 
   void _init() {
@@ -49,8 +51,8 @@ class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
       updateTime: DateTime.now(),
       playing: _player.isPlaying,
       bufferedPosition: _player.duration,
-      shuffleMode: _player.shuffled ? .all : .none,
-      repeatMode: _player.looped ? .one : .all,
+      shuffleMode: _player.isShuffled ? .all : .none,
+      repeatMode: _player.isLooped ? .one : .all,
       speed: 1,
       queueIndex: 0,
     ),
@@ -72,22 +74,13 @@ class AudioHandlerImpl extends BaseAudioHandler with SeekHandler {
   Future<void> seek(Duration position) => _player.seek(position);
 }
 
-extension MediaItemAdapter on Track {
-  MediaItem toMediaItem() => MediaItem(
-    id: 'testid',
-    title: title,
-    album: '',
-    artist: author,
-    duration: duration,
-  );
-}
-
 class AudioPlayerImpl implements AudioPlayer {
   AudioPlayerImpl._() {
     _player.stream.completed.listen((completed) {
       if (completed) _onEnd();
     });
   }
+
   final _player = media_kit.Player();
 
   static final AudioPlayer instance = AudioPlayerImpl._();
@@ -95,8 +88,8 @@ class AudioPlayerImpl implements AudioPlayer {
   List<Track> _queue = [];
   Playlist? _currentPlaylist;
   int? _currentIndex;
-  var _shuffled = false;
-  var _looped = false;
+  var _isShuffled = false;
+  var _isLooped = false;
 
   @override
   bool get isPlaying => _player.state.playing;
@@ -121,30 +114,30 @@ class AudioPlayerImpl implements AudioPlayer {
   @override
   Duration get position => _player.state.position;
   @override
-  bool get shuffled => _shuffled;
+  bool get isShuffled => _isShuffled;
   @override
-  bool get looped => _looped;
+  bool get isLooped => _isLooped;
 
   final StreamController<List<Track>> _queueController = .broadcast();
   final StreamController<Playlist?> _currentPlaylistController = .broadcast();
   final StreamController<int?> _currentIndexController = .broadcast();
-  final StreamController<bool> _shuffledController = .broadcast();
-  final StreamController<bool> _loopedController = .broadcast();
+  final StreamController<bool> _isShuffledController = .broadcast();
+  final StreamController<bool> _isLoopedController = .broadcast();
 
   @override
   late final stream = AudioPlayerStream(
-    _player.stream.volume.map((e) => e / 100),
-    _currentIndexController.stream.distinct(),
-    _queueController.stream.distinct(),
-    _player.stream.position,
-    _player.stream.duration,
-    _player.stream.playing,
-    _shuffledController.stream.distinct(),
-    _currentIndexController.stream.distinct().map(
+    volume: _player.stream.volume.map((e) => e / 100),
+    currentIndex: _currentIndexController.stream.distinct(),
+    queue: _queueController.stream.distinct(),
+    position: _player.stream.position,
+    duration: _player.stream.duration,
+    isPlaying: _player.stream.playing,
+    isShuffled: _isShuffledController.stream.distinct(),
+    currentTrack: _currentIndexController.stream.distinct().map(
       (e) => e != null ? queue[e] : null,
     ),
-    _loopedController.stream.distinct(),
-    _currentPlaylistController.stream.distinct(),
+    isLooped: _isLoopedController.stream.distinct(),
+    currentPlaylist: _currentPlaylistController.stream.distinct(),
   );
 
   @override
@@ -169,14 +162,14 @@ class AudioPlayerImpl implements AudioPlayer {
       }
     }
     _queueController.add(_queue);
-    _shuffled = shuffled;
-    _shuffledController.add(shuffled);
+    _isShuffled = shuffled;
+    _isShuffledController.add(shuffled);
   }
 
   @override
   void setLooped(bool looped) {
-    _looped = looped;
-    _loopedController.add(looped);
+    _isLooped = looped;
+    _isLoopedController.add(looped);
   }
 
   @override
@@ -195,7 +188,7 @@ class AudioPlayerImpl implements AudioPlayer {
       _currentIndex = null;
       _currentIndexController.add(null);
     }
-    setShuffled(shuffled);
+    setShuffled(isShuffled);
   }
 
   @override
@@ -264,7 +257,7 @@ class AudioPlayerImpl implements AudioPlayer {
 
   @override
   Future<void> jump(int index, {bool play = true}) => setIndex(
-    shuffled ? queue.indexOf(currentPlaylist![index]) : index,
+    isShuffled ? queue.indexOf(currentPlaylist![index]) : index,
     play: play,
   );
 
@@ -279,7 +272,7 @@ class AudioPlayerImpl implements AudioPlayer {
     }
   }
 
-  Future<void> _onEnd() => looped ? play() : next();
+  Future<void> _onEnd() => isLooped ? play() : next();
 
   @override
   Future<void> next() => setIndex(currentIndex! + 1);
@@ -295,7 +288,7 @@ class AudioPlayerImpl implements AudioPlayer {
     _queueController.close(),
     _currentPlaylistController.close(),
     _currentIndexController.close(),
-    _shuffledController.close(),
-    _loopedController.close(),
+    _isShuffledController.close(),
+    _isLoopedController.close(),
   ]);
 }

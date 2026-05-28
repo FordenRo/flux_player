@@ -245,8 +245,8 @@ class ConfigService {
     final wPosY = wPos.dy;
     final volume = audioPlayer.volume;
     final pageIndex = appController.currentPage.index;
-    final shuffled = audioPlayer.shuffled;
-    final looped = audioPlayer.looped;
+    final shuffled = audioPlayer.isShuffled;
+    final looped = audioPlayer.isLooped;
     final wasPlayingPlaylist = audioPlayer.currentPlaylist != null;
     final playingPlaylistIdx = wasPlayingPlaylist
         ? audioPlayer.currentPlaylist! == importedPlaylist

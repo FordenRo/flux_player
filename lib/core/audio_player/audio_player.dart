@@ -1,14 +1,13 @@
 import 'dart:async';
 
-// import 'package:metadata_audio/metadata_audio.dart' as audio_metadata;
 import 'package:audio_metadata_reader/audio_metadata_reader.dart'
     as audio_metadata;
 import 'package:media_kit/media_kit.dart' as media_kit;
 
 import '../models/playlist.dart';
 import '../models/track.dart';
-import 'audio_player_impl.dart';
-import 'audio_player_stream.dart';
+import 'src/audio_player_impl.dart';
+import 'src/audio_player_stream.dart';
 
 final AudioPlayer audioPlayer = AudioPlayerImpl.instance;
 
@@ -27,8 +26,8 @@ abstract interface class AudioPlayer {
   Duration get position;
   Duration get duration;
   double get volume;
-  bool get shuffled;
-  bool get looped;
+  bool get isShuffled;
+  bool get isLooped;
   AudioPlayerStream get stream;
 
   Future<void> setVolume(double volume);

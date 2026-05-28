@@ -7,7 +7,7 @@ import '../../../../core/audio_player/audio_player.dart';
 import '../../../../core/models/track.dart';
 import '../../../../core/services/config_service.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../core/utils.dart';
+import '../../../../core/utils/track_playlist_changed.dart';
 import '../../../../pages/playlists_page/widgets/add_to_playlist_button.dart';
 import '../../../fade_in_widget.dart';
 import '../../../simple_menu.dart';
