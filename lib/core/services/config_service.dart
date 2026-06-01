@@ -59,16 +59,18 @@ class ConfigService {
     final dir = Directory(path);
     if (!dir.existsSync()) return;
 
-    await for (final file in dir.list().where(
-      (e) => audioExtensions.contains(e.path.split('.').last),
-    )) {
-      if (file is! File) continue;
-
-      final track = Track.fromFile(file);
-      if (_isAlreadyImported(track)) continue;
-
-      importedPlaylist.add(track);
-    }
+    importedPlaylist.addAll(
+      await dir
+          .list()
+          .where(
+            (e) =>
+                e is File && audioExtensions.contains(e.path.split('.').last),
+          )
+          .cast<File>()
+          .map(Track.fromFile)
+          .where((e) => !_isAlreadyImported(e))
+          .toList(),
+    );
     _addedFolders.add(path);
     _watchingFolders.add(dir.watch().listen(_onFolderEvent));
   }
