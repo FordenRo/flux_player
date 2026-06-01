@@ -86,6 +86,7 @@ class AudioPlayerImpl implements AudioPlayer {
   static final AudioPlayer instance = AudioPlayerImpl._();
 
   List<Track> _queue = [];
+  List<Track> _originalQueue = [];
   Playlist? _currentPlaylist;
   int? _currentIndex;
   var _isShuffled = false;
@@ -148,6 +149,8 @@ class AudioPlayerImpl implements AudioPlayer {
   void setShuffled(bool shuffled, {bool shuffleQueue = true}) {
     if (shuffled && shuffleQueue) {
       final track = currentTrack;
+      if (currentPlaylist == null) _originalQueue = List.of(queue);
+
       _queue.shuffle();
       if (track != null) {
         _currentIndex = _queue.indexOf(track);
@@ -155,10 +158,12 @@ class AudioPlayerImpl implements AudioPlayer {
       }
     } else if (!shuffled) {
       final track = currentTrack;
-      _queue = List.of(currentPlaylist ?? []);
+      _queue = List.of(currentPlaylist ?? _originalQueue);
       if (track != null) {
-        _currentIndex = _queue.indexOf(track);
-        _currentIndexController.add(_currentIndex);
+        if (_queue.indexOf(track) case final index when index != -1) {
+          _currentIndex = index;
+          _currentIndexController.add(_currentIndex);
+        }
       }
     }
     _queueController.add(_queue);
