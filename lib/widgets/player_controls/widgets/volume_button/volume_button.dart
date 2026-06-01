@@ -41,7 +41,17 @@ class _VolumeButtonState extends State<VolumeButton> {
       stream: audioPlayer.stream.volume.map(_getIconDataFromVolume).distinct(),
       initialData: _getIconDataFromVolume(audioPlayer.volume),
       builder: (context, snapshot) => IconButton(
-        onHover: (hovered) => volumeOverlay.isButtonHovered = hovered,
+        onHover: (hovered) {
+          if (hovered) {
+            hoverTimer = Timer(
+              Durations.short3,
+              () => volumeOverlay.isButtonHovered = hovered,
+            );
+          } else {
+            volumeOverlay.isButtonHovered = false;
+            hoverTimer?.cancel();
+          }
+        },
         onPressed: () {
           if (audioPlayer.volume > 0) {
             lastVolume = audioPlayer.volume;
