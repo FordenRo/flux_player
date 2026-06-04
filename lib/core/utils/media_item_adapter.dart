@@ -3,10 +3,11 @@ import '../models/track.dart';
 
 extension MediaItemAdapter on Track {
   MediaItem toMediaItem() => MediaItem(
-    id: 'testid',
+    id: id,
     title: title,
-    album: '',
+    album: metadata.album,
     artist: author,
     duration: duration,
+    artUri: .file(path),
   );
 }

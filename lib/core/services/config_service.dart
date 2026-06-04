@@ -93,8 +93,7 @@ class ConfigService {
       importedPlaylist.where((e) => e.id == track.id).isNotEmpty;
 
   Future<void> loadConfiguration() async {
-    final path =
-        '${(await getApplicationDocumentsDirectory()).path}/Flux Player';
+    final path = (await getApplicationSupportDirectory()).path;
 
     final file = File('$path/config');
     if (!file.existsSync()) return;
@@ -234,8 +233,7 @@ class ConfigService {
       });
 
   Future<void> saveConfiguration() async {
-    final path =
-        '${(await getApplicationDocumentsDirectory()).path}/Flux Player';
+    final path = (await getApplicationSupportDirectory()).path;
 
     final file = File('$path/config');
     await file.create(recursive: true);

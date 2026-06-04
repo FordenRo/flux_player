@@ -31,8 +31,9 @@ Future<void> main() async {
   await AudioService.init(
     builder: AudioHandlerImpl.new,
     config: const .new(
-      androidNotificationChannelId: 'com.flux.notification.audio',
-      androidNotificationChannelName: 'FluxPlayer',
+      androidNotificationChannelId: 'com.cmpbronze.flux.channel.audio',
+      androidNotificationChannelName: 'Flux Player',
+      androidNotificationChannelDescription: 'Flux Player',
       androidShowNotificationBadge: true,
     ),
   );
