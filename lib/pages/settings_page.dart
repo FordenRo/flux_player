@@ -28,6 +28,16 @@ class SettingsPage extends StatelessWidget {
         ),
       ),
       ListTile(
+        title: const Text('Disable volume overlay'),
+        trailing: StatefulBuilder(
+          builder: (context, setState) => Checkbox(
+            value: configService.isVolumeOverlayDisabled,
+            onChanged: (value) =>
+                setState(() => configService.isVolumeOverlayDisabled = value!),
+          ),
+        ),
+      ),
+      ListTile(
         title: const Text('Delete all playlists'),
         trailing: IconButton(
           onPressed: playlists.clear,
@@ -39,6 +49,14 @@ class SettingsPage extends StatelessWidget {
         trailing: IconButton(
           onPressed: importedPlaylist.clear,
           icon: const Icon(Icons.delete_outlined),
+        ),
+      ),
+      ListTile(
+        title: const Text('Version'),
+        subtitle: const Text('0.1.0'),
+        trailing: TextButton(
+          onPressed: () {},
+          child: const Text('Check updates'),
         ),
       ),
     ],

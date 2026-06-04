@@ -23,6 +23,7 @@ List<Playlist> playlists = [];
 class ConfigService {
   ConfigService._();
 
+  var isVolumeOverlayDisabled = false;
   final List<String> _addedFiles = [];
   final List<String> _addedFolders = [];
   final List<StreamSubscription<FileSystemEvent>> _watchingFolders = [];
@@ -114,6 +115,7 @@ class ConfigService {
     final hasMainPlaylist = stream.readBool();
     final mainPlaylistIdx = hasMainPlaylist ? stream.read(8) : null;
     final themeColorIdx = stream.read(5);
+    isVolumeOverlayDisabled = stream.readBool();
 
     _setWindowPosition(wPosX, wPosY);
 
@@ -279,7 +281,9 @@ class ConfigService {
       ..write((position * 255).toInt(), 10)
       ..writeBool(hasMainPlaylist);
     if (hasMainPlaylist) stream.write(playlists.indexOf(mainPlaylist!), 8);
-    stream.write(seedColors.indexOf(appTheme.seedColor), 5);
+    stream
+      ..write(seedColors.indexOf(appTheme.seedColor), 5)
+      ..writeBool(isVolumeOverlayDisabled);
     await file.writeAsBytes(stream.toBytes());
 
     await _savePaths(path);
