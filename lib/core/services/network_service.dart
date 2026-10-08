@@ -53,7 +53,8 @@ class NetworkService {
     final downloadPath =
         this.downloadPath ?? await FilePicker.getDirectoryPath();
     if (downloadPath == null) return null;
-    final file = File('$downloadPath\\$filename')..writeAsBytesSync(data);
+    final file = File(downloadPath + Platform.pathSeparator + filename)
+      ..writeAsBytesSync(data);
     return TrackDownloadResult(
       track: libraryRepository.getTrackFromFile(file),
       file: file,
