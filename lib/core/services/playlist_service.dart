@@ -41,10 +41,10 @@ class PlaylistService {
         .map(
           (e) async => Playlist(
             title: e.uri.pathSegments.last.split('.').first,
-            tracks: (await e.readAsLines())
+            tracks: await (await e.readAsLines())
                 .where((l) => !l.startsWith('#'))
                 .map((l) => libraryRepository.getTrackFromFile(File(l)))
-                .toList(),
+                .wait,
           ),
         )
         .wait;

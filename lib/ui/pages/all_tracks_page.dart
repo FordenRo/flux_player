@@ -30,8 +30,6 @@ class _AllTracksPageState extends State<AllTracksPage> {
   var query = '';
   _Sorting sorting = .title;
 
-  List<Track> get allTracks => libraryRepository.getAllTracks();
-  List<Track> get sortedTracks => allTracks.toList()..sort(_sort);
   List<Playlist> get playlists => playlistRepository.getAllPlaylists();
 
   String sortingToText(_Sorting sorting) => switch (sorting) {
@@ -69,10 +67,6 @@ class _AllTracksPageState extends State<AllTracksPage> {
 
   @override
   Widget build(BuildContext context) {
-    final tracks = query.isNotEmpty
-        ? searchTracks(allTracks, query)
-        : sortedTracks;
-
     if (libraryRepository.getPaths().isEmpty) {
       return Column(
         mainAxisAlignment: .center,
@@ -92,117 +86,132 @@ class _AllTracksPageState extends State<AllTracksPage> {
       );
     }
 
-    return Column(
-      children: [
-        Row(
+    return FutureBuilder(
+      future: libraryRepository.getAllTracks(),
+      builder: (context, asyncSnapshot) {
+        if (!asyncSnapshot.hasData) return const SizedBox();
+
+        final allTracks = asyncSnapshot.requireData;
+        final tracks =
+            query.isNotEmpty ? searchTracks(allTracks, query) : allTracks
+              ..sort(_sort);
+
+        return Column(
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: SearchField(
+                    hint: 'Поиск треков',
+                    onChanged: _onQueryChanged,
+                  ),
+                ),
+                AnimatedSize(
+                  duration: Durations.short3,
+                  child: query.isEmpty
+                      ? Builder(
+                          builder: (context) => TextButton.icon(
+                            onPressed: () async {
+                              final sort = await showContextMenu(
+                                context,
+                                contextMenu: ContextMenu<_Sorting>(
+                                  entries: [
+                                    MenuItem(
+                                      label: Text(sortingToText(.title)),
+                                      value: .title,
+                                    ),
+                                    MenuItem(
+                                      label: Text(sortingToText(.artist)),
+                                      value: .artist,
+                                    ),
+                                    MenuItem(
+                                      label: Text(sortingToText(.date)),
+                                      value: .date,
+                                    ),
+                                  ],
+                                  position: context
+                                      .findRenderObject()!
+                                      .globalPaintBounds
+                                      .bottomCenter,
+                                ),
+                              );
+                              if (sort != null && sort != sorting) {
+                                await _onSortingChanged(sort);
+                              }
+                            },
+                            label: Text(sortingToText(sorting)),
+                            icon: const Icon(Icons.sort_rounded),
+                            style: .new(
+                              foregroundColor: .all(
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(width: 0),
+                ),
+              ],
+            ),
             Expanded(
-              child: SearchField(
-                hint: 'Поиск треков',
-                onChanged: _onQueryChanged,
+              child: TrackListView(
+                tracks: tracks,
+                controller: controller,
+                showWatchTrack: query.isEmpty,
+                menuEntriesBuilder: (context, index) {
+                  final track = tracks[index];
+                  return [
+                    MenuItem(
+                      label: const Text('Играть следующим'),
+                      onSelected: (_) => audioPlayer.addNext(track),
+                    ),
+                    if (playlists.isNotEmpty &&
+                        playlists.any((e) => !e.contains(track)))
+                      MenuItem.submenu(
+                        label: const Text('Добавить в плейлист'),
+                        items: playlists
+                            .where((e) => !e.contains(track))
+                            .map(
+                              (e) => MenuItem<void>(
+                                label: Text(e.title),
+                                onSelected: (_) => e.add(track),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    if (playlists.isNotEmpty &&
+                        playlists.any((e) => e.contains(track)))
+                      MenuItem.submenu(
+                        label: const Text('Удалить из плейлиста'),
+                        items: playlists
+                            .where((e) => e.contains(track))
+                            .map(
+                              (e) => MenuItem<void>(
+                                label: Text(e.title),
+                                onSelected: (_) => e.remove(track),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    const MenuItem(label: Text('Удалить')), // TODO
+                    MenuItem(
+                      label: const Text('Свойства'),
+                      onSelected: (_) => showDialog(
+                        context: context,
+                        builder: (context) => TrackDetails(track),
+                      ),
+                    ),
+                  ];
+                },
+                onTrackPlayed: (index) => audioPlayer.setQueue(
+                  tracks.toList(),
+                  index: index,
+                  play: true,
+                ),
               ),
             ),
-            AnimatedSize(
-              duration: Durations.short3,
-              child: query.isEmpty
-                  ? Builder(
-                      builder: (context) => TextButton.icon(
-                        onPressed: () async {
-                          final sort = await showContextMenu(
-                            context,
-                            contextMenu: ContextMenu<_Sorting>(
-                              entries: [
-                                MenuItem(
-                                  label: Text(sortingToText(.title)),
-                                  value: .title,
-                                ),
-                                MenuItem(
-                                  label: Text(sortingToText(.artist)),
-                                  value: .artist,
-                                ),
-                                MenuItem(
-                                  label: Text(sortingToText(.date)),
-                                  value: .date,
-                                ),
-                              ],
-                              position: context
-                                  .findRenderObject()!
-                                  .globalPaintBounds
-                                  .bottomCenter,
-                            ),
-                          );
-                          if (sort != null && sort != sorting) {
-                            await _onSortingChanged(sort);
-                          }
-                        },
-                        label: Text(sortingToText(sorting)),
-                        icon: const Icon(Icons.sort_rounded),
-                        style: .new(
-                          foregroundColor: .all(
-                            Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox(width: 0),
-            ),
           ],
-        ),
-        Expanded(
-          child: TrackListView(
-            tracks: tracks,
-            controller: controller,
-            showWatchTrack: query.isEmpty,
-            menuEntriesBuilder: (context, index) {
-              final track = tracks[index];
-              return [
-                MenuItem(
-                  label: const Text('Играть следующим'),
-                  onSelected: (_) => audioPlayer.addNext(track),
-                ),
-                if (playlists.isNotEmpty &&
-                    playlists.any((e) => !e.contains(track)))
-                  MenuItem.submenu(
-                    label: const Text('Добавить в плейлист'),
-                    items: playlists
-                        .where((e) => !e.contains(track))
-                        .map(
-                          (e) => MenuItem<void>(
-                            label: Text(e.title),
-                            onSelected: (_) => e.add(track),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                if (playlists.isNotEmpty &&
-                    playlists.any((e) => e.contains(track)))
-                  MenuItem.submenu(
-                    label: const Text('Удалить из плейлиста'),
-                    items: playlists
-                        .where((e) => e.contains(track))
-                        .map(
-                          (e) => MenuItem<void>(
-                            label: Text(e.title),
-                            onSelected: (_) => e.remove(track),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                const MenuItem(label: Text('Удалить')), // TODO
-                MenuItem(
-                  label: const Text('Свойства'),
-                  onSelected: (_) => showDialog(
-                    context: context,
-                    builder: (context) => TrackDetails(track),
-                  ),
-                ),
-              ];
-            },
-            onTrackPlayed: (index) =>
-                audioPlayer.setQueue(tracks.toList(), index: index, play: true),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

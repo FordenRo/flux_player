@@ -56,7 +56,7 @@ class NetworkService {
     final file = File(downloadPath + Platform.pathSeparator + filename)
       ..writeAsBytesSync(data);
     return TrackDownloadResult(
-      track: libraryRepository.getTrackFromFile(file),
+      track: await libraryRepository.getTrackFromFile(file),
       file: file,
     );
   }

@@ -64,10 +64,10 @@ class ConfigRepository {
       await audioPlayer.setPlaylist(playlist!);
     }
     if (config.queue != null) {
-      final queue = config.queue!
+      final queue = await config.queue!
           .where((e) => File(e).existsSync())
           .map((e) => libraryRepository.getTrackFromFile(File(e)))
-          .toList();
+          .wait;
       await audioPlayer.setQueue(queue, index: config.index);
     }
     if (config.looped != null) audioPlayer.setLooped(config.looped!);
@@ -75,7 +75,9 @@ class ConfigRepository {
       audioPlayer.setShuffled(config.shuffled!);
     }
     if (config.position != null) {
-      await audioPlayer.seek(Duration(seconds: config.position!));
+      await Future.microtask(
+        () => audioPlayer.seek(Duration(seconds: config.position!)),
+      );
     }
   }
 

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:audio_metadata_reader/audio_metadata_reader.dart'
     show readMetadata;
@@ -16,7 +18,7 @@ class LibraryRepository {
   List<Track>? _allTracks;
   var _paths = <String>{'C:/Users/FordenRo/Music'};
 
-  List<Track> getAllTracks() => _allTracks ??= _paths
+  Future<List<Track>> getAllTracks() async => _allTracks ??= await _paths
       .map(
         (e) =>
             Directory(e)
@@ -25,17 +27,19 @@ class LibraryRepository {
                 .where((e) => audioExtensions.contains(e.path.split('.').last))
                 .map(getTrackFromFile),
       )
-      .fold(<Track>[], (a, b) => a.followedBy(b).toList())
-      .toList();
+      .fold(<Future<Track>>[], (a, b) => a.followedBy(b).toList())
+      .wait;
 
   List<String> getPaths() => _paths.toList();
 
-  Track getTrackFromFile(File file) =>
-      _cachedTracks?.firstWhere(
-        (e) => e.path == file.path,
-        orElse: () => _loadTrack(file),
-      ) ??
-      _loadTrack(file);
+  Future<Track> getTrackFromFile(File file) async {
+    var track = _cachedTracks.where((e) => e.path == file.path).firstOrNull;
+    if (track == null) {
+      track = await _loadTrack(file);
+      _cachedTracks.add(track);
+    }
+    return track;
+  }
 
   void setPaths(Iterable<String> paths) => _paths = paths.toSet();
 
@@ -50,8 +54,9 @@ class LibraryRepository {
   }
 }
 
-Track _loadTrack(File file) {
-  final metadata = readMetadata(file);
+Future<Track> _loadTrack(File file) async {
+  final metadata = await Isolate.run(() => readMetadata(file, getImage: true));
+
   return .new(
     title: metadata.title!,
     artist: metadata.artist!,
