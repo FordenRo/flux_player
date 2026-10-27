@@ -14,9 +14,10 @@ final libraryRepository = LibraryRepository._();
 class LibraryRepository {
   LibraryRepository._();
 
-  List<Track>? _cachedTracks;
+  final List<Track> _cachedTracks = [];
   List<Track>? _allTracks;
-  var _paths = <String>{'C:/Users/FordenRo/Music'};
+  var _paths = <String>{};
+  final _subscriptions = <StreamSubscription<FileSystemEvent>>[];
 
   Future<List<Track>> getAllTracks() async => _allTracks ??= await _paths
       .map(
@@ -44,12 +45,29 @@ class LibraryRepository {
   void setPaths(Iterable<String> paths) => _paths = paths.toSet();
 
   void addPath(String path) {
+    if (_paths.contains(path)) return;
+
     _paths.add(path);
+    _subscriptions.add(Directory(path).watch().listen(_fileEvent));
     _allTracks = null;
+  }
+
+  void _fileEvent(FileSystemEvent event) {
+    if (event.isDirectory) return;
+    switch (event) {
+      case FileSystemCreateEvent():
+        _allTracks = null;
+      case FileSystemDeleteEvent(:final path):
+        _allTracks = null;
+        _cachedTracks.removeWhere((e) => e.path == path);
+      default:
+        return;
+    }
   }
 
   void removePath(String path) {
     _paths.remove(path);
+    _cachedTracks.removeWhere((e) => e.path == path);
     _allTracks = null;
   }
 }
@@ -58,10 +76,11 @@ Future<Track> _loadTrack(File file) async {
   final metadata = await Isolate.run(() => readMetadata(file, getImage: true));
 
   return .new(
-    title: metadata.title!,
-    artist: metadata.artist!,
+    title: metadata.title ?? file.uri.pathSegments.last,
+    artist: metadata.artist ?? 'No artist',
     path: file.path,
     duration: metadata.duration!,
     album: metadata.album,
+    picture: metadata.pictures.elementAtOrNull(0)?.bytes,
   );
 }
