@@ -5,6 +5,7 @@ pkgdesc="Flux Media Player"
 arch=('x86_64')
 url="https://github.com/FordenRo/flux_player"
 license=("unknown")
+makedepends=('flutter-target-linux')
 source=("git+${url}.git")
 sha256sums=('SKIP')
 
